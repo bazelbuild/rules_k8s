@@ -1,6 +1,8 @@
 # Bazel Kubernetes Rules
 
-[![Build Status](http://ci.bazel.io/buildStatus/icon?job=rules_k8s)](http://ci.bazel.io/job/rules_k8s)
+Travis CI | Bazel CI
+:---: | :---:
+[![Build Status](https://travis-ci.org/bazelbuild/rules_k8s.svg?branch=master)](https://travis-ci.org/bazelbuild/rules_k8s) | [![Build Status](http://ci.bazel.io/buildStatus/icon?job=rules_k8s)](http://ci.bazel.io/job/rules_k8s)
 
 ## Rules
 
