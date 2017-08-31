@@ -13,6 +13,8 @@
 # limitations under the License.
 """Rules for manipulation of K8s constructs."""
 
+load(":with-defaults.bzl", "k8s_defaults")
+
 def k8s_repositories():
   """Download dependencies of k8s rules."""
   pass
