@@ -20,14 +20,28 @@ Add the following to your `WORKSPACE` file to add the necessary external depende
 
 ```python
 git_repository(
-    name = "io_bazel_rules_k8s",
-    remote = "https://github.com/bazelbuild/rules_k8s.git",
+    name = "io_bazel_rules_docker",
     commit = "{HEAD}",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
 )
 
-# TODO(mattmoor): We should be careful to enable folks to do stuff with the template
-# portions of this without requiring a rules_docker dependency (if we can).
+load(
+  "@io_bazel_rules_docker//docker:docker.bzl",
+  "docker_repositories",
+)
+
+docker_repositories()
+
+# This requires rules_docker to be fully instantiated before
+# it is pulled in.
+git_repository(
+    name = "io_bazel_rules_k8s",
+    commit = "{HEAD}",
+    remote = "https://github.com/mattmoor/rules_k8s.git",
+)
+
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
+
 k8s_repositories()
 ```
 
