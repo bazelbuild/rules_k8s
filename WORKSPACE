@@ -13,6 +13,11 @@
 # limitations under the License.
 workspace(name = "io_bazel_rules_k8s")
 
-load("//k8s:k8s.bzl", "k8s_repositories")
+load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 
 k8s_repositories()
+
+k8s_defaults(
+    name = "k8s_deploy",
+    kind = "deployment",
+)

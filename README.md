@@ -6,10 +6,10 @@ Travis CI | Bazel CI
 
 ## Rules
 
+* [k8s_defaults](#k8s_defaults)
 * [k8s_object](#k8s_object)
 
 ## Overview
-
 
 This repository contains rules for interacting with Kubernetes
 configurations / clusters.
@@ -65,6 +65,32 @@ k8s_object(
 )
 ```
 
+### Aliasing (e.g. `k8s_deploy`)
+
+In your `WORKSPACE` you can set up aliases for a more readable short-hand:
+```python
+load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_defaults")
+
+k8s_defaults(
+  # This becomes the name of the @repository and the rule
+  # you will import in your BUILD files.
+  name = "k8s_deploy",
+  kind = "deployment",
+  cluster = "my-gke-cluster",
+)
+```
+
+Then in place of the above, you can use the following in your `BUILD` file:
+
+```python
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
+k8s_deploy(
+  name = "dev",
+  template = ":deployment.yaml",
+)
+```
+
 <a name="k8s_object"></a>
 ## k8s_object
 
@@ -104,6 +130,46 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>yaml or json file; required</code></p>
         <p>The yaml or json for a Kubernetes object.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<a name="k8s_defaults"></a>
+## k8s_defaults
+
+```python
+k8s_defaults(name, kind)
+```
+
+A repository rule that allows users to alias `k8s_object` with default values.
+
+<table class="table table-condensed table-bordered table-params">
+  <colgroup>
+    <col class="col-param" />
+    <col class="param-description" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th colspan="2">Attributes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>
+        <p><code>Name, required</code></p>
+        <p>The name of the repository that this rule will create.</p>
+        <p>Also the name of rule imported from
+	   <code>@name//:defaults.bzl</code></p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>kind</code></td>
+      <td>
+        <p><code>Kind, optional</code></p>
+        <p>The kind of objects the alias of <code>k8s_object</code> handles.</p>
       </td>
     </tr>
   </tbody>

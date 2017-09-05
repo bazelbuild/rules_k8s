@@ -15,10 +15,9 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("//k8s:object.bzl", "k8s_object")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
-k8s_object(
+k8s_deploy(
     name = "staging",
-    kind = "deployment",
     template = "deployment.yaml",
 )
