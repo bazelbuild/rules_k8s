@@ -33,9 +33,10 @@ install:
   - go get -u github.com/bazelbuild/buildifier/buildifier
 
 script:
-  # Check that all of our samples build
+  # Check that all of our tools and samples build
   - bazel clean && bazel build //...
-  # We have no Bazel-based testing currently.
+  # Check that all of our tests pass
+  - bazel clean && bazel test //...
 
   # Check for issues with the format of our bazel config files.
   - buildifier -mode=check $(find . -name BUILD -type f)

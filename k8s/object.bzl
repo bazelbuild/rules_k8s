@@ -23,11 +23,35 @@ def _impl(ctx):
       substitutions = {},
   )
 
-  return struct()
+  ctx.action(
+      command = """cat > {resolve_script} <<"EOF"
+#!/bin/bash -e
+{resolver} --template {yaml}
+EOF""".format(
+        resolver = ctx.executable._resolver.short_path,
+        yaml = ctx.outputs.yaml.short_path,
+        resolve_script = ctx.outputs.executable.path,
+      ),
+      inputs = [],
+      outputs = [ctx.outputs.executable],
+      mnemonic = "ResolveScript"
+  )
+
+
+  return struct(runfiles = ctx.runfiles(files = [
+    ctx.executable._resolver,
+    ctx.outputs.yaml,
+  ]))
 
 _common_attrs = {
     # TODO(mattmoor): Add cluster / namespace once we have executable friends.
     "kind": attr.string(mandatory = True),
+    "_resolver": attr.label(
+        default = Label("//k8s:resolver.par"),
+        cfg = "host",
+        executable = True,
+        allow_files = True,
+    ),
 }
 
 _k8s_object = rule(
@@ -42,7 +66,7 @@ _k8s_object = rule(
         ),
         # TODO(mattmoor): images
     } + _common_attrs,
-    # TODO(mattmoor): Make this executable.
+    executable = True,
     outputs = {
         "yaml": "%{name}.yaml",
     },

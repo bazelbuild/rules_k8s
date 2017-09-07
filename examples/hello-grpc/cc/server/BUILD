@@ -15,36 +15,20 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@subpar//:subpar.bzl", "par_binary")
+load("@io_bazel_rules_docker//docker/contrib/cc:image.bzl", "cc_image")
 
-py_library(
-    name = "resolver_lib",
-    srcs = ["resolver.py"],
-    deps = [
-        "@containerregistry//:containerregistry",
-        "@yaml//:yaml",
-    ],
+cc_image(
+    name = "server",
+    srcs = ["main.cc"],
+    deps = ["//examples/hello-grpc/proto"],
 )
 
-py_test(
-    name = "resolver_test",
-    srcs = ["resolver_test.py"],
-    data = [
-        "//examples/hello-grpc/cc/server:server.tar",
-    ],
-    deps = [
-        ":resolver_lib",
-        "@mock//:mock",
-    ],
-)
+load("@io_bazel_rules_docker//docker:docker.bzl", "docker_push")
 
-par_binary(
-    name = "resolver",
-    srcs = ["resolver.py"],
-    main = "resolver.py",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@containerregistry//:containerregistry",
-        "@yaml//:yaml",
-    ],
+docker_push(
+    name = "push",
+    image = ":server",
+    registry = "us.gcr.io",
+    repository = "rules_k8s/examples/hello-grpc",
+    tag = "cc",
 )
