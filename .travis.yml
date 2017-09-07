@@ -16,23 +16,26 @@ addons:
       - google-cloud-sdk
       - kubectl
 
-
-# TODO(mattmoor): Set up a cluster against which we will integration test PRs.
-# before_install:
-#   # Log into GCR
-#   - docker login -u _json_key -p "${GOOGLE_JSON_KEY}" https://us.gcr.io
-#   # Log into gcloud
-#   - echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
-#   - gcloud auth activate-service-account --key-file keyfile.json
-#   - rm -f keyfile.json
-#   - gcloud config set core/project rules-k8s
-#   - gcloud config set compute/zone us-central1-f
-#   - gcloud container clusters get-credentials my-cluster-name
+before_install:
+  # Log into GCR
+  - docker login -u _json_key -p "${GOOGLE_JSON_KEY}" https://us.gcr.io
+  # Log into gcloud
+  - echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
+  - gcloud auth activate-service-account --key-file keyfile.json
+  - rm -f keyfile.json
+  - gcloud config set core/project rules-k8s
+  - gcloud config set compute/zone us-central1-f
+  - gcloud container clusters get-credentials testing
 
 install:
   - go get -u github.com/bazelbuild/buildifier/buildifier
 
 script:
+  # Check our installs.
+  - bazel version
+  - gcloud version
+  - kubectl version
+
   # Check that all of our tools and samples build
   - bazel clean && bazel build //...
   # Check that all of our tests pass
