@@ -46,4 +46,5 @@ script:
   - buildifier -mode=check $(find . -name WORKSPACE -type f)
   - buildifier -mode=check $(find . -name '*.bzl' -type f)
 
-  # TODO(mattmoor): Run end-to-end testing against the cluster.
+  # Run end-to-end integration testing.
+  - ./examples/hello-grpc/cc/e2e-test.sh
