@@ -20,6 +20,7 @@ import sys
 from containerregistry.client import docker_creds
 from containerregistry.client import docker_name
 from containerregistry.client.v2_2 import docker_image as v2_2_image
+from containerregistry.client.v2_2 import docker_session as v2_2_session
 from containerregistry.tools import patched
 from containerregistry.transport import transport_pool
 
@@ -33,6 +34,13 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
   '--template', action='store',
   help='The template file to resolve.')
+
+parser.add_argument(
+  '--image_spec', action='append',
+  help='Associative lists of the constitutent elements of a FromDisk image.')
+
+_THREADS = 32
+_DOCUMENT_DELIMITER = '---\n'
 
 
 def Resolve(input, tag_to_digest):
@@ -72,8 +80,8 @@ def TagToDigest(tag, overrides, transport):
     return str(overrides[tag])
 
   def fully_qualify_digest(digest):
-    return str(docker_name.Digest('{registry}/{repo}@{digest}'.format(
-      registry=tag.registry, repo=tag.repository, digest=digest)))
+    return docker_name.Digest('{registry}/{repo}@{digest}'.format(
+      registry=tag.registry, repo=tag.repository, digest=digest))
 
   # Resolve the tag to digest using the standard
   # Docker keychain logic.
@@ -91,8 +99,48 @@ def TagToDigest(tag, overrides, transport):
     return digest
 
 
-_THREADS = 32
-_DOCUMENT_DELIMITER = '---\n'
+def Publish(transport,
+            name=None, tarball=None, config=None, digest=None, layer=None):
+  if not name:
+    raise Exception('Expected "name" kwarg')
+
+  if not config and (layer or digest):
+    raise Exception(
+      name + ': Using "layer" or "digest" requires "config" to be specified.')
+
+  if config:
+    with open(config, 'r') as reader:
+      config = reader.read()
+  elif tarball:
+    with v2_2_image.FromTarball(tarball) as base:
+      config = base.config_file()
+  else:
+    raise Exception(name + ': Either "config" or "tarball" must be specified.')
+
+  if digest or layer:
+    digest = digest.split(',')
+    layer = layer.split(',')
+    if len(digest) != len(layer):
+      raise Exception(
+          name + ': "digest" and "layer" must have matching lengths.')
+  else:
+    digest = []
+    layer = []
+
+  name = docker_name.Tag(name)
+
+  # Resolve the appropriate credential to use based on the standard Docker
+  # client logic.
+  creds = docker_creds.DefaultKeychain.Resolve(name)
+
+  with v2_2_session.Push(name, creds, transport, threads=_THREADS) as session:
+    with v2_2_image.FromDisk(config, zip(digest or [], layer or []),
+                             legacy_base=tarball) as v2_2_img:
+      session.upload(v2_2_img)
+
+      return (name, docker_name.Digest('{repository}@{digest}'.format(
+          repository=name.as_repository(),
+          digest=v2_2_img.digest())))
 
 
 def main():
@@ -101,8 +149,13 @@ def main():
   transport = transport_pool.Http(httplib2.Http, size=_THREADS)
 
   overrides = {}
-  # TODO(mattmoor): Support publishing images and using the
-  # published digest to override resolution (to avoid races).
+  # TODO(mattmoor): Execute these in a threadpool and
+  # aggregate the results as they complete.
+  for spec in args.image_spec:
+    parts = spec.split(';')
+    kwargs = dict([x.split('=', 2) for x in parts])
+    (tag, digest) = Publish(transport, **kwargs)
+    overrides[tag] = digest
 
   with open(args.template, 'r') as f:
     inputs = f.read()

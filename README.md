@@ -76,6 +76,13 @@ k8s_object(
 
   # A template of a Kubernetes Deployment object yaml.
   template = ":deployment.yaml",
+
+  # An optional collection of docker_build images to publish
+  # when this target is bazel run.  The digest of the published
+  # image is substituted as a part of the resolution process.
+  images = {
+    "gcr.io/rules_k8s/server:dev": "//server:image"
+  },
 )
 ```
 
@@ -102,8 +109,52 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 k8s_deploy(
   name = "dev",
   template = ":deployment.yaml",
+  images = {
+    "gcr.io/rules_k8s/server:dev": "//server:image"
+  },
 )
 ```
+
+## Usage
+
+This single target exposes a collection of actions.  We will follow the `:dev`
+target from the example above.
+
+### Build
+
+Build builds all of the constituent elements, and makes the template available
+as `{name}.yaml`.  If `template` is a generated input, it will be built.
+Likewise, any `docker_build` images referenced from the `images={}` attribute
+will be built.
+
+```shell
+bazel build :dev
+```
+
+### Resolve
+
+Deploying with tags, especially in production, is a bad practice because they
+are mutable.  If a tag changes, it can lead to inconsistent versions of your app
+running after auto-scaling or auto-healing events.  Thankfully in v2 of the
+Docker Registry, digests were introduced.  Deploying by digest provides
+cryptographic guarantees of consistency across the replicas of a deployment.
+
+You can "resolve" your resource `template` by running:
+
+```shell
+bazel run :dev
+```
+
+The resolved `template` will be printed to `STDOUT`.
+
+This command will publish any `images = {}` present in your rule, substituting
+those exact digests into the yaml template, and for other images resolving the
+tags to digests by reaching out to the appropriate registry.  Any images that
+cannot be found or accessed are left unresolved.
+
+**This process only supports fully-qualified tag names.**  This means you must
+always specify tag and registry domain names (no implicit `:latest`).
+
 
 <a name="k8s_object"></a>
 ## k8s_object
@@ -144,6 +195,16 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>yaml or json file; required</code></p>
         <p>The yaml or json for a Kubernetes object.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>images</code></td>
+      <td>
+        <p><code>string to label dictionary; required</code></p>
+        <p>When this target is <code>bazel run</code> the images
+	   referenced by label will be published to the tag key.</p>
+	<p>The published digests of these images will be substituted
+	   directly, so as to avoid a race in the resolution process</p>
       </td>
     </tr>
   </tbody>

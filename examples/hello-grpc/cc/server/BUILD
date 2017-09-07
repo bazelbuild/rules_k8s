@@ -23,12 +23,12 @@ cc_image(
     deps = ["//examples/hello-grpc/proto"],
 )
 
-load("@io_bazel_rules_docker//docker:docker.bzl", "docker_push")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
-docker_push(
-    name = "push",
-    image = ":server",
-    registry = "us.gcr.io",
-    repository = "rules_k8s/examples/hello-grpc",
-    tag = "cc",
+k8s_deploy(
+    name = "staging",
+    images = {
+        "us.gcr.io/rules_k8s/hello-grpc:staging": ":server",
+    },
+    template = "//examples/hello-grpc:deployment.yaml",
 )
