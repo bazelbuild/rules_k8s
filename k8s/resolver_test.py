@@ -92,7 +92,7 @@ key1:
         tag = docker_name.Tag('gcr.io/foo/bar:baz')
         expected_digest = docker_name.Digest('gcr.io/foo/bar@' + img.digest())
         actual_digest = resolver.TagToDigest(tag, {}, _BAD_TRANSPORT)
-        self.assertEqual(actual_digest, expected_digest)
+        self.assertEqual(actual_digest, str(expected_digest))
 
   def test_publish_legacy(self):
     td = TestData(
