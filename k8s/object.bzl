@@ -47,7 +47,6 @@ def _impl(ctx):
     # Each images entry results in a single --image_spec argument.
     # As part of this walk, we also collect all of the image's input files
     # to include as runfiles, so they are accessible to be pushed.
-    index = 0
     for tag in ctx.attr.images:
       target = ctx.attr.images[tag]
       image = _get_layers(ctx, image_target_dict[target], image_files_dict[target])
@@ -72,7 +71,6 @@ def _impl(ctx):
         "%s=%s" % (k, v)
         for (k, v) in image_spec.items()
       ])]
-      index += 1
 
   ctx.action(
       command = """cat > {resolve_script} <<"EOF"
