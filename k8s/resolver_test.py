@@ -14,13 +14,16 @@
 
 import io
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 import mock
 from containerregistry.client import docker_name
-from containerregistry.client.v2 import docker_image as v2_image
 from containerregistry.client.v2_2 import docker_image as v2_2_image
+from containerregistry.client.v2_2 import docker_session as v2_2_session
+from containerregistry.client.v2_2 import save
 
 from k8s import resolver
 
@@ -31,7 +34,25 @@ def TestData(name):
   return os.path.join(os.environ['TEST_SRCDIR'], name)
 
 
+class NopPush(object):
+
+  def upload(self, unused_image):
+    pass
+
+  def __enter__(self):
+    return self
+
+  def __exit__(self, unused_type, unused_value, unused_traceback):
+    return
+
+
 class ResolverTest(unittest.TestCase):
+
+  def setUp(self):
+    self._tmpdir = tempfile.mkdtemp()
+
+  def tearDown(self):
+    shutil.rmtree(self._tmpdir)
 
   def test_complex_walk(self):
     present = 'gcr.io/foo/bar:baz'
@@ -71,7 +92,36 @@ key1:
         tag = docker_name.Tag('gcr.io/foo/bar:baz')
         expected_digest = docker_name.Digest('gcr.io/foo/bar@' + img.digest())
         actual_digest = resolver.TagToDigest(tag, {}, _BAD_TRANSPORT)
-        self.assertEqual(actual_digest, str(expected_digest))
+        self.assertEqual(actual_digest, expected_digest)
+
+  def test_publish_legacy(self):
+    td = TestData(
+        'io_bazel_rules_k8s/examples/hello-grpc/cc/server/server.tar')
+    name = docker_name.Tag('fake.gcr.io/foo/bar:baz')
+
+    with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
+      (tag, digest) = resolver.Publish(
+          _BAD_TRANSPORT, name=str(name), tarball=td)
+      self.assertEqual(tag, name)
+      with v2_2_image.FromTarball(td) as img:
+        self.assertEqual(digest.digest, img.digest())
+
+  def test_publish_fast(self):
+    td = TestData(
+        'io_bazel_rules_k8s/examples/hello-grpc/cc/server/server.tar')
+    name = docker_name.Tag('fake.gcr.io/foo/bar:baz')
+
+    with v2_2_image.FromTarball(td) as img:
+      (config_path, layer_data) = save.fast(img, self._tmpdir, threads=16)
+      expected_digest = img.digest()
+
+    with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
+      (tag, digest) = resolver.Publish(
+          _BAD_TRANSPORT, name=str(name), config=config_path,
+          digest=','.join([h for (h, unused) in layer_data]),
+          layer=','.join([layer for (unused, layer) in layer_data]))
+      self.assertEqual(tag, name)
+      self.assertEqual(digest.digest, expected_digest)
 
 
 if __name__ == '__main__':
