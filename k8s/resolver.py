@@ -90,13 +90,13 @@ def TagToDigest(tag, overrides, transport):
     if img.exists():
       digest = fully_qualify_digest(img.digest())
       overrides[tag] = digest
-      return digest
+      return str(digest)
 
   # If the tag doesn't exists as v2.2, then try as v2.
   with v2_image.FromRegistry(tag, creds, transport) as img:
     digest = fully_qualify_digest(img.digest())
     overrides[tag] = digest
-    return digest
+    return str(digest)
 
 
 def Publish(transport,
@@ -151,7 +151,7 @@ def main():
   overrides = {}
   # TODO(mattmoor): Execute these in a threadpool and
   # aggregate the results as they complete.
-  for spec in args.image_spec:
+  for spec in args.image_spec or []:
     parts = spec.split(';')
     kwargs = dict([x.split('=', 2) for x in parts])
     (tag, digest) = Publish(transport, **kwargs)

@@ -156,6 +156,45 @@ cannot be found or accessed are left unresolved.
 always specify tag and registry domain names (no implicit `:latest`).
 
 
+### Create
+
+Users can create an environment by running:
+```shell
+bazel run :dev.create
+```
+
+This deploys the **resolved** template, which includes publishing images.
+
+### Update
+
+Users can update (replace) their environment by running:
+```shell
+bazel run :dev.replace
+```
+
+Like `.create` this deploys the **resolved** template, which includes
+republishing images.  **This action is intended to be the workhorse
+of fast-iteration development** (rebuilding / republishing / redeploying).
+
+### Delete
+
+Users can tear down their environment by running:
+```shell
+bazel run :dev.delete
+```
+
+It is notable that despite deleting the deployment, this will NOT delete
+any services currently load balancing over the deployment; this is intentional
+as creating load balancers can be slow.
+
+### Describe
+
+Users can "describe" their environment by running:
+
+```shell
+bazel run :dev.describe
+```
+
 <a name="k8s_object"></a>
 ## k8s_object
 
@@ -188,6 +227,28 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>Kind, required</code></p>
         <p>The kind of the Kubernetes object in the yaml.</p>
+        <p><b>If this is omitted, the <code>create, replace, delete,
+          describe</code> actions will not exist.</b></p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The name of the cluster to which <code>create, replace, delete,
+          describe</code> should speak.</p>
+        <p><b>If this is omitted, the <code>create, replace, delete,
+          describe</code> actions will not exist.</b></p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>namespace</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The namespace on the cluster within which the actions are
+          performed.</p>
+        <p><b>If this is omitted, it will default to
+          <code>"default"</code>.</b></p>
       </td>
     </tr>
     <tr>
@@ -202,9 +263,9 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>string to label dictionary; required</code></p>
         <p>When this target is <code>bazel run</code> the images
-	   referenced by label will be published to the tag key.</p>
-	<p>The published digests of these images will be substituted
-	   directly, so as to avoid a race in the resolution process</p>
+          referenced by label will be published to the tag key.</p>
+       <p>The published digests of these images will be substituted
+          directly, so as to avoid a race in the resolution process</p>
       </td>
     </tr>
   </tbody>
@@ -237,7 +298,7 @@ A repository rule that allows users to alias `k8s_object` with default values.
         <p><code>Name, required</code></p>
         <p>The name of the repository that this rule will create.</p>
         <p>Also the name of rule imported from
-	   <code>@name//:defaults.bzl</code></p>
+          <code>@name//:defaults.bzl</code></p>
       </td>
     </tr>
     <tr>
@@ -245,6 +306,22 @@ A repository rule that allows users to alias `k8s_object` with default values.
       <td>
         <p><code>Kind, optional</code></p>
         <p>The kind of objects the alias of <code>k8s_object</code> handles.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>cluster</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The name of the cluster to which <code>create, replace, delete,
+           describe</code> should speak.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>namespace</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The namespace on the cluster within which the actions are
+           performed.</p>
       </td>
     </tr>
   </tbody>

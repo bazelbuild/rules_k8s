@@ -15,6 +15,13 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
+exports_files([
+    "create.sh.tpl",
+    "replace.sh.tpl",
+    "delete.sh.tpl",
+    "describe.sh.tpl",
+])
+
 load("@subpar//:subpar.bzl", "par_binary")
 
 py_library(

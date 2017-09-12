@@ -53,6 +53,14 @@ def _impl(repository_ctx):
   repository_ctx.file("BUILD", "")
 
   overrides = []
+  if repository_ctx.attr.cluster:
+    overrides += [_override(repository_ctx.attr.name,
+                            "cluster", repository_ctx.attr.cluster)]
+
+  if repository_ctx.attr.namespace:
+    overrides += [_override(repository_ctx.attr.name,
+                            "namespace", repository_ctx.attr.namespace)]
+
   if repository_ctx.attr.kind:
     overrides += [_override(repository_ctx.attr.name,
                             "kind", repository_ctx.attr.kind)]
@@ -73,6 +81,8 @@ def {name}(**kwargs):
 k8s_defaults = repository_rule(
     attrs = {
         "kind": attr.string(mandatory = False),
+        "cluster": attr.string(mandatory = False),
+        "namespace": attr.string(mandatory = False),
     },
     implementation = _impl,
 )

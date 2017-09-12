@@ -96,9 +96,36 @@ EOF""".format(
     ctx.outputs.yaml,
   ] + all_inputs))
 
+def _common_impl(ctx):
+  substitutions = {
+      "%{cluster}": ctx.attr.cluster,
+      "%{namespace}": ctx.attr.namespace,
+      "%{kind}": ctx.attr.kind,
+  }
+  files = [ctx.executable._resolver]
+
+  if hasattr(ctx.executable, "resolved"):
+    substitutions["%{resolve_script}"] = ctx.executable.resolved.short_path
+    files += [ctx.executable.resolved]
+    files += list(ctx.attr.resolved.default_runfiles.files)
+
+  if hasattr(ctx.files, "unresolved"):
+    substitutions["%{unresolved}"] = ctx.files.unresolved[0].short_path
+    files += ctx.files.unresolved
+
+  ctx.actions.expand_template(
+      template = ctx.file._template,
+      substitutions = substitutions,
+      output = ctx.outputs.executable,
+  )
+  return struct(runfiles = ctx.runfiles(files = files))
+
 _common_attrs = {
-    # TODO(mattmoor): Add cluster / namespace once we have executable friends.
-    "kind": attr.string(mandatory = True),
+    # We allow namespace / cluster / kind to be omitted, and we just
+    # don't expose the extra actions.
+    "namespace": attr.string(default = "default"),
+    "cluster": attr.string(),
+    "kind": attr.string(),
     "_resolver": attr.label(
         default = Label("//k8s:resolver.par"),
         cfg = "host",
@@ -121,12 +148,80 @@ _k8s_object = rule(
         # Implicit dependencies.
         "image_targets": attr.label_list(allow_files = True),
         "image_target_strings": attr.string_list(),
-    } + _common_attrs,
+    } + _common_attrs + _layer_tools,
     executable = True,
     outputs = {
         "yaml": "%{name}.yaml",
     },
     implementation = _impl,
+)
+
+_k8s_object_create = rule(
+    attrs = {
+        "resolved": attr.label(
+            cfg = "target",
+            executable = True,
+            allow_files = True,
+        ),
+        "_template": attr.label(
+            default = Label("//k8s:create.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
+    } + _common_attrs,
+    executable = True,
+    implementation = _common_impl,
+)
+
+_k8s_object_replace = rule(
+    attrs = {
+        "resolved": attr.label(
+            cfg = "target",
+            executable = True,
+            allow_files = True,
+        ),
+        "_template": attr.label(
+            default = Label("//k8s:replace.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
+    } + _common_attrs,
+    executable = True,
+    implementation = _common_impl,
+)
+
+_k8s_object_describe = rule(
+    attrs = {
+        "unresolved": attr.label(
+            allow_files = [".yaml"],
+            single_file = True,
+            mandatory = True,
+        ),
+        "_template": attr.label(
+            default = Label("//k8s:describe.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
+    } + _common_attrs,
+    executable = True,
+    implementation = _common_impl,
+)
+
+_k8s_object_delete = rule(
+    attrs = {
+        "unresolved": attr.label(
+            allow_files = [".yaml"],
+            single_file = True,
+            mandatory = True,
+        ),
+        "_template": attr.label(
+            default = Label("//k8s:delete.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
+    } + _common_attrs,
+    executable = True,
+    implementation = _common_impl,
 )
 
 def k8s_object(name, **kwargs):
@@ -147,3 +242,17 @@ def k8s_object(name, **kwargs):
   kwargs["image_target_strings"] = list(set(kwargs.get("images", {}).values()))
 
   _k8s_object(name=name, **kwargs)
+
+  if "cluster" in kwargs and "kind" in kwargs:
+    _k8s_object_create(name=name + ".create", resolved=name,
+                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
+                       namespace=kwargs.get("namespace"))
+    _k8s_object_delete(name=name + ".delete", unresolved=name + ".yaml",
+                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
+                       namespace=kwargs.get("namespace"))
+    _k8s_object_describe(name=name + ".describe", unresolved=name + ".yaml",
+                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
+                       namespace=kwargs.get("namespace"))
+    _k8s_object_replace(name=name + ".replace", resolved=name,
+                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
+                        namespace=kwargs.get("namespace"))
