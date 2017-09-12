@@ -44,7 +44,7 @@ function delete() {
 
 create
 trap "delete" EXIT
-sleep 3
+sleep 25
 check_msg
 
 for i in $RANDOM $RANDOM; do
