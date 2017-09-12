@@ -83,10 +83,22 @@ load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cpp_proto_repositories")
 
 cpp_proto_repositories()
 
-# We use cc_image to build our sample service
+load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_repositories")
+
+java_proto_repositories()
+
+# We use cc_image to build a sample service
 load(
     "@io_bazel_rules_docker//docker/contrib/cc:image.bzl",
     _cc_image_repos = "repositories",
 )
 
 _cc_image_repos()
+
+# We use java_image to build a sample service
+load(
+    "@io_bazel_rules_docker//docker/contrib/java:image.bzl",
+    _java_image_repos = "repositories",
+)
+
+_java_image_repos()
