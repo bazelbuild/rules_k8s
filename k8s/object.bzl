@@ -96,60 +96,29 @@ EOF""".format(
     ctx.outputs.yaml,
   ] + all_inputs))
 
-def _common_impl(ctx, template):
-  kwargs = {
-      "cluster": ctx.attr.cluster,
-      "namespace": ctx.attr.namespace,
-      "script": ctx.outputs.executable.path,
-      "kind": ctx.attr.kind,
+def _common_impl(ctx):
+  substitutions = {
+      "%{cluster}": ctx.attr.cluster,
+      "%{namespace}": ctx.attr.namespace,
+      "%{kind}": ctx.attr.kind,
   }
   files = [ctx.executable._resolver]
 
   if hasattr(ctx.executable, "resolved"):
-    kwargs["resolve_script"] = ctx.executable.resolved.short_path
+    substitutions["%{resolve_script}"] = ctx.executable.resolved.short_path
     files += [ctx.executable.resolved]
     files += list(ctx.attr.resolved.default_runfiles.files)
 
   if hasattr(ctx.files, "unresolved"):
-    kwargs["unresolved"] = ctx.files.unresolved[0].short_path
+    substitutions["%{unresolved}"] = ctx.files.unresolved[0].short_path
     files += ctx.files.unresolved
 
-  ctx.action(
-      command = template.format(**kwargs),
-      outputs = [ctx.outputs.executable],
+  ctx.actions.expand_template(
+      template = ctx.file._template,
+      substitutions = substitutions,
+      output = ctx.outputs.executable,
   )
   return struct(runfiles = ctx.runfiles(files = files))
-
-def _create_impl(ctx):
-  return _common_impl(ctx, """cat > {script} <<"EOF"
-#!/bin/bash -e
-set -o pipefail
-./{resolve_script} | \
-  kubectl --cluster="{cluster}" --namespace="{namespace}" create -f -
-EOF""")
-
-def _replace_impl(ctx):
-  return _common_impl(ctx, """cat > {script} <<"EOF"
-#!/bin/bash -e
-set -o pipefail
-./{resolve_script} | \
-  kubectl --cluster="{cluster}" --namespace="{namespace}" replace -f -
-EOF""")
-
-def _describe_impl(ctx):
-  return _common_impl(ctx, """cat > {script} <<"EOF"
-#!/bin/bash -e
-set -o pipefail
-kubectl --cluster="{cluster}" --namespace="{namespace}" describe {kind} \
-  "$(kubectl create --dry-run -f "{unresolved}" | cut -d'"' -f 2)"
-EOF""")
-
-def _delete_impl(ctx):
-  return _common_impl(ctx, """cat > {script} <<"EOF"
-#!/bin/bash -e
-set -o pipefail
-kubectl --cluster="{cluster}" --namespace="{namespace}" delete -f "{unresolved}"
-EOF""")
 
 _common_attrs = {
     # We allow namespace / cluster / kind to be omitted, and we just
@@ -194,9 +163,14 @@ _k8s_object_create = rule(
             executable = True,
             allow_files = True,
         ),
+        "_template": attr.label(
+            default = Label("//k8s:create.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
     } + _common_attrs,
     executable = True,
-    implementation = _create_impl,
+    implementation = _common_impl,
 )
 
 _k8s_object_replace = rule(
@@ -206,9 +180,14 @@ _k8s_object_replace = rule(
             executable = True,
             allow_files = True,
         ),
+        "_template": attr.label(
+            default = Label("//k8s:replace.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
     } + _common_attrs,
     executable = True,
-    implementation = _replace_impl,
+    implementation = _common_impl,
 )
 
 _k8s_object_describe = rule(
@@ -218,9 +197,14 @@ _k8s_object_describe = rule(
             single_file = True,
             mandatory = True,
         ),
+        "_template": attr.label(
+            default = Label("//k8s:describe.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
     } + _common_attrs,
     executable = True,
-    implementation = _describe_impl,
+    implementation = _common_impl,
 )
 
 _k8s_object_delete = rule(
@@ -230,9 +214,14 @@ _k8s_object_delete = rule(
             single_file = True,
             mandatory = True,
         ),
+        "_template": attr.label(
+            default = Label("//k8s:delete.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
     } + _common_attrs,
     executable = True,
-    implementation = _delete_impl,
+    implementation = _common_impl,
 )
 
 def k8s_object(name, **kwargs):
