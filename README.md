@@ -115,6 +115,40 @@ k8s_deploy(
 )
 ```
 
+### Developer Environments
+
+A common practice to avoid clobbering other users is to do your development
+against an isolated environment.  Two practices are fairly common-place.
+1. Individual development clusters
+1. Development "namespaces"
+
+To support these scenarios, the rules support using "stamping" variables to
+customize these arguments to `k8s_defaults` or `k8s_object`.
+
+For per-developer clusters, you might use:
+```python
+k8s_defaults(
+  name = "k8s_dev_deploy",
+  kind = "deployment",
+  cluster = "gke_dev-proj_us-central5-z_{BUILD_USER}",
+)
+```
+
+For per-developer namespaces, you might use:
+```python
+k8s_defaults(
+  name = "k8s_dev_deploy",
+  kind = "deployment",
+  cluster = "shared-cluster",
+  namespace = "{BUILD_USER}",
+)
+```
+
+For more information on "stamping", you can see also the `rules_docker`
+documentation on stamping [here](
+https://github.com/bazelbuild/rules_docker#stamping).
+
+
 ## Usage
 
 This single target exposes a collection of actions.  We will follow the `:dev`
