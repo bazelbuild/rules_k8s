@@ -23,7 +23,7 @@ function create() {
 function check_msg() {
    bazel build examples/hello-grpc/${LANGUAGE}/client
 
-   OUTPUT=$(./bazel-bin/examples/hello-grpc/${LANGUAGE}/client/client 2>&1)
+   OUTPUT=$(./bazel-bin/examples/hello-grpc/${LANGUAGE}/client/client)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
@@ -44,7 +44,7 @@ function delete() {
 
 create
 trap "delete" EXIT
-sleep 3
+sleep 25
 check_msg
 
 for i in $RANDOM $RANDOM; do

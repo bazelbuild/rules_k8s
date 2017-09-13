@@ -52,7 +52,7 @@ public class HelloClient {
 	FooReply response;
 	try {
 	    response = blockingStub.foo(request);
-	    logger.info("Foo(" + name + "): " + response.getMessage());
+	    System.out.println("Foo(" + name + "): " + response.getMessage());
 	    return response.getMessage();
 	} catch (StatusRuntimeException e) {
 	    String msg = "RPC failed: " + e.getStatus();

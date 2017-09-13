@@ -49,3 +49,4 @@ script:
   # Run end-to-end integration testing.
   - ./examples/hello-grpc/e2e-test.sh cc
   - ./examples/hello-grpc/e2e-test.sh java
+  - ./examples/hello-grpc/e2e-test.sh go

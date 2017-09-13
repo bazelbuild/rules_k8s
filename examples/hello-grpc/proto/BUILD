@@ -17,3 +17,13 @@ java_proto_library(
         "simple.proto",
     ],
 )
+
+load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_library")
+
+go_proto_library(
+    name = "go",
+    importpath = "github.com/bazelbuild/rules_k8s/examples/hello-grpc/proto/go",
+    protos = [
+        "simple.proto",
+    ],
+)

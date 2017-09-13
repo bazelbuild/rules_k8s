@@ -23,7 +23,7 @@ git_repository(
 
 git_repository(
     name = "io_bazel_rules_docker",
-    commit = "27b494ceefedd35b0ae72100860997f7ab1bf714",
+    commit = "65df68f4f64e9c59eb571290eb86bf07766393b6",
     remote = "https://github.com/bazelbuild/rules_docker.git",
 )
 
@@ -70,8 +70,29 @@ py_library(
 # ================================================================
 
 git_repository(
+    name = "io_bazel_rules_go",
+    commit = "ae70411645c171b2056d38a6a959e491949f9afe",
+    remote = "https://github.com/bazelbuild/rules_go.git",
+)
+
+load(
+    "@io_bazel_rules_go//go:def.bzl",
+    "go_repositories",
+)
+
+go_repositories()
+
+# We use go_image to build a sample service
+load(
+    "@io_bazel_rules_docker//docker/contrib/go:image.bzl",
+    _go_image_repos = "repositories",
+)
+
+_go_image_repos()
+
+git_repository(
     name = "org_pubref_rules_protobuf",
-    commit = "be63ed9cb3140ec23e4df5118fca9a3f98640cf6",
+    commit = "5b1ca3aae51cb1b5d9e79e4280ddc705407af136",
     remote = "https://github.com/pubref/rules_protobuf.git",
 )
 
@@ -102,3 +123,15 @@ load(
 )
 
 _java_image_repos()
+
+load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_repositories")
+
+go_proto_repositories()
+
+# We use go_image to build a sample service
+load(
+    "@io_bazel_rules_docker//docker/contrib/go:image.bzl",
+    _go_image_repos = "repositories",
+)
+
+_go_image_repos()
