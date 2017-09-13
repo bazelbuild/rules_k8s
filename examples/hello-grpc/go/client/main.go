@@ -16,6 +16,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 
 	pb "github.com/bazelbuild/rules_k8s/examples/hello-grpc/proto/go"
@@ -45,5 +46,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Foo: %v", err)
 	}
-	log.Printf("Foo(%s): %s", *name, fooRep.Message)
+	fmt.Printf("Foo(%s): %s\n", *name, fooRep.Message)
 }
