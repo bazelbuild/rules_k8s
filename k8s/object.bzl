@@ -23,6 +23,13 @@ load(
     _string_to_label = "string_to_label",
 )
 
+def _deduplicate(iterable):
+  """
+  Performs a deduplication (similar to `list(set(...))`,
+  but `set` is not available in Skylark).
+  """
+  return {k: None for k in iterable}.keys()
+
 def _impl(ctx):
   """Core implementation of k8s_object."""
 
@@ -238,8 +245,8 @@ def k8s_object(name, **kwargs):
     if reserved in kwargs:
       fail("reserved for internal use by docker_bundle macro", attr=reserved)
 
-  kwargs["image_targets"] = list(set(kwargs.get("images", {}).values()))
-  kwargs["image_target_strings"] = list(set(kwargs.get("images", {}).values()))
+  kwargs["image_targets"] = _deduplicate(kwargs.get("images", {}).values())
+  kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
   _k8s_object(name=name, **kwargs)
 
