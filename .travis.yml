@@ -47,4 +47,5 @@ script:
   - buildifier -mode=check $(find . -name '*.bzl' -type f)
 
   # Run end-to-end integration testing.
-  - ./examples/hello-grpc/cc/e2e-test.sh
+  - ./examples/hello-grpc/e2e-test.sh cc
+  - ./examples/hello-grpc/e2e-test.sh java

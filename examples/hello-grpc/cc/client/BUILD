@@ -19,7 +19,7 @@ cc_library(
     name = "simple_lib",
     srcs = ["simple.cc"],
     hdrs = ["simple.h"],
-    deps = ["//examples/hello-grpc/proto"],
+    deps = ["//examples/hello-grpc/proto:cc"],
 )
 
 cc_binary(

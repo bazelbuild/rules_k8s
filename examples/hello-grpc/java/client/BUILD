@@ -1,5 +1,3 @@
-#!/bin/bash -e
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+package(default_visibility = ["//visibility:public"])
 
-SUFFIX="$1"
+licenses(["notice"])  # Apache 2.0
 
-sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/hello-grpc/cc/server/main.cc
+java_binary(
+    name = "client",
+    srcs = ["HelloClient.java"],
+    main_class = "io.bazel.rules_k8s.examples.helloworld.java.client.HelloClient",
+    deps = [
+        "//examples/hello-grpc/proto:java",
+        "//examples/hello-grpc/proto:java_compile_imports",
+        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+    ],
+)

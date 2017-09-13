@@ -14,29 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+LANGUAGE="$1"
+
 function create() {
-   bazel run examples/hello-grpc/cc/server:staging.create
+   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.create
 }
 
 function check_msg() {
-   bazel build examples/hello-grpc/cc/client
+   bazel build examples/hello-grpc/${LANGUAGE}/client
 
-   OUTPUT=$(./bazel-bin/examples/hello-grpc/cc/client/client)
+   OUTPUT=$(./bazel-bin/examples/hello-grpc/${LANGUAGE}/client/client 2>&1)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
 function edit() {
-   ./examples/hello-grpc/cc/server/edit.sh "$1"
+   ./examples/hello-grpc/${LANGUAGE}/server/edit.sh "$1"
 }
 
 function update() {
-   bazel run examples/hello-grpc/cc/server:staging.replace
+   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.replace
 }
 
 function delete() {
-   bazel run examples/hello-grpc/cc/server:staging.describe
-   bazel run examples/hello-grpc/cc/server:staging.delete
+   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.describe
+   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.delete
 }
 
 
@@ -52,3 +54,6 @@ for i in $RANDOM $RANDOM; do
   sleep 25
   check_msg "$i"
 done
+
+# Replace the trap with a success message.
+trap "delete; echo PASS" EXIT
