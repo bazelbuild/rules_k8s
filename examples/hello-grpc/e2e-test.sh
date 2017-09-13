@@ -16,6 +16,11 @@
 
 LANGUAGE="$1"
 
+function get_lb_ip() {
+    kubectl --namespace=${USER} get service hello-grpc-staging \
+	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+}
+
 function create() {
    bazel run examples/hello-grpc/${LANGUAGE}/server:staging.create
 }
@@ -23,7 +28,7 @@ function create() {
 function check_msg() {
    bazel build examples/hello-grpc/${LANGUAGE}/client
 
-   OUTPUT=$(./bazel-bin/examples/hello-grpc/${LANGUAGE}/client/client)
+   OUTPUT=$(./bazel-bin/examples/hello-grpc/${LANGUAGE}/client/client $(get_lb_ip))
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
