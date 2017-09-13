@@ -42,6 +42,7 @@ k8s_defaults(
     name = "k8s_deploy",
     cluster = "gke_rules-k8s_us-central1-f_testing",
     kind = "deployment",
+    namespace = "{BUILD_USER}",
 )
 
 new_http_archive(

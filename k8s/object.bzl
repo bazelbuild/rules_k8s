@@ -103,13 +103,45 @@ EOF""".format(
     ctx.outputs.yaml,
   ] + all_inputs))
 
+def _resolve(ctx, string, output):
+  stamps = [ctx.info_file, ctx.version_file]
+  stamp_args = [
+    "--stamp-info-file=%s" % sf.path
+    for sf in stamps
+  ]
+  ctx.action(
+    executable = ctx.executable._stamper,
+    arguments = [
+      "--format=%s" % string,
+      "--output=%s" % output.path,
+    ] + stamp_args,
+    inputs = [ctx.executable._stamper] + stamps,
+    outputs = [output],
+    mnemonic = "Stamp"
+  )
+
 def _common_impl(ctx):
+  files = [ctx.executable._resolver]
+
+  cluster_arg = ctx.attr.cluster
+  if "{" in ctx.attr.cluster:
+    cluster_file = ctx.new_file(ctx.label.name + ".cluster-name")
+    _resolve(ctx, ctx.attr.cluster, cluster_file)
+    cluster_arg = "$(cat %s)" % cluster_file.short_path
+    files += [cluster_file]
+
+  namespace_arg = ctx.attr.namespace
+  if "{" in ctx.attr.namespace:
+    namespace_file = ctx.new_file(ctx.label.name + ".namespace-name")
+    _resolve(ctx, ctx.attr.namespace, namespace_file)
+    namespace_arg = "$(cat %s)" % namespace_file.short_path
+    files += [namespace_file]
+
   substitutions = {
-      "%{cluster}": ctx.attr.cluster,
-      "%{namespace}": ctx.attr.namespace,
+      "%{cluster}": cluster_arg,
+      "%{namespace}": namespace_arg,
       "%{kind}": ctx.attr.kind,
   }
-  files = [ctx.executable._resolver]
 
   if hasattr(ctx.executable, "resolved"):
     substitutions["%{resolve_script}"] = ctx.executable.resolved.short_path
@@ -135,6 +167,12 @@ _common_attrs = {
     "kind": attr.string(),
     "_resolver": attr.label(
         default = Label("//k8s:resolver.par"),
+        cfg = "host",
+        executable = True,
+        allow_files = True,
+    ),
+    "_stamper": attr.label(
+        default = Label("//k8s:stamper.par"),
         cfg = "host",
         executable = True,
         allow_files = True,
