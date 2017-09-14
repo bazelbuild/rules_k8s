@@ -27,3 +27,12 @@ go_proto_library(
         "simple.proto",
     ],
 )
+
+load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_library")
+
+py_proto_library(
+    name = "py",
+    protos = [
+        "simple.proto",
+    ],
+)

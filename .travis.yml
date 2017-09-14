@@ -50,3 +50,4 @@ script:
   - ./examples/hellogrpc/e2e-test.sh cc
   - ./examples/hellogrpc/e2e-test.sh java
   - ./examples/hellogrpc/e2e-test.sh go
+  - ./examples/hellogrpc/e2e-test.sh py

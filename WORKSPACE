@@ -23,7 +23,7 @@ git_repository(
 
 git_repository(
     name = "io_bazel_rules_docker",
-    commit = "65df68f4f64e9c59eb571290eb86bf07766393b6",
+    commit = "7fc2bd0338f2c866ebd6b5ec5c2b486e72d40ffd",
     remote = "https://github.com/bazelbuild/rules_docker.git",
 )
 
@@ -71,29 +71,8 @@ py_library(
 # ================================================================
 
 git_repository(
-    name = "io_bazel_rules_go",
-    commit = "ae70411645c171b2056d38a6a959e491949f9afe",
-    remote = "https://github.com/bazelbuild/rules_go.git",
-)
-
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_repositories",
-)
-
-go_repositories()
-
-# We use go_image to build a sample service
-load(
-    "@io_bazel_rules_docker//docker/contrib/go:image.bzl",
-    _go_image_repos = "repositories",
-)
-
-_go_image_repos()
-
-git_repository(
     name = "org_pubref_rules_protobuf",
-    commit = "5b1ca3aae51cb1b5d9e79e4280ddc705407af136",
+    commit = "7b53cea2a65df74dc71e408e2de66345a54753cc",
     remote = "https://github.com/pubref/rules_protobuf.git",
 )
 
@@ -125,9 +104,18 @@ load(
 
 _java_image_repos()
 
-load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_repositories")
+git_repository(
+    name = "io_bazel_rules_go",
+    commit = "ae70411645c171b2056d38a6a959e491949f9afe",
+    remote = "https://github.com/bazelbuild/rules_go.git",
+)
 
-go_proto_repositories()
+load(
+    "@io_bazel_rules_go//go:def.bzl",
+    "go_repositories",
+)
+
+go_repositories()
 
 # We use go_image to build a sample service
 load(
@@ -136,3 +124,42 @@ load(
 )
 
 _go_image_repos()
+
+load("@org_pubref_rules_protobuf//go:rules.bzl", "go_proto_repositories")
+
+go_proto_repositories()
+
+git_repository(
+    name = "io_bazel_rules_python",
+    commit = "7f4cc9244dac7637d514e4f86364507681dda37e",
+    remote = "https://github.com/bazelbuild/rules_python.git",
+)
+
+load(
+    "@io_bazel_rules_python//python:pip.bzl",
+    "pip_import",
+    "pip_repositories",
+)
+
+pip_repositories()
+
+pip_import(
+    name = "examples_helloworld_pip",
+    requirements = "//examples/hellogrpc/py:requirements.txt",
+)
+
+load("@examples_helloworld_pip//:requirements.bzl", "pip_install")
+
+pip_install()
+
+# We use py_image to build a sample service
+load(
+    "@io_bazel_rules_docker//docker/contrib/python:image.bzl",
+    _py_image_repos = "repositories",
+)
+
+_py_image_repos()
+
+load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_repositories")
+
+py_proto_repositories()
