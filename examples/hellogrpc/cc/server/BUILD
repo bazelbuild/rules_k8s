@@ -15,17 +15,12 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//docker/contrib/java:image.bzl", "java_image")
+load("@io_bazel_rules_docker//docker/contrib/cc:image.bzl", "cc_image")
 
-java_image(
+cc_image(
     name = "server",
-    srcs = ["HelloServer.java"],
-    main_class = "io.bazel.rules_k8s.examples.helloworld.java.server.HelloServer",
-    deps = [
-        "//examples/hello-grpc/proto:java",
-        "//examples/hello-grpc/proto:java_compile_imports",
-        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
-    ],
+    srcs = ["main.cc"],
+    deps = ["//examples/hellogrpc/proto:cc"],
 )
 
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
@@ -35,5 +30,5 @@ k8s_deploy(
     images = {
         "us.gcr.io/rules_k8s/hello-grpc:staging": ":server",
     },
-    template = "//examples/hello-grpc:deployment.yaml",
+    template = "//examples/hellogrpc:deployment.yaml",
 )

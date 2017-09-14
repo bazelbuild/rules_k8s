@@ -6,9 +6,9 @@ load("@org_pubref_rules_protobuf//go:rules.bzl", "GRPC_COMPILE_DEPS")
 go_image(
     name = "server",
     srcs = ["main.go"],
-    importpath = "github.com/bazelbuild/rules_k8s/rules_k8s/examples/hello-grpc/go/server",
+    importpath = "github.com/bazelbuild/rules_k8s/rules_k8s/examples/hellogrpc/go/server",
     deps = [
-        "//examples/hello-grpc/proto:go",
+        "//examples/hellogrpc/proto:go",
     ] + GRPC_COMPILE_DEPS,
 )
 
@@ -19,5 +19,5 @@ k8s_deploy(
     images = {
         "us.gcr.io/rules_k8s/hello-grpc:staging": ":server",
     },
-    template = "//examples/hello-grpc:deployment.yaml",
+    template = "//examples/hellogrpc:deployment.yaml",
 )

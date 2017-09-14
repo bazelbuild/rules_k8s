@@ -19,7 +19,7 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/bazelbuild/rules_k8s/examples/hello-grpc/proto/go"
+	pb "github.com/bazelbuild/rules_k8s/examples/hellogrpc/proto/go"
 	"google.golang.org/grpc"
 )
 

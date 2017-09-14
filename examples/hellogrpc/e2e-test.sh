@@ -22,28 +22,28 @@ function get_lb_ip() {
 }
 
 function create() {
-   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.create
+   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.create
 }
 
 function check_msg() {
-   bazel build examples/hello-grpc/${LANGUAGE}/client
+   bazel build examples/hellogrpc/${LANGUAGE}/client
 
-   OUTPUT=$(./bazel-bin/examples/hello-grpc/${LANGUAGE}/client/client $(get_lb_ip))
+   OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
 function edit() {
-   ./examples/hello-grpc/${LANGUAGE}/server/edit.sh "$1"
+   ./examples/hellogrpc/${LANGUAGE}/server/edit.sh "$1"
 }
 
 function update() {
-   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.replace
+   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.replace
 }
 
 function delete() {
-   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.describe
-   bazel run examples/hello-grpc/${LANGUAGE}/server:staging.delete
+   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe
+   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.delete
 }
 
 

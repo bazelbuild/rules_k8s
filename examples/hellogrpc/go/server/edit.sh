@@ -16,4 +16,4 @@
 
 SUFFIX="$1"
 
-sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/hello-grpc/cc/server/main.cc
+sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/hellogrpc/go/server/main.go

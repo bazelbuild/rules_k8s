@@ -37,7 +37,7 @@ py_test(
     name = "resolver_test",
     srcs = ["resolver_test.py"],
     data = [
-        "//examples/hello-grpc/cc/server:server.tar",
+        "//examples/hellogrpc/cc/server:server.tar",
     ],
     deps = [
         ":resolver_lib",
