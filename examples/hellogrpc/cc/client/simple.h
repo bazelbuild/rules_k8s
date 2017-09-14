@@ -19,8 +19,8 @@
 #include <string>
 #include <grpc++/grpc++.h>
 
-#include "examples/hello-grpc/proto/simple.pb.h"
-#include "examples/hello-grpc/proto/simple.grpc.pb.h"
+#include "examples/hellogrpc/proto/simple.pb.h"
+#include "examples/hellogrpc/proto/simple.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;

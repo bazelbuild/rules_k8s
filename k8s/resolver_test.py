@@ -84,7 +84,7 @@ key1:
 
   def test_tag_to_digest_not_cached(self):
     with v2_2_image.FromTarball(TestData(
-        'io_bazel_rules_k8s/examples/hello-grpc/cc/server/server.tar')) as img:
+        'io_bazel_rules_k8s/examples/hellogrpc/cc/server/server.tar')) as img:
       # Add a fake exists method to look like FromRegistry
       img.exists = lambda: True
       with mock.patch.object(v2_2_image, 'FromRegistry',
@@ -96,7 +96,7 @@ key1:
 
   def test_publish_legacy(self):
     td = TestData(
-        'io_bazel_rules_k8s/examples/hello-grpc/cc/server/server.tar')
+        'io_bazel_rules_k8s/examples/hellogrpc/cc/server/server.tar')
     name = docker_name.Tag('fake.gcr.io/foo/bar:baz')
 
     with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
@@ -108,7 +108,7 @@ key1:
 
   def test_publish_fast(self):
     td = TestData(
-        'io_bazel_rules_k8s/examples/hello-grpc/cc/server/server.tar')
+        'io_bazel_rules_k8s/examples/hellogrpc/cc/server/server.tar')
     name = docker_name.Tag('fake.gcr.io/foo/bar:baz')
 
     with v2_2_image.FromTarball(td) as img:

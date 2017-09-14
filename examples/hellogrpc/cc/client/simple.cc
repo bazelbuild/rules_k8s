@@ -13,7 +13,7 @@
 // limitations under the License.
 #include <iostream>
 
-#include "examples/hello-grpc/cc/client/simple.h"
+#include "examples/hellogrpc/cc/client/simple.h"
 
 // Constructor with "initialization list"
 SimpleClient::SimpleClient(std::shared_ptr<Channel> channel)

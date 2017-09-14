@@ -15,20 +15,15 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//docker/contrib/cc:image.bzl", "cc_image")
-
-cc_image(
-    name = "server",
-    srcs = ["main.cc"],
-    deps = ["//examples/hello-grpc/proto:cc"],
+cc_library(
+    name = "simple_lib",
+    srcs = ["simple.cc"],
+    hdrs = ["simple.h"],
+    deps = ["//examples/hellogrpc/proto:cc"],
 )
 
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
-
-k8s_deploy(
-    name = "staging",
-    images = {
-        "us.gcr.io/rules_k8s/hello-grpc:staging": ":server",
-    },
-    template = "//examples/hello-grpc:deployment.yaml",
+cc_binary(
+    name = "client",
+    srcs = ["main.cc"],
+    deps = [":simple_lib"],
 )
