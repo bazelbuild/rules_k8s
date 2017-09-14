@@ -15,24 +15,24 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	pb "github.com/bazelbuild/rules_k8s/examples/hello-grpc/proto/go"
 	"google.golang.org/grpc"
 )
 
-var (
-	addr = flag.String("addr", "104.154.73.154:50051", "Server address to connect to")
-	name = flag.String("name", "world", "Name to send")
-)
-
 func main() {
-	flag.Parse()
 	ctx := context.Background()
 
-	conn, err := grpc.Dial(*addr, grpc.WithInsecure())
+	if len(os.Args) != 2 {
+		log.Fatalf("Expected a single IP argument")
+	}
+
+	addr := os.Args[1]
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:50051", addr), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Dial: %v", err)
 	}
@@ -41,10 +41,10 @@ func main() {
 	client := pb.NewSimpleClient(conn)
 
 	fooRep, err := client.Foo(ctx, &pb.FooRequest{
-		Name: *name,
+		Name: "world",
 	})
 	if err != nil {
 		log.Fatalf("Foo: %v", err)
 	}
-	fmt.Printf("Foo(%s): %s\n", *name, fooRep.Message)
+	fmt.Printf("Foo(%s): %s\n", "world", fooRep.Message)
 }

@@ -16,11 +16,18 @@
 #include "examples/hello-grpc/cc/client/simple.h"
 
 int main(int argc, char** argv) {
+  if (argc != 2) {
+    std::cerr << "Expected single IP address argument." << std::endl;
+    return 1;
+  }
+  std::string address(argv[1]);
+  address.append(":50051");
+
   // Instantiate the client. It requires a channel, out of which the
   // actual RPCs are created. This channel models a connection to an
   // endpoint (in this case, localhost at port 50051). We indicate
   // that the channel isn't authenticated (use of InsecureCredentials()).
-  SimpleClient simple(grpc::CreateChannel("104.154.73.154:50051", grpc::InsecureChannelCredentials()));
+  SimpleClient simple(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
   std::string user("world");
 
   std::cout << "Foo(" << user << "): " << simple.Foo(user) << std::endl;

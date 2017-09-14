@@ -55,3 +55,10 @@ par_binary(
         "@yaml//:yaml",
     ],
 )
+
+par_binary(
+    name = "stamper",
+    srcs = ["stamper.py"],
+    main = "stamper.py",
+    visibility = ["//visibility:public"],
+)

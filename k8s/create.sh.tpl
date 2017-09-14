@@ -15,5 +15,7 @@
 # limitations under the License.
 set -euo pipefail
 
+# TODO(mattmoor): Should we create namespaces that do not exist?
+
 ./%{resolve_script} | \
   kubectl --cluster="%{cluster}" --namespace="%{namespace}" create -f -
