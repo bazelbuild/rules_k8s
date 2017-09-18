@@ -15,13 +15,13 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@examples_helloworld_pip//:requirements.bzl", "package")
+load("@examples_helloworld_pip//:requirements.bzl", "requirement")
 
 py_binary(
     name = "client",
     srcs = ["client.py"],
     deps = [
         "//examples/hellogrpc/proto:py",
-        package("grpcio"),
+        requirement("grpcio"),
     ],
 )
