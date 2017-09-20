@@ -15,7 +15,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@examples_helloworld_pip//:requirements.bzl", "package")
+load("@examples_helloworld_pip//:requirements.bzl", "requirement")
 load("@io_bazel_rules_docker//docker/contrib/python:image.bzl", "py_image")
 
 py_image(
@@ -27,7 +27,7 @@ py_image(
     # ~400KB.  By partitioning things this way, the large grpcio layer remains
     # unchanging and we can reduce the amount of image data we repush by ~99%!
     layers = [
-        package("grpcio"),
+        requirement("grpcio"),
         "//examples/hellogrpc/proto:py",
     ],
     main = "server.py",
