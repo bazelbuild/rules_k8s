@@ -22,7 +22,8 @@ function get_lb_ip() {
 }
 
 function create() {
-   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.create
+   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
+   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
 }
 
 function check_msg() {
@@ -38,12 +39,15 @@ function edit() {
 }
 
 function update() {
-   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.replace
+   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
+   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
 }
 
 function delete() {
-   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe
-   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.delete
+   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
+   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe
+   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
+   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
 }
 
 

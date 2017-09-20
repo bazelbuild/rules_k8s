@@ -23,5 +23,4 @@ function guess_runfiles() {
 
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
-PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --namespace="%{namespace}" replace -f -
+%{resolver} --template %{yaml} %{images}
