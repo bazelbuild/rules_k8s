@@ -47,7 +47,10 @@ script:
   - buildifier -mode=check $(find . -name '*.bzl' -type f)
 
   # Run end-to-end integration testing.
+  # First, GRPC.
   - ./examples/hellogrpc/e2e-test.sh cc
   - ./examples/hellogrpc/e2e-test.sh java
   - ./examples/hellogrpc/e2e-test.sh go
   - ./examples/hellogrpc/e2e-test.sh py
+  # Second, HTTP.
+  - ./examples/hellogrpc/e2e-test.sh go
