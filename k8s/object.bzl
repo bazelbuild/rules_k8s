@@ -60,7 +60,7 @@ def _impl(ctx):
 
       image_spec = {"name": tag}
       if image.get("legacy"):
-        image_spec["tarball"] = image["legacy"]
+        image_spec["tarball"] = image["legacy"].short_path
         all_inputs += [image["legacy"]]
 
       blobsums = image.get("blobsum", [])
