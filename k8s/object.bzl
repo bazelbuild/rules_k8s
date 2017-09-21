@@ -22,6 +22,13 @@ load(
     "@io_bazel_rules_docker//docker:label.bzl",
     _string_to_label = "string_to_label",
 )
+load(
+    "@io_bazel_rules_docker//docker:path.bzl",
+    _get_runfile_path = "runfile",
+)
+
+def _runfiles(ctx, f):
+  return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
 
 def _deduplicate(iterable):
   """
@@ -60,48 +67,43 @@ def _impl(ctx):
 
       image_spec = {"name": tag}
       if image.get("legacy"):
-        image_spec["tarball"] = image["legacy"].short_path
+        image_spec["tarball"] = _runfiles(ctx, image["legacy"])
         all_inputs += [image["legacy"]]
 
       blobsums = image.get("blobsum", [])
-      image_spec["digest"] = ",".join([f.short_path for f in blobsums])
+      image_spec["digest"] = ",".join([_runfiles(ctx, f) for f in blobsums])
       all_inputs += blobsums
 
       blobs = image.get("zipped_layer", [])
-      image_spec["layer"] = ",".join([f.short_path for f in blobs])
+      image_spec["layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
       all_inputs += blobs
 
-      image_spec["config"] = image["config"].short_path
+      image_spec["config"] = _runfiles(ctx, image["config"])
       all_inputs += [image["config"]]
 
-      image_specs += [";".join([
+      # Quote the semi-colons so they don't complete the command.
+      image_specs += ["';'".join([
         "%s=%s" % (k, v)
         for (k, v) in image_spec.items()
       ])]
 
-  ctx.action(
-      command = """cat > {resolve_script} <<"EOF"
-#!/bin/bash -e
-{resolver} --template {yaml} {images}
-EOF""".format(
-        resolver = ctx.executable._resolver.short_path,
-        yaml = ctx.outputs.yaml.short_path,
-        images = " ".join([
-          # Quote the parameter otherwise semi-colons complete the command.
-          "--image_spec='%s'" % spec
+  ctx.actions.expand_template(
+      template = ctx.file._template,
+      substitutions = {
+        "%{resolver}": _runfiles(ctx, ctx.executable._resolver),
+        "%{yaml}": _runfiles(ctx, ctx.outputs.yaml),
+        "%{images}": " ".join([
+          "--image_spec=%s" % spec
           for spec in image_specs
         ]),
-        resolve_script = ctx.outputs.executable.path,
-      ),
-      inputs = [],
-      outputs = [ctx.outputs.executable],
-      mnemonic = "ResolveScript"
+      },
+      output = ctx.outputs.executable,
   )
 
   return struct(runfiles = ctx.runfiles(files = [
     ctx.executable._resolver,
     ctx.outputs.yaml,
-  ] + all_inputs))
+  ] + list(ctx.attr._resolver.default_runfiles.files) + all_inputs))
 
 def _resolve(ctx, string, output):
   stamps = [ctx.info_file, ctx.version_file]
@@ -127,14 +129,14 @@ def _common_impl(ctx):
   if "{" in ctx.attr.cluster:
     cluster_file = ctx.new_file(ctx.label.name + ".cluster-name")
     _resolve(ctx, ctx.attr.cluster, cluster_file)
-    cluster_arg = "$(cat %s)" % cluster_file.short_path
+    cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
     files += [cluster_file]
 
   namespace_arg = ctx.attr.namespace
   if "{" in ctx.attr.namespace:
     namespace_file = ctx.new_file(ctx.label.name + ".namespace-name")
     _resolve(ctx, ctx.attr.namespace, namespace_file)
-    namespace_arg = "$(cat %s)" % namespace_file.short_path
+    namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
     files += [namespace_file]
 
   substitutions = {
@@ -144,12 +146,12 @@ def _common_impl(ctx):
   }
 
   if hasattr(ctx.executable, "resolved"):
-    substitutions["%{resolve_script}"] = ctx.executable.resolved.short_path
+    substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
     files += [ctx.executable.resolved]
     files += list(ctx.attr.resolved.default_runfiles.files)
 
   if hasattr(ctx.files, "unresolved"):
-    substitutions["%{unresolved}"] = ctx.files.unresolved[0].short_path
+    substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
     files += ctx.files.unresolved
 
   ctx.actions.expand_template(
@@ -166,13 +168,13 @@ _common_attrs = {
     "cluster": attr.string(),
     "kind": attr.string(),
     "_resolver": attr.label(
-        default = Label("//k8s:resolver.par"),
+        default = Label("//k8s:resolver"),
         cfg = "host",
         executable = True,
         allow_files = True,
     ),
     "_stamper": attr.label(
-        default = Label("//k8s:stamper.par"),
+        default = Label("//k8s:stamper"),
         cfg = "host",
         executable = True,
         allow_files = True,
@@ -193,6 +195,11 @@ _k8s_object = rule(
         # Implicit dependencies.
         "image_targets": attr.label_list(allow_files = True),
         "image_target_strings": attr.string_list(),
+        "_template": attr.label(
+            default = Label("//k8s:resolve.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
     } + _common_attrs + _layer_tools,
     executable = True,
     outputs = {

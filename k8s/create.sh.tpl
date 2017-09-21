@@ -15,7 +15,15 @@
 # limitations under the License.
 set -euo pipefail
 
+function guess_runfiles() {
+    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
+    pwd
+    popd > /dev/null 2>&1
+}
+
+RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
+
 # TODO(mattmoor): Should we create namespaces that do not exist?
 
-./%{resolve_script} | \
+PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
   kubectl --cluster="%{cluster}" --namespace="%{namespace}" create -f -

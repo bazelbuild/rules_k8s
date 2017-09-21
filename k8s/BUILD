@@ -18,6 +18,7 @@ licenses(["notice"])  # Apache 2.0
 exports_files([
     "create.sh.tpl",
     "replace.sh.tpl",
+    "resolve.sh.tpl",
     "delete.sh.tpl",
     "describe.sh.tpl",
 ])
