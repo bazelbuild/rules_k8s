@@ -13,14 +13,6 @@
 # limitations under the License.
 workspace(name = "io_bazel_rules_k8s")
 
-# TODO(mattmoor): Remove once we upgrade to a rules_docker that pulls in
-# the .digest() method on DockerImage.
-git_repository(
-    name = "containerregistry",
-    commit = "f451d8a32ba8bc0ee81d54dbcf46112b44a90fc0",
-    remote = "https://github.com/google/containerregistry.git",
-)
-
 git_repository(
     name = "io_bazel_rules_docker",
     commit = "7fc2bd0338f2c866ebd6b5ec5c2b486e72d40ffd",
