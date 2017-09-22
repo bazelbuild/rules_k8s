@@ -97,6 +97,8 @@ k8s_defaults(
   # you will import in your BUILD files.
   name = "k8s_deploy",
   kind = "deployment",
+  # This is the name of the cluster as it appears in:
+  #   kubectl config current-context
   cluster = "my-gke-cluster",
 )
 ```
@@ -348,6 +350,8 @@ A repository rule that allows users to alias `k8s_object` with default values.
         <p><code>string, optional</code></p>
         <p>The name of the cluster to which <code>create, replace, delete,
            describe</code> should speak.</p>
+	<p>This should match the cluster name as it would appear in
+           <code>kubectl config current-context</code></p>
       </td>
     </tr>
     <tr>
