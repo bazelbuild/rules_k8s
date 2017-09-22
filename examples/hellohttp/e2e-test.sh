@@ -53,7 +53,7 @@ check_msg
 for i in $RANDOM $RANDOM; do
   edit "$i"
   update
-  # Don't let K8s slowness cause flakes.
+  # Don't let k8s slowness cause flakes.
   sleep 25
   check_msg "$i"
 done
