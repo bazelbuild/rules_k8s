@@ -53,5 +53,5 @@ script:
   - ./examples/hellogrpc/e2e-test.sh go
   - ./examples/hellogrpc/e2e-test.sh py
   # Second, HTTP.
-  - ./examples/hellogrpc/e2e-test.sh java
-  - ./examples/hellogrpc/e2e-test.sh go
+  - ./examples/hellohttp/e2e-test.sh java
+  - ./examples/hellohttp/e2e-test.sh go
