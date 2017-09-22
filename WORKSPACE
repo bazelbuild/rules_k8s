@@ -155,3 +155,17 @@ _py_image_repos()
 load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_repositories")
 
 py_proto_repositories()
+
+http_archive(
+    name = "io_bazel_rules_jsonnet",
+    sha256 = "e0f42a31f5b2feeeb5496d40cb0b7c5d3872bd7e0bdb44b04543cce96de321f8",
+    strip_prefix = "rules_jsonnet-0.0.3",
+    urls = [
+        "http://mirror.bazel.build/github.com/bazelbuild/rules_jsonnet/archive/0.0.3.tar.gz",
+        "https://github.com/bazelbuild/rules_jsonnet/archive/0.0.3.tar.gz",
+    ],
+)
+
+load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_repositories")
+
+jsonnet_repositories()

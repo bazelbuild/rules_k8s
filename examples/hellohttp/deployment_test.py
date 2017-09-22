@@ -11,26 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-package(default_visibility = ["//visibility:public"])
 
-licenses(["notice"])  # Apache 2.0
+import json
+import os
+import unittest
+import yaml
 
-load("@io_bazel_rules_docker//docker/contrib/java:image.bzl", "war_image")
+def TestData(name):
+  return os.path.join(os.environ['TEST_SRCDIR'], 'io_bazel_rules_k8s', name)
 
-war_image(
-    name = "server",
-    srcs = ["Servlet.java"],
-    deps = [
-        "@javax_servlet_api//jar:jar",
-    ],
-)
+class DeploymentTest(unittest.TestCase):
 
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+  def test_things_match(self):
+    with open(TestData('examples/hellohttp/deployment.yaml'), 'r') as f:
+      static = yaml.load(f.read())
+    with open(TestData('examples/hellohttp/deployment.json'), 'r') as f:
+      generated = json.loads(f.read())
 
-k8s_deploy(
-    name = "staging",
-    images = {
-        "us.gcr.io/rules_k8s/hello-http:staging": ":server",
-    },
-    template = "//examples/hellohttp:deployment.json",
-)
+    self.assertEqual(static, generated)
+
+if __name__ == '__main__':
+  unittest.main()

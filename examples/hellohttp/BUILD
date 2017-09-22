@@ -21,3 +21,28 @@ k8s_deploy(
     name = "staging",
     template = "deployment.yaml",
 )
+
+load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
+
+jsonnet_to_json(
+    name = "deployment",
+    src = "deployment.jsonnet",
+    outs = ["deployment.json"],
+    deps = [
+        "//examples:container_lib",
+        "//examples:deploy_lib",
+    ],
+)
+
+# Verify that deployment.json == deployment.yaml
+py_test(
+    name = "deployment_test",
+    srcs = ["deployment_test.py"],
+    data = [
+        ":deployment.json",
+        ":deployment.yaml",
+    ],
+    deps = [
+        "@yaml//:yaml",
+    ],
+)
