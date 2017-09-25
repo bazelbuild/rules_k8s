@@ -64,7 +64,7 @@ py_library(
 
 git_repository(
     name = "org_pubref_rules_protobuf",
-    commit = "d9523f3d443b6a4f3fabc72051d84eb5474d7745", # v0.8.1 (Sep 23 2017)
+    commit = "d9523f3d443b6a4f3fabc72051d84eb5474d7745",  # v0.8.1 (Sep 23 2017)
     remote = "https://github.com/pubref/rules_protobuf.git",
 )
 
