@@ -16,7 +16,7 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])  # Apache 2.0
 
 load("@examples_helloworld_pip//:requirements.bzl", "requirement")
-load("@io_bazel_rules_docker//docker/contrib/python:image.bzl", "py_image")
+load("@io_bazel_rules_docker//python:image.bzl", "py_image")
 
 py_image(
     name = "server",

@@ -13,7 +13,7 @@
 # limitations under the License.
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_docker//docker/contrib/go:image.bzl", "go_image")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 load("@org_pubref_rules_protobuf//go:rules.bzl", "GRPC_COMPILE_DEPS")
 
 go_image(

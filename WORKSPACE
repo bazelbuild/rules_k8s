@@ -15,7 +15,7 @@ workspace(name = "io_bazel_rules_k8s")
 
 git_repository(
     name = "io_bazel_rules_docker",
-    commit = "7fc2bd0338f2c866ebd6b5ec5c2b486e72d40ffd",
+    commit = "839a297d4e874216b4fd93f09dd35be5592dc10e",
     remote = "https://github.com/bazelbuild/rules_docker.git",
 )
 
@@ -82,7 +82,7 @@ java_proto_repositories()
 
 # We use cc_image to build a sample service
 load(
-    "@io_bazel_rules_docker//docker/contrib/cc:image.bzl",
+    "@io_bazel_rules_docker//cc:image.bzl",
     _cc_image_repos = "repositories",
 )
 
@@ -90,7 +90,7 @@ _cc_image_repos()
 
 # We use java_image to build a sample service
 load(
-    "@io_bazel_rules_docker//docker/contrib/java:image.bzl",
+    "@io_bazel_rules_docker//java:image.bzl",
     _java_image_repos = "repositories",
 )
 
@@ -111,7 +111,7 @@ go_repositories()
 
 # We use go_image to build a sample service
 load(
-    "@io_bazel_rules_docker//docker/contrib/go:image.bzl",
+    "@io_bazel_rules_docker//go:image.bzl",
     _go_image_repos = "repositories",
 )
 
@@ -146,7 +146,7 @@ pip_install()
 
 # We use py_image to build a sample service
 load(
-    "@io_bazel_rules_docker//docker/contrib/python:image.bzl",
+    "@io_bazel_rules_docker//python:image.bzl",
     _py_image_repos = "repositories",
 )
 
