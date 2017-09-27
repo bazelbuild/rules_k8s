@@ -14,16 +14,16 @@
 """An implementation of k8s_object for interacting with an object of kind."""
 
 load(
-    "@io_bazel_rules_docker//docker:layers.bzl",
+    "@io_bazel_rules_docker//container:layers.bzl",
     _get_layers = "get_from_target",
     _layer_tools = "tools",
 )
 load(
-    "@io_bazel_rules_docker//docker:label.bzl",
+    "@io_bazel_rules_docker//skylib:label.bzl",
     _string_to_label = "string_to_label",
 )
 load(
-    "@io_bazel_rules_docker//docker:path.bzl",
+    "@io_bazel_rules_docker//skylib:path.bzl",
     _get_runfile_path = "runfile",
 )
 

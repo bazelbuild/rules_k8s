@@ -15,7 +15,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//docker/contrib/cc:image.bzl", "cc_image")
+load("@io_bazel_rules_docker//cc:image.bzl", "cc_image")
 
 cc_image(
     name = "server",

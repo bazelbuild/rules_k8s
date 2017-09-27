@@ -15,7 +15,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//docker/contrib/java:image.bzl", "java_image")
+load("@io_bazel_rules_docker//java:image.bzl", "java_image")
 
 java_image(
     name = "server",
