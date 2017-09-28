@@ -208,6 +208,23 @@ _k8s_object = rule(
     implementation = _impl,
 )
 
+_k8s_object_apply = rule(
+    attrs = {
+        "resolved": attr.label(
+            cfg = "target",
+            executable = True,
+            allow_files = True,
+        ),
+        "_template": attr.label(
+            default = Label("//k8s:apply.sh.tpl"),
+            single_file = True,
+            allow_files = True,
+        ),
+    } + _common_attrs,
+    executable = True,
+    implementation = _common_impl,
+)
+
 _k8s_object_create = rule(
     attrs = {
         "resolved": attr.label(
@@ -295,16 +312,21 @@ def k8s_object(name, **kwargs):
 
   _k8s_object(name=name, **kwargs)
 
-  if "cluster" in kwargs and "kind" in kwargs:
+  if "cluster" in kwargs:
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                        namespace=kwargs.get("namespace"))
     _k8s_object_delete(name=name + ".delete", unresolved=name + ".yaml",
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                        namespace=kwargs.get("namespace"))
-    _k8s_object_describe(name=name + ".describe", unresolved=name + ".yaml",
-                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
     _k8s_object_replace(name=name + ".replace", resolved=name,
                         kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                         namespace=kwargs.get("namespace"))
+    _k8s_object_apply(name=name + ".apply", resolved=name,
+                      kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
+                      namespace=kwargs.get("namespace"))
+    if "kind" in kwargs:
+      _k8s_object_describe(name=name + ".describe", unresolved=name + ".yaml",
+                           kind=kwargs.get("kind"),
+                           cluster=kwargs.get("cluster"),
+                           namespace=kwargs.get("namespace"))
