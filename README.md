@@ -202,6 +202,48 @@ documentation on stamping [here](
 https://github.com/bazelbuild/rules_docker#stamping).
 
 
+#### Don't tread on my tags
+
+Another ugly problem remains, which is that image references are still
+shared across developers, and while our resolution to digests avoids races, we
+may not want them trampling on the same tag, or on production tags if shared
+templates are being used.
+
+Moreover, developers may not have access to push to the images referenced in a
+particular template, or the development cluster to which they are deploying may
+not be able to pull them (e.g. clusters in different GCP projects).
+
+To resolve this, we enable developers to "chroot" the image references,
+publishing them instead to that reference under another repository.
+
+Consider the following, where developers use GCP projects named
+`company-{BUILD_USER}`:
+```python
+k8s_defaults(
+  name = "k8s_dev_deploy",
+  kind = "deployment",
+  cluster = "gke_company-{BUILD_USER}_us-central5-z_da-cluster",
+  image_chroot = "us.gcr.io/company-{BUILD_USER}/dev",
+)
+```
+In this example, the `k8s_dev_deploy` rules will target the developer's cluster
+in their project, and images will all be published under the `image_chroot`.
+
+For example, if the BUILD file contains:
+```python
+k8s_deploy(
+  name = "dev",
+  template = ":deployment.yaml",
+  images = {
+    "gcr.io/rules_k8s/server:dev": "//server:image"
+  },
+)
+```
+
+Then the references to `gcr.io/rules_k8s/server:dev` will be replaced with one
+to: `us.gcr.io/company-{BUILD_USER}/dev/gcr.io/rules_k8s/server@sha256:...`.
+
+
 ## Usage
 
 The `k8s_object[s]` rules expose a collection of actions.  We will follow the `:dev`
@@ -369,6 +411,13 @@ A rule for interacting with Kubernetes objects.
           directly, so as to avoid a race in the resolution process</p>
       </td>
     </tr>
+    <tr>
+      <td><code>image_chroot</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The repository under which to actually publish Docker images.</p>
+      </td>
+    </tr>
   </tbody>
 </table>
 
@@ -466,6 +515,13 @@ A repository rule that allows users to alias `k8s_object` with default values.
         <p><code>string, optional</code></p>
         <p>The namespace on the cluster within which the actions are
            performed.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>image_chroot</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The repository under which to actually publish Docker images.</p>
       </td>
     </tr>
   </tbody>

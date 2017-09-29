@@ -65,6 +65,10 @@ def _impl(repository_ctx):
     overrides += [_override(repository_ctx.attr.name,
                             "kind", repository_ctx.attr.kind)]
 
+  if repository_ctx.attr.image_chroot:
+    overrides += [_override(repository_ctx.attr.name,
+                            "image_chroot", repository_ctx.attr.image_chroot)]
+
   repository_ctx.file("defaults.bzl", """
 load(
   "@io_bazel_rules_k8s//k8s:object.bzl",
@@ -83,6 +87,7 @@ k8s_defaults = repository_rule(
         "kind": attr.string(mandatory = False),
         "cluster": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
+        "image_chroot": attr.string(mandatory = False),
     },
     implementation = _impl,
 )
