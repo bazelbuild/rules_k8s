@@ -212,6 +212,20 @@ Like `.create` this deploys the **resolved** template, which includes
 republishing images.  **This action is intended to be the workhorse
 of fast-iteration development** (rebuilding / republishing / redeploying).
 
+### Apply
+
+Users can "apply" a configuration by running:
+```shell
+bazel run :dev.apply
+```
+
+`:dev.apply` maps to `kubectl apply`, which will create or replace an existing
+configuration.  For more information see the `kubectl` documentation.
+
+This applies the **resolved** template, which includes republishing images.
+**This action is intended to be the workhorse of fast-iteration development**
+(rebuilding / republishing / redeploying).
+
 ### Delete
 
 Users can tear down their environment by running:

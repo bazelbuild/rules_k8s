@@ -21,10 +21,6 @@ function get_lb_ip() {
 	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
-function create() {
-   bazel run examples/hellohttp/${LANGUAGE}:staging.create
-}
-
 function check_msg() {
    OUTPUT=$(curl http://$(get_lb_ip):8080)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
@@ -35,8 +31,8 @@ function edit() {
    ./examples/hellohttp/${LANGUAGE}/edit.sh "$1"
 }
 
-function update() {
-   bazel run examples/hellohttp/${LANGUAGE}:staging.replace
+function apply() {
+   bazel run examples/hellohttp/${LANGUAGE}:staging.apply
 }
 
 function delete() {
@@ -44,15 +40,14 @@ function delete() {
    bazel run examples/hellohttp/${LANGUAGE}:staging.delete
 }
 
-
-create
+apply
 trap "delete" EXIT
 sleep 25
 check_msg
 
 for i in $RANDOM $RANDOM; do
   edit "$i"
-  update
+  apply
   # Don't let k8s slowness cause flakes.
   sleep 25
   check_msg "$i"
