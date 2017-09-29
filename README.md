@@ -8,6 +8,7 @@ Travis CI | Bazel CI
 
 * [k8s_defaults](#k8s_defaults)
 * [k8s_object](#k8s_object)
+* [k8s_objects](#k8s_objects)
 
 ## Overview
 
@@ -117,6 +118,56 @@ k8s_deploy(
 )
 ```
 
+### Multi-Object Actions
+
+It is common practice in the Kubernetes world to have multiple objects that
+comprise an application.  There are two main ways that we support interacting
+with these kinds of objects.
+
+The first is to simply use a template file that contains your N objects
+delimited with `---`, and omitting `kind="..."`.
+
+The second is through the use of `k8s_objects`, which aggregates N `k8s_object`
+rules:
+```python
+# Note the plurality of "objects" here.
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+
+k8s_objects(
+   name = "deployments",
+   objects = [
+      ":foo-deployment",
+      ":bar-deployment",
+      ":baz-deployment",
+   ]
+)
+
+k8s_objects(
+   name = "services",
+   objects = [
+      ":foo-service",
+      ":bar-service",
+      ":baz-service",
+   ]
+)
+
+# These rules can be nested
+k8s_objects(
+   name = "everything",
+   objects = [
+      ":deployments",
+      ":services",
+      ":configmaps",
+      ":ingress",
+   ]
+)
+```
+
+This can be useful when you want to be able to stand up a full environment,
+which includes resources that are expensive to recreate (e.g. LoadBalancer),
+but still want to be able to quickly iterate on parts of your application.
+
+
 ### Developer Environments
 
 A common practice to avoid clobbering other users is to do your development
@@ -153,7 +204,7 @@ https://github.com/bazelbuild/rules_docker#stamping).
 
 ## Usage
 
-This single target exposes a collection of actions.  We will follow the `:dev`
+The `k8s_object[s]` rules expose a collection of actions.  We will follow the `:dev`
 target from the example above.
 
 ### Build
@@ -237,7 +288,7 @@ It is notable that despite deleting the deployment, this will NOT delete
 any services currently load balancing over the deployment; this is intentional
 as creating load balancers can be slow.
 
-### Describe
+### Describe (`k8s_object`-only)
 
 Users can "describe" their environment by running:
 
@@ -316,6 +367,47 @@ A rule for interacting with Kubernetes objects.
           referenced by label will be published to the tag key.</p>
        <p>The published digests of these images will be substituted
           directly, so as to avoid a race in the resolution process</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<a name="k8s_objects"></a>
+## k8s_objects
+
+```python
+k8s_objects(name, objects)
+```
+
+A rule for interacting with multiple Kubernetes objects.
+
+<table class="table table-condensed table-bordered table-params">
+  <colgroup>
+    <col class="col-param" />
+    <col class="param-description" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th colspan="2">Attributes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>
+        <p><code>Name, required</code></p>
+        <p>Unique name for this rule.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>objects</code></td>
+      <td>
+        <p><code>Label list; required</code></p>
+        <p>The list of objects on which actions are taken.</p>
+	<p>When <code>bazel run</code> this target resolves each of the object
+	   targets which includes publishing their associated images, and will
+	   print a <code>---</code> delimited yaml.</p>
       </td>
     </tr>
   </tbody>

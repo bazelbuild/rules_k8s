@@ -20,6 +20,7 @@ exports_files([
     "create.sh.tpl",
     "replace.sh.tpl",
     "resolve.sh.tpl",
+    "resolve-all.sh.tpl",
     "delete.sh.tpl",
     "describe.sh.tpl",
 ])
