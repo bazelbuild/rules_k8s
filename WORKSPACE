@@ -37,6 +37,13 @@ k8s_defaults(
     namespace = "{BUILD_USER}",
 )
 
+k8s_defaults(
+    name = "k8s_service",
+    cluster = "gke_rules-k8s_us-central1-f_testing",
+    kind = "service",
+    namespace = "{BUILD_USER}",
+)
+
 new_http_archive(
     name = "mock",
     build_file_content = """

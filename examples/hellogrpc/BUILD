@@ -18,8 +18,25 @@ licenses(["notice"])  # Apache 2.0
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
-    name = "staging",
+    name = "staging-deployment",
     template = "deployment.yaml",
+)
+
+load("@k8s_service//:defaults.bzl", "k8s_service")
+
+k8s_deploy(
+    name = "staging-service",
+    template = "service.yaml",
+)
+
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+
+k8s_objects(
+    name = "staging",
+    objects = [
+        ":staging-deployment",
+        ":staging-service",
+    ],
 )
 
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
