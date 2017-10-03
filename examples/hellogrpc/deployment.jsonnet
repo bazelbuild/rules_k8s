@@ -17,5 +17,5 @@ local container = import "../container.libsonnet";
 deployment.Simple("hello-grpc-staging",
 	          container.Simple(
 		     "hello-grpc",
-		     "us.gcr.io/rules_k8s/hello-grpc:staging",
+		     "us.gcr.io/not-my-project/hello-grpc:staging",
 		     50051))

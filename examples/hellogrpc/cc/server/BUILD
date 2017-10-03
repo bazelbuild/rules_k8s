@@ -28,7 +28,7 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 k8s_deploy(
     name = "staging",
     images = {
-        "us.gcr.io/rules_k8s/hello-grpc:staging": ":server",
+        "us.gcr.io/not-my-project/hello-grpc:staging": ":server",
     },
     template = "//examples/hellogrpc:deployment.yaml",
 )

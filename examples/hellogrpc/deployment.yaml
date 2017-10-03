@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: hello-grpc
-        image: us.gcr.io/rules_k8s/hello-grpc:staging
+        image: us.gcr.io/not-my-project/hello-grpc:staging
         imagePullPolicy: Always
         ports:
         - containerPort: 50051
