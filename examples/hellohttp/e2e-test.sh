@@ -40,6 +40,20 @@ function delete() {
    bazel run examples/hellohttp/${LANGUAGE}:staging.delete
 }
 
+function check_bad_substitution() {
+    echo Checking a bad substitution
+    if ! bazel run examples/hellohttp:error-on-run;
+    then
+	echo "Success, substitution failed."
+	return
+    else
+	echo "Bad substitution should fail!"
+	exit 1
+    fi
+}
+
+check_bad_substitution
+
 apply
 trap "delete" EXIT
 sleep 25

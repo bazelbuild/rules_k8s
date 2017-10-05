@@ -46,3 +46,14 @@ py_test(
         "@yaml//:yaml",
     ],
 )
+
+# This is used by the e2e testing to make sure that we get a clear
+# failure when a reference isn't substituted.
+k8s_deploy(
+    name = "error-on-run",
+    images = {
+        # Simulate a typo
+        "us.gcr.io/not-my-porject/hello-http:staging": "//examples/hellohttp/go:server",
+    },
+    template = "deployment.yaml",
+)
