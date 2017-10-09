@@ -197,6 +197,22 @@ k8s_defaults(
 )
 ```
 
+You can customize the stamp variables that are available at a repository level
+by leveraging `--workspace_status_command`.  One pattern for this is to check in
+the following:
+```shell
+$ cat .bazelrc
+build --workspace_status_command=./print-workspace-status.sh
+run --workspace_status_command=./print-workspace-status.sh
+
+$ cat print-workspace-status.sh
+cat <<EOF
+VAR1 value1
+# This can be overriden by users if they "export VAR2_OVERRIDE"
+VAR2 ${VAR2_OVERRIDE:-default-value2}
+EOF
+```
+
 For more information on "stamping", you can see also the `rules_docker`
 documentation on stamping [here](
 https://github.com/bazelbuild/rules_docker#stamping).
