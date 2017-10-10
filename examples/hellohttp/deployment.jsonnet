@@ -17,5 +17,5 @@ local container = import "../container.libsonnet";
 deployment.Simple("hello-http-staging",
 	          container.Simple(
 		     "hello-http",
-		     "us.gcr.io/rules_k8s/hello-http:staging",
+		     "us.gcr.io/not-my-project/hello-http:staging",
 		     8080))

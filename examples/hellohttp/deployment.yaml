@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: hello-http
-        image: us.gcr.io/rules_k8s/hello-http:staging
+        image: us.gcr.io/not-my-project/hello-http:staging
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

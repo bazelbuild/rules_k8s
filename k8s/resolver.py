@@ -15,6 +15,7 @@
 """
 
 import argparse
+import os
 import sys
 
 from containerregistry.client import docker_creds
@@ -38,6 +39,11 @@ parser.add_argument(
 parser.add_argument(
   '--image_spec', action='append',
   help='Associative lists of the constitutent elements of a FromDisk image.')
+
+parser.add_argument(
+  '--image_chroot', action='store',
+  help=('The repository under which to chroot image references when '
+        'publishing them.'))
 
 _THREADS = 32
 _DOCUMENT_DELIMITER = '---\n'
@@ -99,7 +105,7 @@ def TagToDigest(tag, overrides, transport):
     return str(digest)
 
 
-def Publish(transport,
+def Publish(transport, image_chroot,
             name=None, tarball=None, config=None, digest=None, layer=None):
   if not name:
     raise Exception('Expected "name" kwarg')
@@ -127,19 +133,22 @@ def Publish(transport,
     digest = []
     layer = []
 
-  name = docker_name.Tag(name)
+  name_to_replace = docker_name.Tag(name)
+  name_to_publish = name_to_replace
+  if image_chroot:
+    name_to_publish = docker_name.Tag(os.path.join(image_chroot, name))
 
   # Resolve the appropriate credential to use based on the standard Docker
   # client logic.
-  creds = docker_creds.DefaultKeychain.Resolve(name)
+  creds = docker_creds.DefaultKeychain.Resolve(name_to_publish)
 
-  with v2_2_session.Push(name, creds, transport, threads=_THREADS) as session:
+  with v2_2_session.Push(name_to_publish, creds, transport, threads=_THREADS) as session:
     with v2_2_image.FromDisk(config, zip(digest or [], layer or []),
                              legacy_base=tarball) as v2_2_img:
       session.upload(v2_2_img)
 
-      return (name, docker_name.Digest('{repository}@{digest}'.format(
-          repository=name.as_repository(),
+      return (name_to_replace, docker_name.Digest('{repository}@{digest}'.format(
+          repository=name_to_publish.as_repository(),
           digest=v2_2_img.digest())))
 
 
@@ -154,7 +163,7 @@ def main():
   for spec in args.image_spec or []:
     parts = spec.split(';')
     kwargs = dict([x.split('=', 2) for x in parts])
-    (tag, digest) = Publish(transport, **kwargs)
+    (tag, digest) = Publish(transport, args.image_chroot, **kwargs)
     overrides[tag] = digest
 
   with open(args.template, 'r') as f:

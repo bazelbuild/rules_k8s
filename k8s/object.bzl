@@ -87,11 +87,19 @@ def _impl(ctx):
         for (k, v) in image_spec.items()
       ])]
 
+  image_chroot_arg = ctx.attr.image_chroot
+  if "{" in ctx.attr.image_chroot:
+    image_chroot_file = ctx.new_file(ctx.label.name + ".image-chroot-name")
+    _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
+    image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
+    all_inputs += [image_chroot_file]
+
   ctx.actions.expand_template(
       template = ctx.file._template,
       substitutions = {
         "%{resolver}": _runfiles(ctx, ctx.executable._resolver),
         "%{yaml}": _runfiles(ctx, ctx.outputs.yaml),
+        "%{image_chroot}": image_chroot_arg,
         "%{images}": " ".join([
           "--image_spec=%s" % spec
           for spec in image_specs
@@ -162,11 +170,13 @@ def _common_impl(ctx):
   return struct(runfiles = ctx.runfiles(files = files))
 
 _common_attrs = {
-    # We allow namespace / cluster / kind to be omitted, and we just
-    # don't expose the extra actions.
     "namespace": attr.string(default = "default"),
+    # We allow cluster to be omitted, and we just
+    # don't expose the extra actions.
     "cluster": attr.string(),
+    # This is only needed for describe.
     "kind": attr.string(),
+    "image_chroot": attr.string(),
     "_resolver": attr.label(
         default = Label("//k8s:resolver"),
         cfg = "host",

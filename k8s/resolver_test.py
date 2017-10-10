@@ -101,7 +101,7 @@ key1:
 
     with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
       (tag, digest) = resolver.Publish(
-          _BAD_TRANSPORT, name=str(name), tarball=td)
+          _BAD_TRANSPORT, None, name=str(name), tarball=td)
       self.assertEqual(tag, name)
       with v2_2_image.FromTarball(td) as img:
         self.assertEqual(digest.digest, img.digest())
@@ -117,7 +117,7 @@ key1:
 
     with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
       (tag, digest) = resolver.Publish(
-          _BAD_TRANSPORT, name=str(name), config=config_path,
+          _BAD_TRANSPORT, None, name=str(name), config=config_path,
           digest=','.join([h for (h, unused) in layer_data]),
           layer=','.join([layer for (unused, layer) in layer_data]))
       self.assertEqual(tag, name)
