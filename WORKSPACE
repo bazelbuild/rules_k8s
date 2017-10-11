@@ -30,20 +30,28 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 
 k8s_repositories()
 
-k8s_defaults(
-    name = "k8s_deploy",
-    cluster = "gke_rules-k8s_us-central1-f_testing",
-    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
-    kind = "deployment",
-    namespace = "{BUILD_USER}",
-)
+_CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+
+_NAMESPACE = "{BUILD_USER}"
 
 k8s_defaults(
-    name = "k8s_service",
-    cluster = "gke_rules-k8s_us-central1-f_testing",
-    kind = "service",
-    namespace = "{BUILD_USER}",
+    name = "k8s_deploy",
+    cluster = _CLUSTER,
+    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
+    kind = "deployment",
+    namespace = _NAMESPACE,
 )
+
+[k8s_defaults(
+    name = "k8s_" + kind,
+    cluster = _CLUSTER,
+    kind = kind,
+    namespace = _NAMESPACE,
+) for kind in [
+    "service",
+    "crd",
+    "todo",
+]]
 
 new_http_archive(
     name = "mock",
@@ -131,7 +139,7 @@ go_proto_repositories()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "d6fbb0fb2a5c8e318dd4de5104dc41358cefaa90",
+    commit = "c208292d1286e9a0280555187caf66cd3b4f5bed",
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -188,3 +196,15 @@ git_repository(
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_repositories")
 
 jsonnet_repositories()
+
+pip_import(
+    name = "examples_todocontroller_pip",
+    requirements = "//examples/todocontroller/py:requirements.txt",
+)
+
+load(
+    "@examples_todocontroller_pip//:requirements.bzl",
+    _controller_pip_install = "pip_install",
+)
+
+_controller_pip_install()
