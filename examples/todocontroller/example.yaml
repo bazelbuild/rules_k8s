@@ -1,0 +1,7 @@
+apiVersion: "rules-k8s.bazel.io/v1"
+kind: Todo
+metadata:
+  name: my-todo
+spec:
+  subject: Do something
+  done: false
