@@ -148,9 +148,24 @@ pip_import(
     requirements = "//examples/hellogrpc/py:requirements.txt",
 )
 
-load("@examples_helloworld_pip//:requirements.bzl", "pip_install")
+load(
+    "@examples_helloworld_pip//:requirements.bzl",
+    grpcpip_install = "pip_install",
+)
 
-pip_install()
+grpcpip_install()
+
+pip_import(
+    name = "examples_hellohttp_pip",
+    requirements = "//examples/hellohttp/py:requirements.txt",
+)
+
+load(
+    "@examples_hellohttp_pip//:requirements.bzl",
+    httppip_install = "pip_install",
+)
+
+httppip_install()
 
 # We use py_image to build a sample service
 load(
