@@ -27,34 +27,30 @@ before_install:
   - gcloud config set compute/zone us-central1-f
   - gcloud container clusters get-credentials testing
 
+# Based on https://gist.github.com/jamesarosen/e29076bd81a099f0f72e
+matrix:
+  include:
+    - env: TO_TEST=BUILDIFIER
+    - env: TO_TEST=BUILD
+    - env: TO_TEST=TEST
+    - env: TO_TEST=HELLOGRPC
+    - env: TO_TEST=HELLOHTTP
+    - env: TO_TEST=TODOCONTROLLER
+  fast_finish: false
+
 install:
   - go get -u github.com/bazelbuild/buildifier/buildifier
 
 script:
-  # Check our installs.
-  - bazel version
-  - gcloud version
-  - kubectl version
-
   # Check that all of our tools and samples build
-  - bazel clean && bazel build //...
+  - if [ "$TO_TEST" = "BUILD" ]; then bazel clean && bazel build //...; fi
   # Check that all of our tests pass
-  - bazel clean && bazel test //...
+  - if [ "$TO_TEST" = "TEST" ]; then bazel clean && bazel test //...; fi
 
   # Check for issues with the format of our bazel config files.
-  - buildifier -mode=check $(find . -name BUILD -type f)
-  - buildifier -mode=check $(find . -name WORKSPACE -type f)
-  - buildifier -mode=check $(find . -name '*.bzl' -type f)
+  - if [ "$TO_TEST" = "BUILDIFIER" ]; then buildifier -mode=check $(find . -name BUILD -o -name WORKSPACE -o -name '*.bzl' -type f); fi
 
-  # Run end-to-end integration testing.
-  # First, GRPC.
-  - ./examples/hellogrpc/e2e-test.sh cc
-  - ./examples/hellogrpc/e2e-test.sh java
-  - ./examples/hellogrpc/e2e-test.sh go
-  - ./examples/hellogrpc/e2e-test.sh py
-  # Second, HTTP.
-  - ./examples/hellohttp/e2e-test.sh java
-  - ./examples/hellohttp/e2e-test.sh go
-  - ./examples/hellohttp/e2e-test.sh py
-  # Third, TODO Controller.
-  - ./examples/todocontroller/e2e-test.sh py
+  # End-to-end integration testing.
+  - if [ "$TO_TEST" = "HELLOGRPC" ]; then ./examples/hellogrpc/e2e-test.sh cc && ./examples/hellogrpc/e2e-test.sh java && ./examples/hellogrpc/e2e-test.sh go && ./examples/hellogrpc/e2e-test.sh py fi
+  - if [ "$TO_TEST" = "HELLOHTTP" ]; then ./examples/hellohttp/e2e-test.sh java && ./examples/hellohttp/e2e-test.sh go && ./examples/hellohttp/e2e-test.sh py; fi
+  - if [ "$TO_TEST" = "TODOCONTROLLER" ]; then ./examples/todocontroller/e2e-test.sh py; fi
