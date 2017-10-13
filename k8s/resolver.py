@@ -14,6 +14,8 @@
 """Walks a yaml object and resolves all docker_name.Tag to docker_name.Digest.
 """
 
+from __future__ import print_function
+
 import argparse
 import os
 import sys
@@ -157,6 +159,7 @@ def main():
 
   transport = transport_pool.Http(httplib2.Http, size=_THREADS)
 
+  unseen_tags = set()
   overrides = {}
   # TODO(mattmoor): Execute these in a threadpool and
   # aggregate the results as they complete.
@@ -165,14 +168,27 @@ def main():
     kwargs = dict([x.split('=', 2) for x in parts])
     (tag, digest) = Publish(transport, args.image_chroot, **kwargs)
     overrides[tag] = digest
+    unseen_tags.add(tag)
 
   with open(args.template, 'r') as f:
     inputs = f.read()
 
-  print(_DOCUMENT_DELIMITER.join([
-    Resolve(x, lambda t: TagToDigest(t, overrides, transport))
+  def _TagToDigest(t):
+    unseen_tags.remove(t)
+    return TagToDigest(t, overrides, transport)
+
+  content = _DOCUMENT_DELIMITER.join([
+    Resolve(x, _TagToDigest)
     for x in inputs.split(_DOCUMENT_DELIMITER)
-  ]))
+  ])
+
+  if len(unseen_tags) > 0:
+    print('The following image references were not found: [%s]' % "\n".join([
+      str(x) for x in unseen_tags
+    ]),file=sys.stderr)
+    sys.exit(1)
+
+  print(content)
 
 
 if __name__ == '__main__':
