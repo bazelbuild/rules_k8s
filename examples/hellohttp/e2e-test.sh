@@ -52,7 +52,16 @@ function check_bad_substitution() {
     fi
 }
 
+function check_no_images_resolution() {
+    echo Checking resolution with no images attribute.
+    bazel build examples/hellohttp:resolve-external
+    OUTPUT=$(bazel-bin/examples/hellohttp/resolve-external 2>&1)
+    echo Checking output: "${OUTPUT}" matches: "/pause@"
+    echo "${OUTPUT}" | grep "[/]pause[@]"
+}
+
 check_bad_substitution
+check_no_images_resolution
 
 apply
 trap "delete" EXIT

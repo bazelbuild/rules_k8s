@@ -22,6 +22,7 @@ import sys
 
 from containerregistry.client import docker_creds
 from containerregistry.client import docker_name
+from containerregistry.client.v2 import docker_image as v2_image
 from containerregistry.client.v2_2 import docker_image as v2_2_image
 from containerregistry.client.v2_2 import docker_session as v2_2_session
 from containerregistry.tools import patched
@@ -174,7 +175,8 @@ def main():
     inputs = f.read()
 
   def _TagToDigest(t):
-    unseen_tags.remove(t)
+    if t in unseen_tags:
+      unseen_tags.remove(t)
     return TagToDigest(t, overrides, transport)
 
   content = _DOCUMENT_DELIMITER.join([
