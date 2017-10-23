@@ -40,20 +40,25 @@ def main():
         logging.error("Updating: %s", name)
         crds.replace_namespaced_custom_object(DOMAIN, "v1", namespace, "todos", name, obj)
 
-    # TODO(mattmoor): Integration test that deploys this, creates TODOs,
-    # and then checks for the appropriate $RANDOM string.
-    stream = watch.Watch().stream(crds.list_namespaced_custom_object, DOMAIN, "v1", namespace, "todos")
-    for event in stream:
-        obj = event["object"]
-        spec = obj.get("spec")
-        if not spec:
-            logging.error("No 'spec' in object, skipping event: %s", json.dumps(obj, indent=1))
-            continue
-        done = spec.get("done", True)
-        if done:
-            continue
-        mark_done(event, obj)
-        
+    resource_version = ''
+    while True:
+        stream = watch.Watch().stream(crds.list_namespaced_custom_object,
+                                      DOMAIN, "v1", namespace, "todos",
+                                      resource_version=resource_version)
+        for event in stream:
+            obj = event["object"]
+
+            spec = obj.get("spec")
+            if not spec:
+                logging.error("No 'spec' in object, skipping event: %s", json.dumps(obj, indent=1))
+            else:
+                if not spec.get("done", True):
+                    mark_done(event, obj)
+
+            # Configure where to resume streaming.
+            metadata = obj.get("metadata")
+            if metadata:
+                resource_version = metadata["resourceVersion"]
 
 if __name__ == "__main__":
     main()
