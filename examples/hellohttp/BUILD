@@ -57,3 +57,10 @@ k8s_deploy(
     },
     template = "deployment.yaml",
 )
+
+# This is used by the e2e testing to make sure that we resolve
+# image names that are external to our build process.
+k8s_deploy(
+    name = "resolve-external",
+    template = "static-deployment.yaml",
+)
