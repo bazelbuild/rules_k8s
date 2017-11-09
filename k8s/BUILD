@@ -33,6 +33,7 @@ py_library(
     deps = [
         "@containerregistry//:containerregistry",
         "@yaml//:yaml",
+        "@simplejson//:simplejson",
     ],
 )
 
@@ -56,6 +57,7 @@ par_binary(
     deps = [
         "@containerregistry//:containerregistry",
         "@yaml//:yaml",
+        "@simplejson//:simplejson",
     ],
 )
 
@@ -64,4 +66,15 @@ par_binary(
     srcs = ["stamper.py"],
     main = "stamper.py",
     visibility = ["//visibility:public"],
+)
+
+par_binary(
+    name = "pre_processor",
+    srcs = ["pre_processor.py"],
+    main = "pre_processor.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@yaml//:yaml",
+        "@simplejson//:simplejson",
+    ],
 )

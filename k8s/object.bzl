@@ -40,11 +40,16 @@ def _deduplicate(iterable):
 def _impl(ctx):
   """Core implementation of k8s_object."""
 
-  # Use expand_template with no substitutions as a glorified copy.
-  ctx.actions.expand_template(
-      template = ctx.file.template,
-      output = ctx.outputs.yaml,
-      substitutions = {},
+  # Pre-process the input in case it's a json file.
+  ctx.action(
+      executable = ctx.executable._pre_processor,
+      arguments = [
+        "--input=%s" % ctx.file.template.path,
+        "--output=%s" % ctx.outputs.yaml.path
+      ],
+      inputs = [ctx.executable._pre_processor, ctx.file.template],
+      outputs = [ctx.outputs.yaml],
+      mnemonic = "Preprocess"
   )
 
   all_inputs = []
@@ -210,6 +215,12 @@ _k8s_object = rule(
             single_file = True,
             allow_files = True,
         ),
+        "_pre_processor": attr.label(
+            default = Label("//k8s:pre_processor"),
+            cfg = "host",
+            executable = True,
+            allow_files = True,
+        ),
     } + _common_attrs + _layer_tools,
     executable = True,
     outputs = {
@@ -340,3 +351,4 @@ def k8s_object(name, **kwargs):
                            kind=kwargs.get("kind"),
                            cluster=kwargs.get("cluster"),
                            namespace=kwargs.get("namespace"))
+

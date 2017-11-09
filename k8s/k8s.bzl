@@ -33,3 +33,17 @@ py_library(
            "/PyYAML-3.12.tar.gz"),
     strip_prefix = "PyYAML-3.12/lib/yaml",
   )
+
+  native.new_http_archive(
+    name = "simplejson",
+    build_file_content = """
+py_library(
+    name = "simplejson",
+    srcs = glob(["*.py"]),
+    visibility = ["//visibility:public"],
+)""",
+    sha256 = "df5e38f5e0a24abe0e02276aa5c3f8504150047a51c0b6b848b8153e6e6d395e",
+    url = ('https://pypi.python.org/packages/e8/46/4ab77251fbe4af3091cdd8a38' +
+           'aa7d1c0b2082dd502735b9774614cf39c89/simplejson-3.12.0.tar.gz'),
+    strip_prefix = "simplejson-3.12.0/simplejson",
+  )
