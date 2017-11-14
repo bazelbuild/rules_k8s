@@ -203,7 +203,6 @@ the following:
 ```shell
 $ cat .bazelrc
 build --workspace_status_command=./print-workspace-status.sh
-run --workspace_status_command=./print-workspace-status.sh
 
 $ cat print-workspace-status.sh
 cat <<EOF
