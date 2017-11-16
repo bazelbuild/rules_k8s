@@ -30,7 +30,7 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 k8s_deploy(
     name = "staging",
     images = {
-        "us.gcr.io/not-my-project/hello-http:staging": ":server",
+        "hello-http-image": ":server",
     },
     template = "//examples/hellohttp:deployment.json",
 )

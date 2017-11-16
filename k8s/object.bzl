@@ -40,13 +40,6 @@ def _deduplicate(iterable):
 def _impl(ctx):
   """Core implementation of k8s_object."""
 
-  # Use expand_template with no substitutions as a glorified copy.
-  ctx.actions.expand_template(
-      template = ctx.file.template,
-      output = ctx.outputs.yaml,
-      substitutions = {},
-  )
-
   all_inputs = []
   image_specs = []
   if ctx.attr.images:
@@ -98,7 +91,7 @@ def _impl(ctx):
       template = ctx.file._template,
       substitutions = {
         "%{resolver}": _runfiles(ctx, ctx.executable._resolver),
-        "%{yaml}": _runfiles(ctx, ctx.outputs.yaml),
+        "%{yaml}": _runfiles(ctx, ctx.file.template),
         "%{image_chroot}": image_chroot_arg,
         "%{images}": " ".join([
           "--image_spec=%s" % spec
@@ -110,7 +103,7 @@ def _impl(ctx):
 
   return struct(runfiles = ctx.runfiles(files = [
     ctx.executable._resolver,
-    ctx.outputs.yaml,
+    ctx.file.template,
   ] + list(ctx.attr._resolver.default_runfiles.files) + all_inputs))
 
 def _resolve(ctx, string, output):
@@ -212,9 +205,6 @@ _k8s_object = rule(
         ),
     } + _common_attrs + _layer_tools,
     executable = True,
-    outputs = {
-        "yaml": "%{name}.yaml",
-    },
     implementation = _impl,
 )
 
@@ -272,7 +262,10 @@ _k8s_object_replace = rule(
 _k8s_object_describe = rule(
     attrs = {
         "unresolved": attr.label(
-            allow_files = [".yaml"],
+            allow_files = [
+                ".yaml",
+                ".json",
+            ],
             single_file = True,
             mandatory = True,
         ),
@@ -289,7 +282,10 @@ _k8s_object_describe = rule(
 _k8s_object_delete = rule(
     attrs = {
         "unresolved": attr.label(
-            allow_files = [".yaml"],
+            allow_files = [
+                ".yaml",
+                ".json",
+            ],
             single_file = True,
             mandatory = True,
         ),
@@ -326,7 +322,7 @@ def k8s_object(name, **kwargs):
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                        namespace=kwargs.get("namespace"))
-    _k8s_object_delete(name=name + ".delete", unresolved=name + ".yaml",
+    _k8s_object_delete(name=name + ".delete", unresolved=kwargs.get("template"),
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                        namespace=kwargs.get("namespace"))
     _k8s_object_replace(name=name + ".replace", resolved=name,
@@ -336,7 +332,7 @@ def k8s_object(name, **kwargs):
                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                       namespace=kwargs.get("namespace"))
     if "kind" in kwargs:
-      _k8s_object_describe(name=name + ".describe", unresolved=name + ".yaml",
+      _k8s_object_describe(name=name + ".describe", unresolved=kwargs.get("template"),
                            kind=kwargs.get("kind"),
                            cluster=kwargs.get("cluster"),
                            namespace=kwargs.get("namespace"))

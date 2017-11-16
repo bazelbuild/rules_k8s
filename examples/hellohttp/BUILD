@@ -53,7 +53,7 @@ k8s_deploy(
     name = "error-on-run",
     images = {
         # Simulate a typo
-        "us.gcr.io/not-my-porject/hello-http:staging": "//examples/hellohttp/go:server",
+        "hello-http_image": "//examples/hellohttp/go:server",
     },
     template = "deployment.yaml",
 )
