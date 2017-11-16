@@ -139,7 +139,7 @@ go_proto_repositories()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "c208292d1286e9a0280555187caf66cd3b4f5bed",
+    commit = "3e167dcfb17356c68588715ed324c5e9b76f391d",
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
