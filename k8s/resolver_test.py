@@ -60,8 +60,8 @@ class ResolverTest(unittest.TestCase):
     expected = 'foo@sha256:deadbeef'
     unexpected = 'bar@sha256:baadf00d'
     values = {
-      docker_name.Tag(present): expected,
-      docker_name.Tag(not_present): unexpected,
+      present: expected,
+      not_present: unexpected,
     }
     input = """
 key1:
@@ -75,10 +75,18 @@ key1:
     self.assertFalse(unexpected in output)
 
   def test_tag_to_digest_cached(self):
-    tag = docker_name.Tag('gcr.io/foo/bar:baz')
+    tag_as_string = 'gcr.io/foo/bar:baz'
     expected_digest = 'gcr.io/foo/bar@sha256:deadbeef'
-    actual_digest = resolver.TagToDigest(tag, {
-      tag: expected_digest,
+    actual_digest = resolver.StringToDigest(tag_as_string, {
+      tag_as_string: expected_digest,
+    }, _BAD_TRANSPORT)
+    self.assertEqual(actual_digest, expected_digest)
+
+  def test_tag_to_digest_sentinel(self):
+    sentinel_string = 'XXXXX'
+    expected_digest = 'gcr.io/foo/bar@sha256:deadbeef'
+    actual_digest = resolver.StringToDigest(sentinel_string, {
+      sentinel_string: expected_digest,
     }, _BAD_TRANSPORT)
     self.assertEqual(actual_digest, expected_digest)
 
@@ -89,9 +97,10 @@ key1:
       img.exists = lambda: True
       with mock.patch.object(v2_2_image, 'FromRegistry',
                              return_value=img):
-        tag = docker_name.Tag('gcr.io/foo/bar:baz')
+        tag_as_string = 'gcr.io/foo/bar:baz'
         expected_digest = docker_name.Digest('gcr.io/foo/bar@' + img.digest())
-        actual_digest = resolver.TagToDigest(tag, {}, _BAD_TRANSPORT)
+        actual_digest = resolver.StringToDigest(
+          tag_as_string, {}, _BAD_TRANSPORT)
         self.assertEqual(actual_digest, str(expected_digest))
 
   def test_publish_legacy(self):
@@ -102,7 +111,7 @@ key1:
     with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
       (tag, digest) = resolver.Publish(
           _BAD_TRANSPORT, None, name=str(name), tarball=td)
-      self.assertEqual(tag, name)
+      self.assertEqual(tag, str(name))
       with v2_2_image.FromTarball(td) as img:
         self.assertEqual(digest.digest, img.digest())
 
@@ -120,7 +129,7 @@ key1:
           _BAD_TRANSPORT, None, name=str(name), config=config_path,
           digest=','.join([h for (h, unused) in layer_data]),
           layer=','.join([layer for (unused, layer) in layer_data]))
-      self.assertEqual(tag, name)
+      self.assertEqual(tag, str(name))
       self.assertEqual(digest.digest, expected_digest)
 
 

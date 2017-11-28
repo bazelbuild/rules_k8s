@@ -52,7 +52,7 @@ _THREADS = 32
 _DOCUMENT_DELIMITER = '---\n'
 
 
-def Resolve(input, tag_to_digest):
+def Resolve(input, string_to_digest):
   """Translate tag references within the input yaml into digests."""
   def walk_dict(d):
     return {
@@ -65,9 +65,7 @@ def Resolve(input, tag_to_digest):
 
   def walk_string(s):
     try:
-      as_tag = docker_name.Tag(s)
-      digest = tag_to_digest(as_tag)
-      return digest
+      return string_to_digest(s)
     except:
       return s
 
@@ -83,10 +81,13 @@ def Resolve(input, tag_to_digest):
   return yaml.dump(walk(yaml.load(input)))
 
 
-def TagToDigest(tag, overrides, transport):
-  """Turn a docker_name.Tag into a stringified digest."""
-  if tag in overrides:
-    return str(overrides[tag])
+def StringToDigest(string, overrides, transport):
+  """Turn a string into a stringified digest."""
+  if string in overrides:
+    return str(overrides[string])
+
+  # Attempt to turn the string into a tag, this may throw.
+  tag = docker_name.Tag(string)
 
   def fully_qualify_digest(digest):
     return docker_name.Digest('{registry}/{repo}@{digest}'.format(
@@ -98,13 +99,13 @@ def TagToDigest(tag, overrides, transport):
   with v2_2_image.FromRegistry(tag, creds, transport) as img:
     if img.exists():
       digest = fully_qualify_digest(img.digest())
-      overrides[tag] = digest
+      overrides[string] = digest
       return str(digest)
 
   # If the tag doesn't exists as v2.2, then try as v2.
   with v2_image.FromRegistry(tag, creds, transport) as img:
     digest = fully_qualify_digest(img.digest())
-    overrides[tag] = digest
+    overrides[string] = digest
     return str(digest)
 
 
@@ -136,10 +137,12 @@ def Publish(transport, image_chroot,
     digest = []
     layer = []
 
-  name_to_replace = docker_name.Tag(name)
-  name_to_publish = name_to_replace
+  name_to_replace = name
   if image_chroot:
-    name_to_publish = docker_name.Tag(os.path.join(image_chroot, name))
+    name_to_publish = docker_name.Tag(os.path.join(image_chroot, name), strict=False)
+  else:
+    # Without a chroot, the left-hand-side must be a valid tag.
+    name_to_publish = docker_name.Tag(name, strict=False)
 
   # Resolve the appropriate credential to use based on the standard Docker
   # client logic.
@@ -160,7 +163,7 @@ def main():
 
   transport = transport_pool.Http(httplib2.Http, size=_THREADS)
 
-  unseen_tags = set()
+  unseen_strings = set()
   overrides = {}
   # TODO(mattmoor): Execute these in a threadpool and
   # aggregate the results as they complete.
@@ -169,24 +172,24 @@ def main():
     kwargs = dict([x.split('=', 2) for x in parts])
     (tag, digest) = Publish(transport, args.image_chroot, **kwargs)
     overrides[tag] = digest
-    unseen_tags.add(tag)
+    unseen_strings.add(tag)
 
   with open(args.template, 'r') as f:
     inputs = f.read()
 
-  def _TagToDigest(t):
-    if t in unseen_tags:
-      unseen_tags.remove(t)
-    return TagToDigest(t, overrides, transport)
+  def _StringToDigest(t):
+    if t in unseen_strings:
+      unseen_strings.remove(t)
+    return StringToDigest(t, overrides, transport)
 
   content = _DOCUMENT_DELIMITER.join([
-    Resolve(x, _TagToDigest)
+    Resolve(x, _StringToDigest)
     for x in inputs.split(_DOCUMENT_DELIMITER)
   ])
 
-  if len(unseen_tags) > 0:
+  if len(unseen_strings) > 0:
     print('The following image references were not found: [%s]' % "\n".join([
-      str(x) for x in unseen_tags
+      str(x) for x in unseen_strings
     ]),file=sys.stderr)
     sys.exit(1)
 
