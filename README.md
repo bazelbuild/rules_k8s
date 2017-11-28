@@ -27,11 +27,11 @@ git_repository(
 )
 
 load(
-  "@io_bazel_rules_docker//docker:docker.bzl",
-  "docker_repositories",
+  "@io_bazel_rules_docker//container:container.bzl",
+  container_repositories = "repositories",
 )
 
-docker_repositories()
+container_repositories()
 
 # This requires rules_docker to be fully instantiated before
 # it is pulled in.
@@ -203,7 +203,6 @@ the following:
 ```shell
 $ cat .bazelrc
 build --workspace_status_command=./print-workspace-status.sh
-run --workspace_status_command=./print-workspace-status.sh
 
 $ cat print-workspace-status.sh
 cat <<EOF

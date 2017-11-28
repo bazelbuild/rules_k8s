@@ -42,7 +42,7 @@ def _run_all_impl(ctx):
 _run_all = rule(
     attrs = {
         "objects": attr.label_list(
-            cfg = "host",
+            cfg = "target",
         ),
         "_template": attr.label(
             default = Label("//k8s:resolve-all.sh.tpl"),
