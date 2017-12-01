@@ -410,7 +410,8 @@ A rule for interacting with Kubernetes objects.
         <p><code>string, optional</code></p>
         <p>The namespace on the cluster within which the actions are
           performed.</p>
-        <p><b>If this is omitted, it will default to
+        <p><b>If this is omitted, it will default to the value specified
+          in the template or if also unspecified there, to the value
           <code>"default"</code>.</b></p>
       </td>
     </tr>

@@ -140,9 +140,12 @@ def _common_impl(ctx):
     namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
     files += [namespace_file]
 
+  if namespace_arg:
+    namespace_arg = "--namespace=\"" +  namespace_arg + "\""
+
   substitutions = {
       "%{cluster}": cluster_arg,
-      "%{namespace}": namespace_arg,
+      "%{namespace_arg}": namespace_arg,
       "%{kind}": ctx.attr.kind,
   }
 
