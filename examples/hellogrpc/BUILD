@@ -60,6 +60,6 @@ py_test(
         ":deployment.yaml",
     ],
     deps = [
-        "@yaml//:yaml",
+        "@yaml",
     ],
 )

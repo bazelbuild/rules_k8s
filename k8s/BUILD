@@ -31,8 +31,8 @@ py_library(
     name = "resolver_lib",
     srcs = ["resolver.py"],
     deps = [
-        "@containerregistry//:containerregistry",
-        "@yaml//:yaml",
+        "@containerregistry",
+        "@yaml",
     ],
 )
 
@@ -44,7 +44,7 @@ py_test(
     ],
     deps = [
         ":resolver_lib",
-        "@mock//:mock",
+        "@mock",
     ],
 )
 
@@ -54,8 +54,8 @@ par_binary(
     main = "resolver.py",
     visibility = ["//visibility:public"],
     deps = [
-        "@containerregistry//:containerregistry",
-        "@yaml//:yaml",
+        "@containerregistry",
+        "@yaml",
     ],
 )
 
