@@ -21,7 +21,7 @@ war_image(
     name = "server",
     srcs = ["Servlet.java"],
     deps = [
-        "@javax_servlet_api//jar:jar",
+        "@javax_servlet_api//jar",
     ],
 )
 
