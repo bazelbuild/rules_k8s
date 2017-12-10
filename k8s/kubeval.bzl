@@ -13,57 +13,38 @@
 # limitations under the License.
 """An implementation of kubeval for validating k8s objects."""
 
-_KUBEVAL_VERSION = "0.6.0/"
-
-_KUBEVAL_BASE_URL = "https://github.com/garethr/kubeval/releases/download/"
-
-_KUBEVAL_URLS = {
-    "darwin": _KUBEVAL_BASE_URL + _KUBEVAL_VERSION + "kubeval-darwin-amd64.tar.gz",
-    "linux": _KUBEVAL_BASE_URL + _KUBEVAL_VERSION + "kubeval-linux-amd64.tar.gz",
-}
-
-_KUBEVAL_SHAS = {
-    "darwin": "40122cce2abe1b51ea9752ff00fee61ae3107623d66d7ffc776c8edae8fa9b91",
-    "linux": "b6912927c0df8e4bb7e3a842668de6302b1e81aac476e5cec11772c7e6d98254",
-}
-
-def _kubeval_repositories_impl(repository_ctx):
-    if repository_ctx.os.name == 'mac os x':
-        platform = 'darwin'
-    else:
-        platform = 'linux'
-    
-    repository_ctx.download_and_extract(
-        url=_KUBEVAL_URLS[platform],
-        output=repository_ctx.path(""),
-        type='.tar.gz',
-        sha256=_KUBEVAL_SHAS[platform]
-    )
-    build = """
-package(default_visibility = ["//visibility:public"])
-exports_files(["kubeval"])
-"""
-    repository_ctx.file("BUILD", build)
-
-_kubeval_repositories = repository_rule(implementation = _kubeval_repositories_impl)
 
 def _impl(ctx):
   """Core implementation of kubeval."""
   content="""
 #!/bin/bash
 set -e
-cat {config} | {kubeval}
+
+# The schema directory has to have the structure 'kubernetes-json-schema/master', so do that in a tmpdir
+tmp_dir=$(mktemp -d)
+trap "{{ rm -rf $tmp_dir; }}" EXIT
+
+schema_dir=$tmp_dir/kubernetes-json-schema/master/
+mkdir -p $schema_dir
+ln -s $(pwd)/external/kubeval_schemas/* $schema_dir
+
+cat {config} | {kubeval} --schema-location=file://$tmp_dir --kubernetes-version={kube_version}
 """.format(
     kubeval=ctx.executable._kubeval.short_path,
-    config=ctx.file.config.short_path)
+    config=ctx.file.config.short_path,
+    schemas=ctx.attr._schemas,
+    kube_version=ctx.attr.kubernetes_version)
 
   ctx.actions.write(output=ctx.outputs.executable, content=content, is_executable=True)
   return struct(
-      runfiles=ctx.runfiles(files=[ctx.executable._kubeval, ctx.file.config])
+      runfiles=ctx.runfiles(
+          files=[ctx.executable._kubeval,
+                 ctx.file.config] + 
+                 ctx.attr._schemas.data_runfiles.files.to_list() +
+                 ctx.attr._schemas.default_runfiles.files.to_list())
   )
 
 
-# TODO(dlorenc): expose more paramters for things like API version and custom schema location
 kubeval_test = rule(
     attrs = {
         "config": attr.label(
@@ -72,17 +53,24 @@ kubeval_test = rule(
             mandatory = True,
             single_file = True,
         ),
+        "kubernetes_version": attr.string(
+            default = "master",
+            doc = "Version of Kubernetes to validate against."
+        ),
         "_kubeval": attr.label(
             default = Label("@kubeval//:kubeval"),
             cfg = "target",
             executable = True,
             allow_files = True,
         ),
+        "_schemas": attr.label(
+            default = Label("@kubeval_schemas//:schemas"),
+            allow_files = True,
+            single_file = False,
+        )
     },
     executable = True,
     test = True,
     implementation = _impl,
 )
 
-def kubeval_repositories():
-    _kubeval_repositories(name="kubeval")

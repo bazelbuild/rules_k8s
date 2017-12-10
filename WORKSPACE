@@ -74,7 +74,7 @@ py_library(
     url = "https://pypi.python.org/packages/source/m/mock/mock-1.0.1.tar.gz",
 )
 
-load("//k8s:kubeval.bzl", "kubeval_repositories")
+load("//k8s:kubeval_repos.bzl", "kubeval_repositories")
 
 kubeval_repositories()
 
