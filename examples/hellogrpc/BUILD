@@ -24,8 +24,8 @@ k8s_deploy(
 )
 
 kubeval_test(
-    name="deployment_schema_test",
-    config=":deployment.yaml"
+    name = "deployment_schema_test",
+    config = ":deployment.yaml",
 )
 
 load("@k8s_service//:defaults.bzl", "k8s_service")
@@ -36,8 +36,8 @@ k8s_deploy(
 )
 
 kubeval_test(
-    name="service_schema_test",
-    config=":service.yaml"
+    name = "service_schema_test",
+    config = ":service.yaml",
 )
 
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")

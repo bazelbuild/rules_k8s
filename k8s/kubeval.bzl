@@ -13,7 +13,6 @@
 # limitations under the License.
 """An implementation of kubeval for validating k8s objects."""
 
-
 def _impl(ctx):
   """Core implementation of kubeval."""
   content="""
@@ -44,7 +43,6 @@ cat {config} | {kubeval} --schema-location=file://$tmp_dir --kubernetes-version=
                  ctx.attr._schemas.default_runfiles.files.to_list())
   )
 
-
 kubeval_test = rule(
     attrs = {
         "config": attr.label(
@@ -55,7 +53,7 @@ kubeval_test = rule(
         ),
         "kubernetes_version": attr.string(
             default = "master",
-            doc = "Version of Kubernetes to validate against."
+            doc = "Version of Kubernetes to validate against.",
         ),
         "_kubeval": attr.label(
             default = Label("@kubeval//:kubeval"),
@@ -67,10 +65,9 @@ kubeval_test = rule(
             default = Label("@kubeval_schemas//:schemas"),
             allow_files = True,
             single_file = False,
-        )
+        ),
     },
     executable = True,
     test = True,
     implementation = _impl,
 )
-
