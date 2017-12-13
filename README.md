@@ -64,6 +64,11 @@ for setting up authentication:
 gcloud container clusters get-credentials <CLUSTER NAME>
 ```
 
+## Dependencies
+
+The rules will require the `kubectl` tool when executing the `run` action from
+bazel. If GKE is used, also the `gcloud` sdk need to be installed.
+
 ## Examples
 
 ### Basic "deployment" objects
@@ -405,7 +410,8 @@ A rule for interacting with Kubernetes objects.
         <p><code>string, optional</code></p>
         <p>The namespace on the cluster within which the actions are
           performed.</p>
-        <p><b>If this is omitted, it will default to
+        <p><b>If this is omitted, it will default to the value specified
+          in the template or if also unspecified there, to the value
           <code>"default"</code>.</b></p>
       </td>
     </tr>
