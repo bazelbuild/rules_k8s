@@ -23,5 +23,4 @@ function guess_runfiles() {
 
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
-kubectl --cluster="%{cluster}" --namespace="%{namespace}" delete \
-    -f %{unresolved}
+kubectl --cluster="%{cluster}" %{namespace_arg} delete -f %{unresolved}
