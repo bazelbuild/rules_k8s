@@ -35,28 +35,61 @@ def _kubeval_repositories_impl(repository_ctx):
     
     repository_ctx.download_and_extract(
         url=_KUBEVAL_URLS[platform],
-        output=repository_ctx.path(""),
+        output=repository_ctx.path("bin"),
         type='.tar.gz',
         sha256=_KUBEVAL_SHAS[platform]
     )
+
+    kubeval_script_contents = """#!/bin/bash
+set -e
+find .
+kubeval --kubernetes-version={kube_version} --schema-location=$1
+""".format(kube_version=repository_ctx.attr.kube_version)
+
+    repository_ctx.file(
+        "kubeval.sh",
+        content=kubeval_script_contents,
+        executable=True)
+
+
     build = """
 package(default_visibility = ["//visibility:public"])
-exports_files(["kubeval"])
-"""
+
+sh_binary(
+    name = "kubeval",
+    srcs = [":kubeval.sh"],
+    data = ["@kubeval_schemas//:schemas", ":bin/kubeval"],
+)
+""".format(kube_version=repository_ctx.attr.kube_version)
+
     repository_ctx.file("BUILD", build)
 
-_kubeval_repositories = repository_rule(implementation = _kubeval_repositories_impl)
+_kubeval_repositories = repository_rule(
+    attrs = {
+        "kube_version": attr.string(mandatory = True),
+    },
+    implementation = _kubeval_repositories_impl,
+)
 
-def kubeval_repositories():
+def kubeval_repositories(kube_version):
+    # Master is special cased in the binary.
+    if kube_version == "master":
+        path = "master"
+    else:
+        path = "v%s-standalone" % kube_version
+
+    build_file_template = """
+package(default_visibility = ["//visibility:public"])
+filegroup(
+    name="schemas",
+    srcs=glob(["{kube_version}/**/*"]),
+)
+"""
+    build_file_content = build_file_template.format(kube_version=path)
     native.new_git_repository(
         name="kubeval_schemas",
         commit="27cc8de3a29de73bbe6ddf63006ee4ce1dbf3792",
         remote="https://github.com/garethr/kubernetes-json-schema.git",
-        build_file_content="""
-package(default_visibility = ["//visibility:public"])
-filegroup(
-    name="schemas",
-    srcs=glob(["**/*"]),
-)"""
+        build_file_content=build_file_content
     )
-    _kubeval_repositories(name="kubeval")
+    _kubeval_repositories(name="kubeval", kube_version=kube_version)

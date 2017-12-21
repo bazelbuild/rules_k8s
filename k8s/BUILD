@@ -23,6 +23,7 @@ exports_files([
     "resolve-all.sh.tpl",
     "delete.sh.tpl",
     "describe.sh.tpl",
+    "kubeval.sh.tpl",
 ])
 
 load("@subpar//:subpar.bzl", "par_binary")

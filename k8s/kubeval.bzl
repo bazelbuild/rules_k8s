@@ -15,26 +15,19 @@
 
 def _impl(ctx):
   """Core implementation of kubeval."""
-  content="""
-#!/bin/bash
-set -e
+  # All the schema files should be in the same directory.
+  schemas_dir = ctx.attr._schemas.files.to_list()[0].dirname
 
-# The schema directory has to have the structure 'kubernetes-json-schema/master', so do that in a tmpdir
-tmp_dir=$(mktemp -d)
-trap "{{ rm -rf $tmp_dir; }}" EXIT
+  ctx.actions.expand_template(
+      template=ctx.file._template,
+      output=ctx.outputs.executable,
+      substitutions={
+        "%{kubeval}": ctx.executable._kubeval.short_path,
+        "%{config}": ctx.file.config.short_path,
+        "%{schemas}": schemas_dir
+      },
+      is_executable=True)
 
-schema_dir=$tmp_dir/kubernetes-json-schema/master/
-mkdir -p $schema_dir
-ln -s $(pwd)/external/kubeval_schemas/* $schema_dir
-
-cat {config} | {kubeval} --schema-location=file://$tmp_dir --kubernetes-version={kube_version}
-""".format(
-    kubeval=ctx.executable._kubeval.short_path,
-    config=ctx.file.config.short_path,
-    schemas=ctx.attr._schemas,
-    kube_version=ctx.attr.kubernetes_version)
-
-  ctx.actions.write(output=ctx.outputs.executable, content=content, is_executable=True)
   return struct(
       runfiles=ctx.runfiles(
           files=[ctx.executable._kubeval,
@@ -51,10 +44,6 @@ kubeval_test = rule(
             mandatory = True,
             single_file = True,
         ),
-        "kubernetes_version": attr.string(
-            default = "master",
-            doc = "Version of Kubernetes to validate against.",
-        ),
         "_kubeval": attr.label(
             default = Label("@kubeval//:kubeval"),
             cfg = "target",
@@ -65,6 +54,11 @@ kubeval_test = rule(
             default = Label("@kubeval_schemas//:schemas"),
             allow_files = True,
             single_file = False,
+        ),
+        "_template": attr.label(
+            default = Label("//k8s:kubeval.sh.tpl"),
+            single_file = True,
+            allow_files = True,
         ),
     },
     executable = True,

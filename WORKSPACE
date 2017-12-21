@@ -76,7 +76,7 @@ py_library(
 
 load("//k8s:kubeval_repos.bzl", "kubeval_repositories")
 
-kubeval_repositories()
+kubeval_repositories(kube_version = "1.8.1")
 
 # ================================================================
 # Imports for examples/
