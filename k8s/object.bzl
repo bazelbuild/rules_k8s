@@ -166,7 +166,7 @@ def _common_impl(ctx):
   return struct(runfiles = ctx.runfiles(files = files))
 
 _common_attrs = {
-    "namespace": attr.string(default = "default"),
+    "namespace": attr.string(),
     # We allow cluster to be omitted, and we just
     # don't expose the extra actions.
     "cluster": attr.string(),
