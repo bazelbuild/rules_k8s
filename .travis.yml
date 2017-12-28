@@ -56,5 +56,6 @@ script:
   - ./examples/hellohttp/e2e-test.sh java
   - ./examples/hellohttp/e2e-test.sh go
   - ./examples/hellohttp/e2e-test.sh py
+  - ./examples/hellohttp/e2e-test.sh nodejs
   # Third, TODO Controller.
   - ./examples/todocontroller/e2e-test.sh py
