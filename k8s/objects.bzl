@@ -55,7 +55,7 @@ _run_all = rule(
     implementation = _run_all_impl,
 )
 
-def k8s_objects(name, objects):
+def k8s_objects(name, objects, **kwargs):
   """Interact with a collection of K8s objects.
 
   Args:
@@ -66,8 +66,8 @@ def k8s_objects(name, objects):
   # TODO(mattmoor): We may have to normalize the labels that come
   # in through objects.
 
-  _run_all(name=name, objects=objects, delimiter="echo ---\n")
-  _run_all(name=name + ".create", objects=[x + ".create" for x in objects])
-  _run_all(name=name + ".delete", objects=[x + ".delete" for x in objects])
-  _run_all(name=name + ".replace", objects=[x + ".replace" for x in objects])
-  _run_all(name=name + ".apply", objects=[x + ".apply" for x in objects])
+  _run_all(name=name, objects=objects, delimiter="echo ---\n", **kwargs)
+  _run_all(name=name + ".create", objects=[x + ".create" for x in objects], **kwargs)
+  _run_all(name=name + ".delete", objects=[x + ".delete" for x in objects], **kwargs)
+  _run_all(name=name + ".replace", objects=[x + ".replace" for x in objects], **kwargs)
+  _run_all(name=name + ".apply", objects=[x + ".apply" for x in objects], **kwargs)
