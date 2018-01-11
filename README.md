@@ -291,8 +291,9 @@ k8s_deploy(
 )
 ```
 
-This script needs to invoke the default resolver (`//k8s:resolver`) with all its
-arguments, but may capture the output and apply additional modifications.
+This script may need to invoke the default resolver (`//k8s:resolver`) with all
+its arguments. It may capture the default resolver's output and apply additional
+modifications to the YAML.
 
 
 ## Usage
@@ -574,6 +575,14 @@ A repository rule that allows users to alias `k8s_object` with default values.
       <td>
         <p><code>string, optional</code></p>
         <p>The repository under which to actually publish Docker images.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>resolver</code></td>
+      <td>
+        <p><code>target, optional</code></p>
+        <p>A build target for the binary that's called to resolves references
+           inside the Kubernetes YAML files.</p>
       </td>
     </tr>
   </tbody>
