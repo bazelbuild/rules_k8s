@@ -90,7 +90,7 @@ def _impl(ctx):
   ctx.actions.expand_template(
       template = ctx.file._template,
       substitutions = {
-        "%{resolver}": _runfiles(ctx, ctx.executable._resolver),
+        "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
         "%{yaml}": _runfiles(ctx, ctx.file.template),
         "%{image_chroot}": image_chroot_arg,
         "%{images}": " ".join([
@@ -102,9 +102,9 @@ def _impl(ctx):
   )
 
   return struct(runfiles = ctx.runfiles(files = [
-    ctx.executable._resolver,
+    ctx.executable.resolver,
     ctx.file.template,
-  ] + list(ctx.attr._resolver.default_runfiles.files) + all_inputs))
+  ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
 
 def _resolve(ctx, string, output):
   stamps = [ctx.info_file, ctx.version_file]
@@ -124,7 +124,7 @@ def _resolve(ctx, string, output):
   )
 
 def _common_impl(ctx):
-  files = [ctx.executable._resolver]
+  files = [ctx.executable.resolver]
 
   cluster_arg = ctx.attr.cluster
   if "{" in ctx.attr.cluster:
@@ -173,7 +173,7 @@ _common_attrs = {
     # This is only needed for describe.
     "kind": attr.string(),
     "image_chroot": attr.string(),
-    "_resolver": attr.label(
+    "resolver": attr.label(
         default = Label("//k8s:resolver"),
         cfg = "host",
         executable = True,
