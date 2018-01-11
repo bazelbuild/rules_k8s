@@ -264,6 +264,37 @@ Then the references to `gcr.io/rules_k8s/server:dev` will be replaced with one
 to: `us.gcr.io/company-{BUILD_USER}/dev/gcr.io/rules_k8s/server@sha256:...`.
 
 
+### Custom resolvers
+
+Sometimes, you need to replace additional runtime parameters in the YAML file.
+While you can use `expand_template` for parameters known to the build system,
+you'll need a custom resolver if the parameter is determined at deploy time.
+A common example is Google Cloud Endpoints service versions, which are
+determined by the server.
+
+You can pass a custom resolver executable as the `resolver` argument of all
+rules:
+
+```python
+sh_binary(
+  name = "my_script",
+  ...
+)
+
+k8s_deploy(
+  name = "dev"
+  template = ":deployment.yaml",
+  images = {
+    "gcr.io/rules_k8s/server:dev": "//server:image"
+  },
+  resolver = "//my_script",
+)
+```
+
+This script needs to invoke the default resolver (`//k8s:resolver`) with all its
+arguments, but may capture the output and apply additional modifications.
+
+
 ## Usage
 
 The `k8s_object[s]` rules expose a collection of actions.  We will follow the `:dev`
