@@ -197,7 +197,7 @@ _common_attrs = {
 }
 
 _k8s_object = rule(
-    attrs = add_dicts({
+    attrs = _add_dicts({
         "template": attr.label(
             allow_files = [
                 ".yaml",
@@ -221,7 +221,7 @@ _k8s_object = rule(
 )
 
 _k8s_object_apply = rule(
-    attrs = add_dicts({
+    attrs = _add_dicts({
         "resolved": attr.label(
             cfg = "target",
             executable = True,
@@ -238,7 +238,7 @@ _k8s_object_apply = rule(
 )
 
 _k8s_object_create = rule(
-    attrs = add_dicts({
+    attrs = _add_dicts({
         "resolved": attr.label(
             cfg = "target",
             executable = True,
@@ -255,7 +255,7 @@ _k8s_object_create = rule(
 )
 
 _k8s_object_replace = rule(
-    attrs = add_dicts({
+    attrs = _add_dicts({
         "resolved": attr.label(
             cfg = "target",
             executable = True,
@@ -272,7 +272,7 @@ _k8s_object_replace = rule(
 )
 
 _k8s_object_describe = rule(
-    attrs = add_dicts({
+    attrs = _add_dicts({
         "unresolved": attr.label(
             allow_files = [
                 ".yaml",
@@ -292,7 +292,7 @@ _k8s_object_describe = rule(
 )
 
 _k8s_object_delete = rule(
-    attrs = add_dicts({
+    attrs = _add_dicts({
         "unresolved": attr.label(
             allow_files = [
                 ".yaml",
