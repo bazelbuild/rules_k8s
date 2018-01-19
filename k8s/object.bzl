@@ -37,6 +37,15 @@ def _deduplicate(iterable):
   """
   return {k: None for k in iterable}.keys()
 
+def _add_dicts(*dicts):
+  """
+  Creates a new dict with a union of the elements of the arguments
+  """
+  result = {}
+  for d in dicts:
+    result.update(d)
+  return result
+
 def _impl(ctx):
   """Core implementation of k8s_object."""
 
@@ -188,7 +197,7 @@ _common_attrs = {
 }
 
 _k8s_object = rule(
-    attrs = {
+    attrs = _add_dicts({
         "template": attr.label(
             allow_files = [
                 ".yaml",
@@ -206,13 +215,13 @@ _k8s_object = rule(
             single_file = True,
             allow_files = True,
         ),
-    } + _common_attrs + _layer_tools,
+    }, _common_attrs, _layer_tools),
     executable = True,
     implementation = _impl,
 )
 
 _k8s_object_apply = rule(
-    attrs = {
+    attrs = _add_dicts({
         "resolved": attr.label(
             cfg = "target",
             executable = True,
@@ -223,13 +232,13 @@ _k8s_object_apply = rule(
             single_file = True,
             allow_files = True,
         ),
-    } + _common_attrs,
+    }, _common_attrs),
     executable = True,
     implementation = _common_impl,
 )
 
 _k8s_object_create = rule(
-    attrs = {
+    attrs = _add_dicts({
         "resolved": attr.label(
             cfg = "target",
             executable = True,
@@ -240,13 +249,13 @@ _k8s_object_create = rule(
             single_file = True,
             allow_files = True,
         ),
-    } + _common_attrs,
+    }, _common_attrs),
     executable = True,
     implementation = _common_impl,
 )
 
 _k8s_object_replace = rule(
-    attrs = {
+    attrs = _add_dicts({
         "resolved": attr.label(
             cfg = "target",
             executable = True,
@@ -257,13 +266,13 @@ _k8s_object_replace = rule(
             single_file = True,
             allow_files = True,
         ),
-    } + _common_attrs,
+    }, _common_attrs),
     executable = True,
     implementation = _common_impl,
 )
 
 _k8s_object_describe = rule(
-    attrs = {
+    attrs = _add_dicts({
         "unresolved": attr.label(
             allow_files = [
                 ".yaml",
@@ -277,13 +286,13 @@ _k8s_object_describe = rule(
             single_file = True,
             allow_files = True,
         ),
-    } + _common_attrs,
+    }, _common_attrs),
     executable = True,
     implementation = _common_impl,
 )
 
 _k8s_object_delete = rule(
-    attrs = {
+    attrs = _add_dicts({
         "unresolved": attr.label(
             allow_files = [
                 ".yaml",
@@ -297,7 +306,7 @@ _k8s_object_delete = rule(
             single_file = True,
             allow_files = True,
         ),
-    } + _common_attrs,
+    }, _common_attrs),
     executable = True,
     implementation = _common_impl,
 )
