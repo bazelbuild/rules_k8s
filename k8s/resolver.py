@@ -17,6 +17,7 @@
 from __future__ import print_function
 
 import argparse
+import logging
 import os
 import sys
 
@@ -170,9 +171,12 @@ def main():
   for spec in args.image_spec or []:
     parts = spec.split(';')
     kwargs = dict([x.split('=', 2) for x in parts])
-    (tag, digest) = Publish(transport, args.image_chroot, **kwargs)
-    overrides[tag] = digest
-    unseen_strings.add(tag)
+    try:
+      (tag, digest) = Publish(transport, args.image_chroot, **kwargs)
+      overrides[tag] = digest
+      unseen_strings.add(tag)
+    except Exception as e:
+      logging.fatal('Error publishing provided image: %s', e)
 
   with open(args.template, 'r') as f:
     inputs = f.read()
