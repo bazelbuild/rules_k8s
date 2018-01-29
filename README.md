@@ -123,6 +123,8 @@ k8s_deploy(
 )
 ```
 
+Note that in `load("@k8s_deploy//:defaults.bzl", "k8s_deploy")` both `k8s_deploy`'s are references to the `name` parameter passed to `k8s_defaults`. If you change `name = "k8s_deploy"` to something else, you will need to change the `load` statement in both places.
+
 ### Multi-Object Actions
 
 It is common practice in the Kubernetes world to have multiple objects that
