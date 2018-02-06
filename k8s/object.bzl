@@ -90,6 +90,7 @@ def _impl(ctx):
       ])]
 
   image_chroot_arg = ctx.attr.image_chroot
+  image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
   if "{" in ctx.attr.image_chroot:
     image_chroot_file = ctx.new_file(ctx.label.name + ".image-chroot-name")
     _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
@@ -145,6 +146,7 @@ def _common_impl(ctx):
 
 
   namespace_arg = ctx.attr.namespace
+  namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
   if "{" in ctx.attr.namespace:
     namespace_file = ctx.new_file(ctx.label.name + ".namespace-name")
     _resolve(ctx, ctx.attr.namespace, namespace_file)
