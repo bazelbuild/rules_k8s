@@ -136,11 +136,13 @@ def _common_impl(ctx):
   files = [ctx.executable.resolver]
 
   cluster_arg = ctx.attr.cluster
+  cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
   if "{" in ctx.attr.cluster:
     cluster_file = ctx.new_file(ctx.label.name + ".cluster-name")
     _resolve(ctx, ctx.attr.cluster, cluster_file)
     cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
     files += [cluster_file]
+
 
   namespace_arg = ctx.attr.namespace
   if "{" in ctx.attr.namespace:
