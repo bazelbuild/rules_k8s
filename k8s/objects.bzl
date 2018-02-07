@@ -68,6 +68,6 @@ def k8s_objects(name, objects, **kwargs):
 
   _run_all(name=name, objects=objects, delimiter="echo ---\n", **kwargs)
   _run_all(name=name + ".create", objects=[x + ".create" for x in objects], **kwargs)
-  _run_all(name=name + ".delete", objects=[x + ".delete" for x in objects], **kwargs)
+  _run_all(name=name + ".delete", objects=[x + ".delete" for x in reversed(objects)], **kwargs)
   _run_all(name=name + ".replace", objects=[x + ".replace" for x in objects], **kwargs)
   _run_all(name=name + ".apply", objects=[x + ".apply" for x in objects], **kwargs)
