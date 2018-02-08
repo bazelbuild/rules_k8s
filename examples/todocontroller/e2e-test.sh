@@ -60,6 +60,20 @@ function delete() {
     bazel-bin/examples/todocontroller/${LANGUAGE}/staging.delete
 }
 
+function check_reverse_delete_k8s_object() {
+    echo Checking deletion in reverse order via k8s_object.
+    bazel run examples/todocontroller:joined.apply
+    bazel run examples/todocontroller:joined.delete
+}
+
+function check_reverse_delete_k8s_objects() {
+    echo Checking deletion in reverse order via k8s_objects.
+    bazel run examples/todocontroller:everything.apply
+    bazel run examples/todocontroller:everything.delete
+}
+
+check_reverse_delete_k8s_object
+check_reverse_delete_k8s_objects
 
 create
 trap "delete" EXIT
