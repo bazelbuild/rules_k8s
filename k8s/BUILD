@@ -21,6 +21,7 @@ exports_files([
     "replace.sh.tpl",
     "resolve.sh.tpl",
     "resolve-all.sh.tpl",
+    "reverse.sh.tpl",
     "delete.sh.tpl",
     "describe.sh.tpl",
 ])
@@ -63,5 +64,12 @@ par_binary(
     name = "stamper",
     srcs = ["stamper.py"],
     main = "stamper.py",
+    visibility = ["//visibility:public"],
+)
+
+par_binary(
+    name = "reverser",
+    srcs = ["reverser.py"],
+    main = "reverser.py",
     visibility = ["//visibility:public"],
 )

@@ -30,3 +30,21 @@ k8s_todo(
     name = "example-todo",
     template = ":example.yaml",
 )
+
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+
+k8s_objects(
+    name = "everything",
+    objects = [
+        # Create the CRD first.
+        ":todo-crd",
+        ":example-todo",
+    ],
+)
+
+load("@k8s_object//:defaults.bzl", "k8s_object")
+
+k8s_todo(
+    name = "joined",
+    template = ":joined.yaml",
+)

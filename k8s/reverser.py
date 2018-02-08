@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +11,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
+"""Reverses the object order in a multi-document yaml."""
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+from __future__ import print_function
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
+import argparse
 
-PYTHON_RUNFILES=${RUNFILES} %{reverse_script} | \
-  kubectl --cluster="%{cluster}" %{namespace_arg} delete -f -
+
+parser = argparse.ArgumentParser(
+    description='Reverse a potential multi-document input.')
+
+parser.add_argument(
+  '--template', action='store',
+  help='The template file to resolve.')
+
+_DOCUMENT_DELIMITER = '---\n'
+
+
+def main():
+  args = parser.parse_args()
+
+  with open(args.template, 'r') as f:
+    inputs = f.read()
+
+  content = _DOCUMENT_DELIMITER.join(
+    reversed(inputs.split(_DOCUMENT_DELIMITER)))
+
+  print(content)
+
+
+if __name__ == '__main__':
+  main()

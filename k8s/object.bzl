@@ -116,6 +116,7 @@ def _impl(ctx):
     ctx.file.template,
   ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
 
+
 def _resolve(ctx, string, output):
   stamps = [ctx.info_file, ctx.version_file]
   stamp_args = [
@@ -167,6 +168,11 @@ def _common_impl(ctx):
     files += [ctx.executable.resolved]
     files += list(ctx.attr.resolved.default_runfiles.files)
 
+  if hasattr(ctx.executable, "reversed"):
+    substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
+    files += [ctx.executable.reversed]
+    files += list(ctx.attr.reversed.default_runfiles.files)
+
   if hasattr(ctx.files, "unresolved"):
     substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
     files += ctx.files.unresolved
@@ -199,6 +205,53 @@ _common_attrs = {
         allow_files = True,
     ),
 }
+
+def _reverse(ctx):
+  """Implementation of _reversed."""
+  ctx.actions.expand_template(
+      template = ctx.file._template,
+      substitutions = {
+        "%{reverser}": _runfiles(ctx, ctx.executable.reverser),
+        "%{yaml}": _runfiles(ctx, ctx.file.template),
+      },
+      output = ctx.outputs.executable,
+  )
+
+  return struct(runfiles = ctx.runfiles(files = [
+    ctx.executable.reverser,
+    ctx.file.template,
+  ] + list(ctx.attr.reverser.default_runfiles.files)))
+
+_reversed = rule(
+    attrs = _add_dicts(
+        {
+            "template": attr.label(
+                allow_files = [
+                    ".yaml",
+                    ".json",
+                ],
+                single_file = True,
+                mandatory = True,
+            ),
+            "reverser": attr.label(
+                default = Label("//k8s:reverser"),
+                cfg = "host",
+                executable = True,
+                allow_files = True,
+            ),
+            "_template": attr.label(
+                default = Label("//k8s:reverse.sh.tpl"),
+                single_file = True,
+                allow_files = True,
+            ),
+        },
+        _common_attrs,
+        _layer_tools,
+    ),
+    executable = True,
+    implementation = _reverse,
+)
+
 
 _k8s_object = rule(
     attrs = _add_dicts(
@@ -314,13 +367,10 @@ _k8s_object_describe = rule(
 _k8s_object_delete = rule(
     attrs = _add_dicts(
         {
-            "unresolved": attr.label(
-                allow_files = [
-                    ".yaml",
-                    ".json",
-                ],
-                single_file = True,
-                mandatory = True,
+            "reversed": attr.label(
+                cfg = "target",
+                executable = True,
+                allow_files = True,
             ),
             "_template": attr.label(
                 default = Label("//k8s:delete.sh.tpl"),
@@ -344,7 +394,7 @@ def k8s_object(name, **kwargs):
     template: the yaml template to instantiate.
     images: a dictionary from fully-qualified tag to label.
   """
-  for reserved in ["image_targets", "image_target_strings", "resolved"]:
+  for reserved in ["image_targets", "image_target_strings", "resolved", "reversed"]:
     if reserved in kwargs:
       fail("reserved for internal use by docker_bundle macro", attr=reserved)
 
@@ -352,12 +402,13 @@ def k8s_object(name, **kwargs):
   kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
   _k8s_object(name=name, **kwargs)
+  _reversed(name=name + ".reversed", template=kwargs.get("template"))
 
   if "cluster" in kwargs:
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                        namespace=kwargs.get("namespace"))
-    _k8s_object_delete(name=name + ".delete", unresolved=kwargs.get("template"),
+    _k8s_object_delete(name=name + ".delete", reversed=name + ".reversed",
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
                        namespace=kwargs.get("namespace"))
     _k8s_object_replace(name=name + ".replace", resolved=name,
