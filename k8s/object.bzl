@@ -116,7 +116,6 @@ def _impl(ctx):
     ctx.file.template,
   ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
 
-
 def _resolve(ctx, string, output):
   stamps = [ctx.info_file, ctx.version_file]
   stamp_args = [
@@ -251,7 +250,6 @@ _reversed = rule(
     executable = True,
     implementation = _reverse,
 )
-
 
 _k8s_object = rule(
     attrs = _add_dicts(
