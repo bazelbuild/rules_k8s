@@ -2,7 +2,7 @@
 
 Travis CI | Bazel CI
 :---: | :---:
-[![Build Status](https://travis-ci.org/bazelbuild/rules_k8s.svg?branch=master)](https://travis-ci.org/bazelbuild/rules_k8s) | [![Build Status](https://ci.bazel.io/buildStatus/icon?job=rules_k8s)](https://ci.bazel.io/job/rules_k8s)
+[![Build Status](https://travis-ci.org/bazelbuild/rules_k8s.svg?branch=master)](https://travis-ci.org/bazelbuild/rules_k8s) | [![Build status](https://badge.buildkite.com/4eafd3b619b9febae679bac4ce75b6b74643d48384e7f36eeb.svg)](https://buildkite.com/bazel/k8s-rules-k8s-postsubmit)
 
 ## Rules
 
