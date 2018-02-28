@@ -2,6 +2,10 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: todo-controller-staging
+  annotations:
+    rules-k8s.bazel.io/foo: |
+      ---
+      foo: bar
 spec:
   replicas: 1
   template:

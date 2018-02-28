@@ -16,7 +16,7 @@
 from __future__ import print_function
 
 import argparse
-
+import yaml
 
 parser = argparse.ArgumentParser(
     description='Reverse a potential multi-document input.')
@@ -25,8 +25,6 @@ parser.add_argument(
   '--template', action='store',
   help='The template file to resolve.')
 
-_DOCUMENT_DELIMITER = '---\n'
-
 
 def main():
   args = parser.parse_args()
@@ -34,8 +32,7 @@ def main():
   with open(args.template, 'r') as f:
     inputs = f.read()
 
-  content = _DOCUMENT_DELIMITER.join(
-    reversed(inputs.split(_DOCUMENT_DELIMITER)))
+  content = yaml.dump_all(reversed([x for x in yaml.load_all(inputs)]))
 
   print(content)
 
