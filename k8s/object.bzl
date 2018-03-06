@@ -14,7 +14,7 @@
 """An implementation of k8s_object for interacting with an object of kind."""
 
 load(
-    "@io_bazel_rules_docker//container:layers.bzl",
+    "@io_bazel_rules_docker//container:layer_tools.bzl",
     _get_layers = "get_from_target",
     _layer_tools = "tools",
 )
