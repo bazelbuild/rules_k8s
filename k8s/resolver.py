@@ -188,9 +188,10 @@ def main():
   content = Resolve(inputs, _StringToDigest)
 
   if len(unseen_strings) > 0:
-    print('The following image references were not found: [%s]' % "\n".join([
-      str(x) for x in unseen_strings
-    ]),file=sys.stderr)
+    print('ERROR: The following image references were not found in %r:' %
+          args.template, file=sys.stderr)
+    for ref in unseen_strings:
+      print('    %s' % ref, file=sys.stderr)
     sys.exit(1)
 
   print(content)
