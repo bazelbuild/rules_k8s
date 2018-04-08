@@ -30,11 +30,19 @@ before_install:
 install:
   - go get -u github.com/bazelbuild/buildifier/buildifier
 
+env:
+  - USE_RULES_DOCKER_HEAD=true
+  - USE_RULES_DOCKER_HEAD=false
+
 script:
   # Check our installs.
   - bazel version
   - gcloud version
   - kubectl version
+
+  - [[ "${USE_RULES_DOCKER_HEAD}" == "true" ]] &&
+    sed -i.bak "s/27c94dec66c3c9fdb478c33994471c5bfc15b6eb/4d8ec6570a5313fb0128e2354f2bc4323685282a/" WORKSPACE &&
+    rm WORKSPACE.bak
 
   # Check that all of our tools and samples build
   - bazel clean && bazel build //...
