@@ -473,6 +473,15 @@ A rule for interacting with Kubernetes objects.
         <p>The repository under which to actually publish Docker images.</p>
       </td>
     </tr>
+    <tr>
+      <td><code>wait_for_rollout</code></td>
+      <td>
+        <p><code>bool, optional</code></p>
+        <p>Whether or not to wait for the rollout of a Deployment or StatefulSet. No effect if used on any other resource type.</p>
+        <p><b>If this is omitted, it will default to
+          <code>False</code>.</b></p>
+      </td>
+    </tr>
   </tbody>
 </table>
 

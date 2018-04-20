@@ -160,6 +160,7 @@ def _common_impl(ctx):
       "%{cluster}": cluster_arg,
       "%{namespace_arg}": namespace_arg,
       "%{kind}": ctx.attr.kind,
+      "%{wait_for_rollout}": str(ctx.attr.wait_for_rollout)
   }
 
   if hasattr(ctx.executable, "resolved"):
@@ -203,6 +204,7 @@ _common_attrs = {
         executable = True,
         allow_files = True,
     ),
+    "wait_for_rollout": attr.bool(),
 }
 
 def _reverse(ctx):
@@ -391,6 +393,7 @@ def k8s_object(name, **kwargs):
     kind: the object kind.
     template: the yaml template to instantiate.
     images: a dictionary from fully-qualified tag to label.
+    wait_for_rollout: whether to check the rollout status of any deployments.
   """
   for reserved in ["image_targets", "image_target_strings", "resolved", "reversed"]:
     if reserved in kwargs:
@@ -405,16 +408,16 @@ def k8s_object(name, **kwargs):
   if "cluster" in kwargs:
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       namespace=kwargs.get("namespace"), wait_for_rollout=kwargs.get("wait_for_rollout"))
     _k8s_object_delete(name=name + ".delete", reversed=name + ".reversed",
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       namespace=kwargs.get("namespace"), wait_for_rollout=kwargs.get("wait_for_rollout"))
     _k8s_object_replace(name=name + ".replace", resolved=name,
                         kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                        namespace=kwargs.get("namespace"))
+                        namespace=kwargs.get("namespace"), wait_for_rollout=kwargs.get("wait_for_rollout"))
     _k8s_object_apply(name=name + ".apply", resolved=name,
                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                      namespace=kwargs.get("namespace"))
+                      namespace=kwargs.get("namespace"), wait_for_rollout=kwargs.get("wait_for_rollout"))
     if "kind" in kwargs:
       _k8s_object_describe(name=name + ".describe", unresolved=kwargs.get("template"),
                            kind=kwargs.get("kind"),
