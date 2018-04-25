@@ -30,21 +30,21 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 
 k8s_repositories()
 
-_CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+_CLUSTER = "{STABLE_BUILD_CLUSTER}"
 
 _NAMESPACE = "{BUILD_USER}"
 
 k8s_defaults(
     name = "k8s_object",
     cluster = _CLUSTER,
-    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
+    image_chroot = "{STABLE_DOCKER_REPO}/{BUILD_USER}",
     namespace = _NAMESPACE,
 )
 
 k8s_defaults(
     name = "k8s_deploy",
     cluster = _CLUSTER,
-    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
+    image_chroot = "{STABLE_DOCKER_REPO}/{BUILD_USER}",
     kind = "deployment",
     namespace = _NAMESPACE,
 )

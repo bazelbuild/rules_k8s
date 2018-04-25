@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
@@ -13,31 +13,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+set -euo pipefail
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/../lib/e2e-test-helpers.sh"
 
 LANGUAGE="$1"
 
-function get_lb_ip() {
-    kubectl --namespace=${USER} get service hello-http-staging \
-	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-}
-
-function check_msg() {
-   OUTPUT=$(curl http://$(get_lb_ip):8080)
-   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
-   echo "${OUTPUT}" | grep "DEMO$1[ ]"
-}
-
 function edit() {
-   ./examples/hellohttp/${LANGUAGE}/edit.sh "$1"
+   "./examples/hellohttp/$LANGUAGE/edit.sh" "$1"
 }
 
 function apply() {
-   bazel run examples/hellohttp/${LANGUAGE}:staging.apply
+   bazel run "examples/hellohttp/$LANGUAGE:staging.apply"
 }
 
 function delete() {
-   bazel run examples/hellohttp/${LANGUAGE}:staging.describe
-   bazel run examples/hellohttp/${LANGUAGE}:staging.delete
+   bazel run "examples/hellohttp/$LANGUAGE:staging-deployment.describe"
+   bazel run "examples/hellohttp/$LANGUAGE:staging.delete"
+   edit ''
 }
 
 function check_bad_substitution() {
@@ -65,15 +59,14 @@ check_no_images_resolution
 
 apply
 trap "delete" EXIT
-sleep 25
-check_msg
+sleep 30
+check_msg curl 'http://%s:8080' hello-http-staging ''
 
 for i in $RANDOM $RANDOM; do
   edit "$i"
   apply
-  # Don't let k8s slowness cause flakes.
-  sleep 25
-  check_msg "$i"
+  sleep 15
+  check_msg curl 'http://%s:8080' hello-http-staging "$i"
 done
 
 # Replace the trap with a success message.

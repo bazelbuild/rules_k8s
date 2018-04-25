@@ -33,8 +33,7 @@ using proto::Simple;
 class SimpleServiceImpl final : public Simple::Service {
   Status Foo(ServerContext* context, const FooRequest* request,
 	     FooReply* reply) override {
-    std::string prefix("DEMO ");
-    reply->set_message(prefix + request->name());
+    reply->set_message("DEMO " + request->name());
     return Status::OK;
   }
 };
