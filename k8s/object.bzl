@@ -55,8 +55,6 @@ def _impl(ctx):
     # Compute the set of layers from the image_targets.
     image_target_dict = _string_to_label(
         ctx.attr.image_targets, ctx.attr.image_target_strings)
-    image_files_dict = _string_to_label(
-        ctx.files.image_targets, ctx.attr.image_target_strings)
 
     # Walk the collection of images passed and for each key/value pair
     # collect the parts to pass to the resolver as --image_spec arguments.
@@ -65,7 +63,7 @@ def _impl(ctx):
     # to include as runfiles, so they are accessible to be pushed.
     for tag in ctx.attr.images:
       target = ctx.attr.images[tag]
-      image = _get_layers(ctx, image_target_dict[target], image_files_dict[target])
+      image = _get_layers(ctx, image_target_dict[target])
 
       image_spec = {"name": tag}
       if image.get("legacy"):
