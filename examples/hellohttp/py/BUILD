@@ -28,9 +28,26 @@ py_image(
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
-    name = "staging",
+    name = "staging-deployment",
     images = {
         "hello-http-image": ":server",
     },
     template = "//examples/hellohttp:deployment.yaml",
+)
+
+load("@k8s_service//:defaults.bzl", "k8s_service")
+
+k8s_service(
+    name = "staging-service",
+    template = "//examples/hellohttp:service.yaml",
+)
+
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+
+k8s_objects(
+    name = "staging",
+    objects = [
+        ":staging-deployment",
+        ":staging-service",
+    ],
 )

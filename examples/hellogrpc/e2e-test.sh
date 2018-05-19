@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
@@ -13,25 +13,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+set -euo pipefail
 
 LANGUAGE="$1"
 
-function get_lb_ip() {
-    kubectl --namespace=${USER} get service hello-grpc-staging \
-	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-}
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/../lib/e2e-test-helpers.sh"
 
 function create() {
    bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
    bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
-}
-
-function check_msg() {
-   bazel build examples/hellogrpc/${LANGUAGE}/client
-
-   OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
-   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
-   echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
 function edit() {
@@ -39,29 +30,31 @@ function edit() {
 }
 
 function update() {
-   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
-   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
+   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.apply
+   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.apply
 }
 
 function delete() {
-   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
-   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe
+   bazel build examples/hellogrpc/${LANGUAGE}/server:staging-deployment.describe
+   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging-deployment.describe
    bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
    bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
+   edit ''
 }
 
+bazel build "examples/hellogrpc/${LANGUAGE}/client"
+CHECK_CLIENT="./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client"
 
 create
 trap "delete" EXIT
-sleep 25
-check_msg
+sleep 30
+check_msg "$CHECK_CLIENT" "%s" hello-grpc-staging ''
 
 for i in $RANDOM $RANDOM; do
   edit "$i"
   update
-  # Don't let K8s slowness cause flakes.
-  sleep 25
-  check_msg "$i"
+  sleep 15
+  check_msg "$CHECK_CLIENT" "%s" hello-grpc-staging "$i"
 done
 
 # Replace the trap with a success message.
