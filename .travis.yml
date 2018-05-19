@@ -27,9 +27,6 @@ before_install:
   - gcloud config set compute/zone us-central1-f
   - gcloud container clusters get-credentials testing
 
-install:
-  - go get -u github.com/bazelbuild/buildifier/buildifier
-
 script:
   # Check our installs.
   - bazel version
@@ -40,11 +37,6 @@ script:
   - bazel clean && bazel build //...
   # Check that all of our tests pass
   - bazel clean && bazel test //...
-
-  # Check for issues with the format of our bazel config files.
-  - buildifier -mode=check $(find . -name BUILD -type f)
-  - buildifier -mode=check $(find . -name WORKSPACE -type f)
-  - buildifier -mode=check $(find . -name '*.bzl' -type f)
 
   # Run end-to-end integration testing.
   # First, GRPC.
