@@ -82,9 +82,13 @@ def Resolve(input, string_to_digest):
 
 
 def StringToDigest(string, overrides, transport):
-  """Turn a string into a stringified digest."""
-  if string in overrides:
-    return str(overrides[string])
+  """Replace all keys in the string with fully qualify digests."""
+  replaced_string = string
+  for override, digest in overrides.items():
+    replaced_string = string.replace(override, digest)
+  if replaced_string != string:
+    # Once we've found a match, don't attempt to turn string into a tag
+    return replaced_string
 
   # Attempt to turn the string into a tag, this may throw.
   tag = docker_name.Tag(string)

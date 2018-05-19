@@ -90,6 +90,19 @@ key1:
     }, _BAD_TRANSPORT)
     self.assertEqual(actual_digest, expected_digest)
 
+  def test_tag_embedded_in_metadata(self):
+    """Test that image refs embedded within a YAML string are replaced. This can happen, e.g.,
+    when using spec->template->metadata->annotations.pod.beta.kubernetes.io/init-containers
+    """
+    metadata = '[{"command": ["/some/example/command/example.sh"], "image": "%s"}]'
+    sentinel_string = 'XXXXX'
+    sentinel_within_metadata = metadata % sentinel_string
+    expected_digest = 'gcr.io/foo/bar@sha256:deadbeef'
+    actual_digest = resolver.StringToDigest(sentinel_within_metadata, {
+      sentinel_string: expected_digest,
+    }, _BAD_TRANSPORT)
+    self.assertEqual(actual_digest, metadata % expected_digest)
+
   def test_tag_to_digest_not_cached(self):
     with v2_2_image.FromTarball(TestData(
         'io_bazel_rules_k8s/examples/hellogrpc/cc/server/server.tar')) as img:
