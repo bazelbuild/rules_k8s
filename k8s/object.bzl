@@ -144,6 +144,19 @@ def _common_impl(ctx):
     cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
     files += [cluster_file]
 
+  
+  # If the 'context' parameter is not set by the caller,
+  #     this value becomes an empty string, and kubectl
+  #     will be run like `kubectl --context= ...` In this
+  #     case, kubectl uses the currently-selected context.
+  context_arg = ctx.attr.context
+  context_arg = ctx.expand_make_variables("context", context_arg, {})
+  if "{" in ctx.attr.context:
+    context_file = ctx.new_file(ctx.label.name + ".context-name")
+    _resolve(ctx, ctx.attr.context, context_file)
+    context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
+    files += [context_file]
+
 
   namespace_arg = ctx.attr.namespace
   namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
@@ -158,6 +171,7 @@ def _common_impl(ctx):
 
   substitutions = {
       "%{cluster}": cluster_arg,
+      "%{context}": context_arg,
       "%{namespace_arg}": namespace_arg,
       "%{kind}": ctx.attr.kind,
   }
@@ -188,6 +202,7 @@ _common_attrs = {
     # We allow cluster to be omitted, and we just
     # don't expose the extra actions.
     "cluster": attr.string(),
+    "context": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
     "image_chroot": attr.string(),
@@ -403,20 +418,44 @@ def k8s_object(name, **kwargs):
   _reversed(name=name + ".reversed", template=kwargs.get("template"))
 
   if "cluster" in kwargs:
-    _k8s_object_create(name=name + ".create", resolved=name,
-                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
-    _k8s_object_delete(name=name + ".delete", reversed=name + ".reversed",
-                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
-    _k8s_object_replace(name=name + ".replace", resolved=name,
-                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                        namespace=kwargs.get("namespace"))
-    _k8s_object_apply(name=name + ".apply", resolved=name,
-                      kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                      namespace=kwargs.get("namespace"))
+    _k8s_object_create(
+        name=name + ".create",
+        resolved=name,
+        kind=kwargs.get("kind"),
+        cluster=kwargs.get("cluster"),
+        context=kwargs.get("context"),
+        namespace=kwargs.get("namespace"),
+    )
+    _k8s_object_delete(
+        name=name + ".delete",
+        reversed=name + ".reversed",
+        kind=kwargs.get("kind"),
+        cluster=kwargs.get("cluster"),
+        context=kwargs.get("context"),
+        namespace=kwargs.get("namespace"),
+    )
+    _k8s_object_replace(
+        name=name + ".replace",
+        resolved=name,
+        kind=kwargs.get("kind"),
+        cluster=kwargs.get("cluster"),
+        context=kwargs.get("context"),
+        namespace=kwargs.get("namespace"),
+    )
+    _k8s_object_apply(
+        name=name + ".apply",
+        resolved=name,
+        kind=kwargs.get("kind"),
+        cluster=kwargs.get("cluster"),
+        context=kwargs.get("context"),
+        namespace=kwargs.get("namespace"),
+    )
     if "kind" in kwargs:
-      _k8s_object_describe(name=name + ".describe", unresolved=kwargs.get("template"),
-                           kind=kwargs.get("kind"),
-                           cluster=kwargs.get("cluster"),
-                           namespace=kwargs.get("namespace"))
+      _k8s_object_describe(
+        name=name + ".describe",
+        unresolved=kwargs.get("template"),
+        kind=kwargs.get("kind"),
+        cluster=kwargs.get("cluster"),
+        context=kwargs.get("context"),
+        namespace=kwargs.get("namespace"),
+    )

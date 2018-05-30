@@ -24,4 +24,4 @@ function guess_runfiles() {
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{reverse_script} | \
-  kubectl --cluster="%{cluster}" %{namespace_arg} delete --ignore-not-found=true -f -
+  kubectl --cluster="%{cluster}" --context="%{context}" %{namespace_arg} delete --ignore-not-found=true -f -

@@ -31,12 +31,14 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+_CONTEXT = _CLUSTER
 
 _NAMESPACE = "{BUILD_USER}"
 
 k8s_defaults(
     name = "k8s_object",
     cluster = _CLUSTER,
+    context = _CONTEXT,
     image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
     namespace = _NAMESPACE,
 )
@@ -44,6 +46,7 @@ k8s_defaults(
 k8s_defaults(
     name = "k8s_deploy",
     cluster = _CLUSTER,
+    context = _CONTEXT,
     image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
     kind = "deployment",
     namespace = _NAMESPACE,
@@ -52,6 +55,7 @@ k8s_defaults(
 [k8s_defaults(
     name = "k8s_" + kind,
     cluster = _CLUSTER,
+    context = _CONTEXT,
     kind = kind,
     namespace = _NAMESPACE,
 ) for kind in [

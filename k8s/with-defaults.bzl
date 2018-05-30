@@ -57,6 +57,10 @@ def _impl(repository_ctx):
     overrides += [_override(repository_ctx.attr.name,
                             "cluster", repository_ctx.attr.cluster)]
 
+  if repository_ctx.attr.context:
+    overrides += [_override(repository_ctx.attr.name,
+                            "context", repository_ctx.attr.context)]
+
   if repository_ctx.attr.namespace:
     overrides += [_override(repository_ctx.attr.name,
                             "namespace", repository_ctx.attr.namespace)]
@@ -86,6 +90,7 @@ k8s_defaults = repository_rule(
     attrs = {
         "kind": attr.string(mandatory = False),
         "cluster": attr.string(mandatory = False),
+        "context": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
         "image_chroot": attr.string(mandatory = False),
     },
