@@ -15,6 +15,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
+load("//k8s:kubeval.bzl", "kubeval_test")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
@@ -22,11 +23,21 @@ k8s_deploy(
     template = "deployment.yaml",
 )
 
+kubeval_test(
+    name = "deployment_schema_test",
+    config = ":deployment.yaml",
+)
+
 load("@k8s_service//:defaults.bzl", "k8s_service")
 
 k8s_deploy(
     name = "staging-service",
     template = "service.yaml",
+)
+
+kubeval_test(
+    name = "service_schema_test",
+    config = ":service.yaml",
 )
 
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")

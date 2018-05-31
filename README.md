@@ -9,6 +9,7 @@ Travis CI | Bazel CI
 * [k8s_defaults](#k8s_defaults)
 * [k8s_object](#k8s_object)
 * [k8s_objects](#k8s_objects)
+* [kubeval_test](#kubeval_test)
 
 ## Overview
 
@@ -589,3 +590,17 @@ A repository rule that allows users to alias `k8s_object` with default values.
     </tr>
   </tbody>
 </table>
+
+<a name="kubeval_test"></a>
+## kubeval_test
+```python
+kubeval_test(name, config)
+```
+
+A rule that allows users to check the syntax of the specified kubernetes config file.
+
+This rule works using the [kubeval](https://github.com/garethr/kubeval) tool in `offline` mode.
+
+The tool relies on a second git repository, [kubernetes-json-schema](https://github.com/garethr/kubernetes-json-schema),
+which contains the Kubernetes object definitions in JSON schema format, for each release of Kubernetes.
+This repository is also added as a WORKSPACE dependency, allowing this rule to work with no network access.
