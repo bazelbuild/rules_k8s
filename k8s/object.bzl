@@ -382,6 +382,17 @@ _k8s_object_delete = rule(
     implementation = _common_impl,
 )
 
+# See "attrs" parameter at https://docs.bazel.build/versions/master/skylark/lib/globals.html#parameters-26
+_implicit_attrs = ["visibility", "deprecation", "tags", "testonly", "features"]
+
+def _implicit_args_as_dict(**kwargs):
+    implicit_args = {}
+    for attr_name in _implicit_attrs:
+      if attr_name in kwargs:
+        implicit_args[attr_name] = kwargs[attr_name]
+
+    return implicit_args
+
 def k8s_object(name, **kwargs):
   """Interact with a K8s object.
   Args:
@@ -396,27 +407,29 @@ def k8s_object(name, **kwargs):
     if reserved in kwargs:
       fail("reserved for internal use by docker_bundle macro", attr=reserved)
 
+  implicit_args = _implicit_args_as_dict(**kwargs)
+
   kwargs["image_targets"] = _deduplicate(kwargs.get("images", {}).values())
   kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
   _k8s_object(name=name, **kwargs)
-  _reversed(name=name + ".reversed", template=kwargs.get("template"))
+  _reversed(name=name + ".reversed", template=kwargs.get("template"), **implicit_args)
 
   if "cluster" in kwargs:
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       namespace=kwargs.get("namespace"), **implicit_args)
     _k8s_object_delete(name=name + ".delete", reversed=name + ".reversed",
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       namespace=kwargs.get("namespace"), **implicit_args)
     _k8s_object_replace(name=name + ".replace", resolved=name,
                         kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                        namespace=kwargs.get("namespace"))
+                        namespace=kwargs.get("namespace"), **implicit_args)
     _k8s_object_apply(name=name + ".apply", resolved=name,
                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                      namespace=kwargs.get("namespace"))
+                      namespace=kwargs.get("namespace"), **implicit_args)
     if "kind" in kwargs:
       _k8s_object_describe(name=name + ".describe", unresolved=kwargs.get("template"),
                            kind=kwargs.get("kind"),
                            cluster=kwargs.get("cluster"),
-                           namespace=kwargs.get("namespace"))
+                           namespace=kwargs.get("namespace"), **implicit_args)
