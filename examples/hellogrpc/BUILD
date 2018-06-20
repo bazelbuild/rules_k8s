@@ -24,7 +24,7 @@ k8s_deploy(
 
 load("@k8s_service//:defaults.bzl", "k8s_service")
 
-k8s_deploy(
+k8s_service(
     name = "staging-service",
     template = "service.yaml",
 )
