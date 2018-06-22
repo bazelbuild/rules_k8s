@@ -415,18 +415,18 @@ def k8s_object(name, **kwargs):
   if "cluster" in kwargs:
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       user=kwargs.get("user"), namespace=kwargs.get("namespace"))
     _k8s_object_delete(name=name + ".delete", reversed=name + ".reversed",
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       user=kwargs.get("user"), namespace=kwargs.get("namespace"))
     _k8s_object_replace(name=name + ".replace", resolved=name,
                         kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                        namespace=kwargs.get("namespace"))
+                        user=kwargs.get("user"), namespace=kwargs.get("namespace"))
     _k8s_object_apply(name=name + ".apply", resolved=name,
                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                      namespace=kwargs.get("namespace"))
+                      user=kwargs.get("user"), namespace=kwargs.get("namespace"))
     if "kind" in kwargs:
       _k8s_object_describe(name=name + ".describe", unresolved=kwargs.get("template"),
                            kind=kwargs.get("kind"),
                            cluster=kwargs.get("cluster"),
-                           namespace=kwargs.get("namespace"))
+                           user=kwargs.get("user"), namespace=kwargs.get("namespace"))
