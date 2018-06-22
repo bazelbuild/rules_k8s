@@ -144,6 +144,13 @@ def _common_impl(ctx):
     cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
     files += [cluster_file]
 
+  user_arg = ctx.attr.user
+  user_arg = ctx.expand_make_variables("user", user_arg, {})
+  if "{" in ctx.attr.user:
+    user_file = ctx.new_file(ctx.label.name + ".user-name")
+    _resolve(ctx, ctx.attr.user, user_file)
+    user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
+    files += [user_file]
 
   namespace_arg = ctx.attr.namespace
   namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
@@ -158,6 +165,7 @@ def _common_impl(ctx):
 
   substitutions = {
       "%{cluster}": cluster_arg,
+      "%{user}": user_arg,
       "%{namespace_arg}": namespace_arg,
       "%{kind}": ctx.attr.kind,
   }
@@ -188,6 +196,7 @@ _common_attrs = {
     # We allow cluster to be omitted, and we just
     # don't expose the extra actions.
     "cluster": attr.string(),
+    "user": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
     "image_chroot": attr.string(),
@@ -387,6 +396,7 @@ def k8s_object(name, **kwargs):
   Args:
     name: name of the rule.
     cluster: the name of the cluster.
+    user: the user which has access to the cluster.
     namespace: the namespace within the cluster.
     kind: the object kind.
     template: the yaml template to instantiate.
