@@ -72,4 +72,7 @@ par_binary(
     srcs = ["reverser.py"],
     main = "reverser.py",
     visibility = ["//visibility:public"],
+    deps = [
+        "@yaml",
+    ],
 )

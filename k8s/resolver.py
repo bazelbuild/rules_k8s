@@ -50,7 +50,6 @@ parser.add_argument(
         'publishing them.'))
 
 _THREADS = 32
-_DOCUMENT_DELIMITER = '---\n'
 
 
 def Resolve(input, string_to_digest):
@@ -79,7 +78,7 @@ def Resolve(input, string_to_digest):
       return walk_string(o)
     return o
 
-  return yaml.dump(walk(yaml.load(input)))
+  return yaml.dump_all(map(walk, yaml.load_all(input)))
 
 
 def StringToDigest(string, overrides, transport):
@@ -186,15 +185,13 @@ def main():
       unseen_strings.remove(t)
     return StringToDigest(t, overrides, transport)
 
-  content = _DOCUMENT_DELIMITER.join([
-    Resolve(x, _StringToDigest)
-    for x in inputs.split(_DOCUMENT_DELIMITER)
-  ])
+  content = Resolve(inputs, _StringToDigest)
 
   if len(unseen_strings) > 0:
-    print('The following image references were not found: [%s]' % "\n".join([
-      str(x) for x in unseen_strings
-    ]),file=sys.stderr)
+    print('ERROR: The following image references were not found in %r:' %
+          args.template, file=sys.stderr)
+    for ref in unseen_strings:
+      print('    %s' % ref, file=sys.stderr)
     sys.exit(1)
 
   print(content)
