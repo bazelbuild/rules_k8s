@@ -28,6 +28,7 @@ py_image(
     # unchanging and we can reduce the amount of image data we repush by ~99%!
     layers = [
         requirement("grpcio"),
+        requirement("setuptools"),
         "//examples/hellogrpc/proto:py",
     ],
     main = "server.py",
