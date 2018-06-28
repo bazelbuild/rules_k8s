@@ -18,7 +18,7 @@ addons:
 
 before_install:
   # Log into GCR
-  - docker login -u _json_key -p "${GOOGLE_JSON_KEY}" https://us.gcr.io
+  - echo "${GOOGLE_JSON_KEY}" | docker login -u _json_key --password-stdin https://us.gcr.io
   # Log into gcloud
   - echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
   - gcloud auth activate-service-account --key-file keyfile.json
