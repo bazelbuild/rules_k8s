@@ -589,3 +589,37 @@ A repository rule that allows users to alias `k8s_object` with default values.
     </tr>
   </tbody>
 </table>
+
+
+## Support
+
+Users find on stackoverflow, slack and Google Group mailing list. 
+
+### Stackoverflow
+
+Stackoverflow is a great place for developers to help each other.
+
+Search through [existing questions] to see if someone else has had the same issue as you.
+
+If you have a new question, please [ask] the stackoverflow community. Include `rules_k8s` in the title and add `[bazel]` and `[kubernetes]` tags.
+
+### Google group mailing list
+
+The general [bazel support] options links to the official [bazel-discuss] Google group mailing list.
+
+
+### Slack and IRC
+
+Slack and IRC are great places for developers to chat with each other.
+
+There is a `#bazel` channel in the kubernetes slack. Visit the [kubernetes community] page to find the [slack.k8s.io] invitation link.
+
+There is also a `#bazel` channel on [Freenode IRC], although we have found the slack channel more engaging.
+
+
+[Freenode IRC]: https://freenode.net/
+[bazel support]: https://bazel.build/support.html
+[bazel-discuss]: https://groups.google.com/forum/#!forum/bazel-discuss
+[existing questions]: https://stackoverflow.com/search?q=rules_k8s
+[kubernetes community]: https://kubernetes.io/community/
+[slack.k8s.io]: http://slack.k8s.io/
