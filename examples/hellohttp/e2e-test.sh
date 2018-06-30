@@ -14,33 +14,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LANGUAGE="$1"
+set -o errexit
+set -o nounset
+set -o pipefail
 
-function get_lb_ip() {
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: $(basename $0) <language ...>"
+fi
+
+get_lb_ip() {
     kubectl --namespace=${USER} get service hello-http-staging \
 	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
-function check_msg() {
+# Ensure there is an ip address for hello-http-staging:8080
+apply-lb() {
+   bazel run examples/hellohttp:staging-service.apply
+}
+
+check_msg() {
    OUTPUT=$(curl http://$(get_lb_ip):8080)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
-function edit() {
+edit() {
    ./examples/hellohttp/${LANGUAGE}/edit.sh "$1"
 }
 
-function apply() {
+apply() {
    bazel run examples/hellohttp/${LANGUAGE}:staging.apply
 }
 
-function delete() {
+delete() {
+   kubectl get all --namespace="${USER}" --selector=app=hello-http-staging
    bazel run examples/hellohttp/${LANGUAGE}:staging.describe
    bazel run examples/hellohttp/${LANGUAGE}:staging.delete
 }
 
-function check_bad_substitution() {
+check_bad_substitution() {
     echo Checking a bad substitution
     if ! bazel run examples/hellohttp:error-on-run;
     then
@@ -52,7 +64,7 @@ function check_bad_substitution() {
     fi
 }
 
-function check_no_images_resolution() {
+check_no_images_resolution() {
     echo Checking resolution with no images attribute.
     bazel build examples/hellohttp:resolve-external
     OUTPUT=$(bazel-bin/examples/hellohttp/resolve-external 2>&1)
@@ -63,17 +75,25 @@ function check_no_images_resolution() {
 check_bad_substitution
 check_no_images_resolution
 
-apply
-trap "delete" EXIT
-sleep 25
-check_msg
+apply-lb
 
-for i in $RANDOM $RANDOM; do
-  edit "$i"
+# Test each requested language
+while [[ -n "${1:-}" ]]; do
+  LANGUAGE="$1"
+  shift
+
   apply
-  # Don't let k8s slowness cause flakes.
+  trap "delete" EXIT
   sleep 25
-  check_msg "$i"
+  check_msg ""
+
+  for i in $RANDOM $RANDOM; do
+    edit "$i"
+    apply
+    # Don't let k8s slowness cause flakes.
+    sleep 25
+    check_msg "$i"
+  done
 done
 
 # Replace the trap with a success message.
