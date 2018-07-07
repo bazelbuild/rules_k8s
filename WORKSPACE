@@ -63,7 +63,7 @@ k8s_defaults(
     "todo",
 ]]
 
-new_http_archive(
+http_archive(
     name = "mock",
     build_file_content = """
 # Rename mock.py to __init__.py
