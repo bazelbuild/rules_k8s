@@ -1,8 +1,8 @@
 # Bazel Kubernetes Rules
 
-Bazel CI
-:---:
-[![Build status](https://badge.buildkite.com/4eafd3b619b9febae679bac4ce75b6b74643d48384e7f36eeb.svg)](https://buildkite.com/bazel/k8s-rules-k8s-postsubmit)
+Prow | Bazel CI
+:---: | :---:
+[![Build status](https://prow.k8s.io/badge.svg?jobs=pull-rules-k8s-*)](https://prow.k8s.io/?repo=bazelbuild%2Frules_k8s) | [![Build status](https://badge.buildkite.com/4eafd3b619b9febae679bac4ce75b6b74643d48384e7f36eeb.svg)](https://buildkite.com/bazel/k8s-rules-k8s-postsubmit)
 
 ## Rules
 
