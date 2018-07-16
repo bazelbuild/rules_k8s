@@ -28,8 +28,9 @@
 *.out
 *.app
 
-# Emacs garbage
+# Emacs/vim garbage
 *~
+*.swp
 
 # Bazel directories
 bazel-*

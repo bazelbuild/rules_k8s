@@ -14,19 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-LANGUAGE="$1"
+set -o errexit
+set -o nounset
+set -o pipefail
 
-function get_lb_ip() {
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: $(basename $0) <language ...>"
+fi
+
+get_lb_ip() {
     kubectl --namespace=${USER} get service hello-grpc-staging \
 	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
-function create() {
+# Ensure there is an ip address for hell-grpc-staging:50051
+apply-lb() {
+  bazel build examples/hellogrpc:staging-service.apply
+  bazel-bin/examples/hellogrpc/staging-service.apply
+}
+
+create() {
    bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
    bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
 }
 
-function check_msg() {
+check_msg() {
    bazel build examples/hellogrpc/${LANGUAGE}/client
 
    OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
@@ -34,16 +46,17 @@ function check_msg() {
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
-function edit() {
+edit() {
    ./examples/hellogrpc/${LANGUAGE}/server/edit.sh "$1"
 }
 
-function update() {
+update() {
    bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
    bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
 }
 
-function delete() {
+delete() {
+   kubectl get all --namespace="${USER}" --selector=app=hello-grpc-staging
    bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
    bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe
    bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
@@ -51,18 +64,26 @@ function delete() {
 }
 
 
-create
-trap "delete" EXIT
-sleep 25
-check_msg
+apply-lb
 
-for i in $RANDOM $RANDOM; do
-  edit "$i"
-  update
-  # Don't let K8s slowness cause flakes.
+while [[ -n "${1:-}" ]]; do
+  LANGUAGE="$1"
+  shift
+
+  create
+  trap "delete" EXIT
   sleep 25
-  check_msg "$i"
+  check_msg ""
+
+  for i in $RANDOM $RANDOM; do
+    edit "$i"
+    update
+    # Don't let K8s slowness cause flakes.
+    sleep 25
+    check_msg "$i"
+  done
+  delete
 done
 
 # Replace the trap with a success message.
-trap "delete; echo PASS" EXIT
+trap "echo PASS" EXIT
