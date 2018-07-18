@@ -13,6 +13,7 @@
 # limitations under the License.
 workspace(name = "io_bazel_rules_k8s")
 
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 git_repository(
@@ -62,7 +63,7 @@ k8s_defaults(
     "todo",
 ]]
 
-new_http_archive(
+http_archive(
     name = "mock",
     build_file_content = """
 # Rename mock.py to __init__.py

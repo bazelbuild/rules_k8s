@@ -20,6 +20,8 @@ configurations / clusters.
 Add the following to your `WORKSPACE` file to add the necessary external dependencies:
 
 ```python
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
 git_repository(
     name = "io_bazel_rules_docker",
     commit = "{HEAD}",
