@@ -26,4 +26,4 @@ RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" | cut -d'"' -f 2)
 
 kubectl --cluster="%{cluster}" %{namespace_arg} describe %{kind} \
-  "${RESOURCE_NAME}"
+  "${RESOURCE_NAME}" "$@"

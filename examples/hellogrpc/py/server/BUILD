@@ -42,4 +42,5 @@ k8s_deploy(
         "us.gcr.io/not-my-project/hello-grpc:staging": ":server",
     },
     template = "//examples/hellogrpc:deployment.yaml",
+    wait_for_rollout = True,
 )

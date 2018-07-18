@@ -16,7 +16,7 @@
 set -euo pipefail
 
 function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
+    pushd "${BASH_SOURCE[0]}.runfiles" > /dev/null 2>&1
     pwd
     popd > /dev/null 2>&1
 }
@@ -24,4 +24,4 @@ function guess_runfiles() {
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{reverse_script} | \
-  kubectl --cluster="%{cluster}" %{namespace_arg} delete --ignore-not-found=true -f -
+    kubectl --cluster="%{cluster}" %{namespace_arg} delete --ignore-not-found=true -f - "$@"

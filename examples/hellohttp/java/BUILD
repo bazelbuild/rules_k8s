@@ -33,4 +33,5 @@ k8s_deploy(
         "hello-http-image": ":server",
     },
     template = "//examples/hellohttp:deployment.json",
+    wait_for_rollout = False,
 )

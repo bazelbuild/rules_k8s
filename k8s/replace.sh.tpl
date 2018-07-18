@@ -16,12 +16,29 @@
 set -euo pipefail
 
 function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
+    pushd "${BASH_SOURCE[0]}.runfiles" > /dev/null 2>&1
     pwd
     popd > /dev/null 2>&1
 }
 
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
-PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" %{namespace_arg} replace -f -
+TMP_YAML=$(mktemp)
+trap "rm ${TMP_YAML}" EXIT
+
+PYTHON_RUNFILES=${RUNFILES} %{resolve_script} > "$TMP_YAML"
+
+kubectl --cluster="%{cluster}" %{namespace_arg} replace -f "$TMP_YAML" "$@"
+
+ROLLOUT_STATUS="%{wait_for_rollout}"
+if [ "${ROLLOUT_STATUS}" == "True" ]; then
+    RESOURCE_NAMES=$(kubectl --cluster="%{cluster}" %{namespace_arg} get -f "$TMP_YAML" --output=name)
+    declare -a resource_types=("deployment.apps" "statefulset.apps")
+    for resource_type in "${resource_types[@]}"; do
+        if grep -q "${resource_type}/" <<< "$RESOURCE_NAMES"; then
+            grep "${resource_type}/" <<< "$RESOURCE_NAMES" | while read -r RESOURCE_NAME; do
+                kubectl --cluster="%{cluster}" %{namespace_arg} rollout status "${RESOURCE_NAME}" "$@"
+            done
+        fi
+    done
+fi

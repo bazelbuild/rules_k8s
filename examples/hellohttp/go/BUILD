@@ -16,4 +16,5 @@ k8s_deploy(
         "hello-http-image": ":server",
     },
     template = "//examples/hellohttp:deployment.yaml",
+    wait_for_rollout = True,
 )
