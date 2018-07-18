@@ -1,8 +1,8 @@
 # Bazel Kubernetes Rules
 
-Travis CI | Bazel CI
+Prow | Bazel CI
 :---: | :---:
-[![Build Status](https://travis-ci.org/bazelbuild/rules_k8s.svg?branch=master)](https://travis-ci.org/bazelbuild/rules_k8s) | [![Build status](https://badge.buildkite.com/4eafd3b619b9febae679bac4ce75b6b74643d48384e7f36eeb.svg)](https://buildkite.com/bazel/k8s-rules-k8s-postsubmit)
+[![Build status](https://prow.k8s.io/badge.svg?jobs=pull-rules-k8s-*)](https://prow.k8s.io/?repo=bazelbuild%2Frules_k8s) | [![Build status](https://badge.buildkite.com/4eafd3b619b9febae679bac4ce75b6b74643d48384e7f36eeb.svg)](https://buildkite.com/bazel/k8s-rules-k8s-postsubmit)
 
 ## Rules
 
@@ -593,7 +593,7 @@ A repository rule that allows users to alias `k8s_object` with default values.
 
 ## Support
 
-Users find on stackoverflow, slack and Google Group mailing list. 
+Users find on stackoverflow, slack and Google Group mailing list.
 
 ### Stackoverflow
 
