@@ -1,0 +1,2 @@
+deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8
+deb http://packages.cloud.google.com/apt cloud-sdk-xenial main

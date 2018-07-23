@@ -13,9 +13,12 @@
 # limitations under the License.
 workspace(name = "io_bazel_rules_k8s")
 
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 git_repository(
     name = "io_bazel_rules_docker",
-    commit = "27c94dec66c3c9fdb478c33994471c5bfc15b6eb",
+    commit = "7401cb256222615c497c0dee5a4de5724a4f4cc7",
     remote = "https://github.com/bazelbuild/rules_docker.git",
 )
 
@@ -60,7 +63,7 @@ k8s_defaults(
     "todo",
 ]]
 
-new_http_archive(
+http_archive(
     name = "mock",
     build_file_content = """
 # Rename mock.py to __init__.py
@@ -216,10 +219,11 @@ load(
 
 _controller_pip_install()
 
-git_repository(
+http_archive(
     name = "build_bazel_rules_nodejs",
-    commit = "5c53b46110d13c4c9f22364e96b2d0f55896d7aa",
-    remote = "https://github.com/bazelbuild/rules_nodejs.git",
+    sha256 = "6139762b62b37c1fd171d7f22aa39566cb7dc2916f0f801d505a9aaf118c117f",
+    strip_prefix = "rules_nodejs-0.9.1",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.9.1.zip"],
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")
