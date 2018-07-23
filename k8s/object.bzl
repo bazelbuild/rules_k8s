@@ -143,6 +143,13 @@ def _common_impl(ctx):
     cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
     files += [cluster_file]
 
+  user_arg = ctx.attr.user
+  user_arg = ctx.expand_make_variables("user", user_arg, {})
+  if "{" in ctx.attr.user:
+    user_file = ctx.new_file(ctx.label.name + ".user-name")
+    _resolve(ctx, ctx.attr.user, user_file)
+    user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
+    files += [user_file]
 
   namespace_arg = ctx.attr.namespace
   namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
@@ -157,6 +164,7 @@ def _common_impl(ctx):
 
   substitutions = {
       "%{cluster}": cluster_arg,
+      "%{user}": user_arg,
       "%{namespace_arg}": namespace_arg,
       "%{kind}": ctx.attr.kind,
   }
@@ -187,6 +195,7 @@ _common_attrs = {
     # We allow cluster to be omitted, and we just
     # don't expose the extra actions.
     "cluster": attr.string(),
+    "user": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
     "image_chroot": attr.string(),
@@ -388,6 +397,7 @@ def k8s_object(name, **kwargs):
   Args:
     name: name of the rule.
     cluster: the name of the cluster.
+    user: the user which has access to the cluster.
     namespace: the namespace within the cluster.
     kind: the object kind.
     template: the yaml template to instantiate.
@@ -401,23 +411,29 @@ def k8s_object(name, **kwargs):
   kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
   _k8s_object(name=name, **kwargs)
-  _reversed(name=name + ".reversed", template=kwargs.get("template"))
+  _reversed(name=name + ".reversed", template=kwargs.get("template"),
+            visibility=kwargs.get("visibility"))
 
   if "cluster" in kwargs:
     _k8s_object_create(name=name + ".create", resolved=name,
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       user=kwargs.get("user"), namespace=kwargs.get("namespace"),
+                       visibility=kwargs.get("visibility"))
     _k8s_object_delete(name=name + ".delete", reversed=name + ".reversed",
                        kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                       namespace=kwargs.get("namespace"))
+                       user=kwargs.get("user"), namespace=kwargs.get("namespace"),
+                       visibility=kwargs.get("visibility"))
     _k8s_object_replace(name=name + ".replace", resolved=name,
                         kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                        namespace=kwargs.get("namespace"))
+                        user=kwargs.get("user"), namespace=kwargs.get("namespace"),
+                        visibility=kwargs.get("visibility"))
     _k8s_object_apply(name=name + ".apply", resolved=name,
                       kind=kwargs.get("kind"), cluster=kwargs.get("cluster"),
-                      namespace=kwargs.get("namespace"))
+                      user=kwargs.get("user"), namespace=kwargs.get("namespace"),
+                      visibility=kwargs.get("visibility"))
     if "kind" in kwargs:
       _k8s_object_describe(name=name + ".describe", unresolved=kwargs.get("template"),
                            kind=kwargs.get("kind"),
                            cluster=kwargs.get("cluster"),
-                           namespace=kwargs.get("namespace"))
+                           user=kwargs.get("user"), namespace=kwargs.get("namespace"),
+                           visibility=kwargs.get("visibility"))
