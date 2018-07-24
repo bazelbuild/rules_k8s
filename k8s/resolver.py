@@ -49,6 +49,12 @@ parser.add_argument(
   help=('The repository under which to chroot image references when '
         'publishing them.'))
 
+parser.add_argument(
+  '--allow_unused_images', action='store_true',
+  help=('Allow images that don\'t appear anywhere in the JSON. This is useful '
+        'when generating multiple SKUs of a k8s_object, only some of which use '
+        'a particular image.'))
+
 _THREADS = 32
 
 
@@ -187,7 +193,7 @@ def main():
 
   content = Resolve(inputs, _StringToDigest)
 
-  if len(unseen_strings) > 0:
+  if len(unseen_strings) > 0 and not args.allow_unused_images:
     print('ERROR: The following image references were not found in %r:' %
           args.template, file=sys.stderr)
     for ref in unseen_strings:

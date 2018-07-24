@@ -105,6 +105,7 @@ def _impl(ctx):
           "--image_spec=%s" % spec
           for spec in image_specs
         ]),
+        "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
       },
       output = ctx.outputs.executable,
   )
@@ -214,6 +215,8 @@ _common_attrs = {
         executable = True,
         allow_files = True,
     ),
+    # Extra arguments to pass to the resolver.
+    "resolver_args": attr.string_list(),
     "_stamper": attr.label(
         default = Label("//k8s:stamper"),
         cfg = "host",
