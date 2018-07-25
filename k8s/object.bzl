@@ -424,7 +424,7 @@ def k8s_object(name, **kwargs):
   _reversed(name=name + ".reversed", template=kwargs.get("template"),
             visibility=kwargs.get("visibility"))
 
-  if "cluster" in kwargs:
+  if "cluster" in kwargs or "context" in kwargs:
     _k8s_object_create(
         name=name + ".create",
         resolved=name,
