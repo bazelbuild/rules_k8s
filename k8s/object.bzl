@@ -441,7 +441,7 @@ def k8s_object(name, **kwargs):
         kind=kwargs.get("kind"),
         cluster=kwargs.get("cluster"),
         context=kwargs.get("context"),
-        usre=kwargs.get("user"),
+        user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
         visibility=kwargs.get("visibility"),
     )
