@@ -435,20 +435,39 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>string, optional</code></p>
         <p>The name of the cluster to which <code>create, replace, delete,
-          describe</code> should speak.</p>
+          describe</code> should speak. Subject to "Make" variable substitution.</p>
         <p><b>If this is omitted, the <code>create, replace, delete,
           describe</code> actions will not exist.</b></p>
       </td>
     </tr>
     <tr>
+      <td><code>context</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The name of a kubeconfig context to use. Subject to "Make" variable 
+          substitution.</p>
+        <p><b>If this is omitted, the current context will be used.</b></p>
+      </td>
+    </tr>    
+    <tr>
       <td><code>namespace</code></td>
       <td>
         <p><code>string, optional</code></p>
         <p>The namespace on the cluster within which the actions are
-          performed.</p>
+          performed. Subject to "Make" variable substitution.</p>
         <p><b>If this is omitted, it will default to the value specified
           in the template or if also unspecified there, to the value
           <code>"default"</code>.</b></p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>user</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The user to authenticate to the cluster as configured with kubectl.
+          Subject to "Make" variable substitution.</p>
+        <p><b>If this is omitted, kubectl will authenticate as the user from the 
+          current context.</b></p>
       </td>
     </tr>
     <tr>
@@ -567,11 +586,25 @@ A repository rule that allows users to alias `k8s_object` with default values.
       </td>
     </tr>
     <tr>
+      <td><code>context</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The name of a kubeconfig context to use.</p>
+      </td>
+    </tr>
+    <tr>
       <td><code>namespace</code></td>
       <td>
         <p><code>string, optional</code></p>
         <p>The namespace on the cluster within which the actions are
            performed.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>user</code></td>
+      <td>
+        <p><code>string, optional</code></p>
+        <p>The user to authenticate to the cluster as configured with kubectl.</p>
       </td>
     </tr>
     <tr>
