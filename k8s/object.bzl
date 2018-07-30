@@ -171,7 +171,7 @@ def _common_impl(ctx):
     namespace_arg = "--namespace=\"" +  namespace_arg + "\""
 
   # Support passing in arbitrary kubectl arguments
-  kubectl_args = ctx.attr.namespace
+  kubectl_args = ctx.attr.kubectl_args
   kubectl_args = ctx.expand_make_variables("kubectl_args", kubectl_args, {})
   #TODO: Will probably need to quote things here.
   #TODO: Will probably want to change kubectl_args to kubectl-args as the flag passed on the command line for consistency (I'm not even sure if the underscore is supported) but we need to keep the underscore for the python variable name.
