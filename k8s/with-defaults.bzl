@@ -68,6 +68,10 @@ def _impl(repository_ctx):
     overrides += [_override(repository_ctx.attr.name,
                             "namespace", repository_ctx.attr.namespace)]
 
+  if repository_ctx.attr.kubectl_args:
+    overrides += [_override(repository_ctx.attr.name,
+                            "kubectl_args", repository_ctx.attr.kubectl_args)]
+
   if repository_ctx.attr.kind:
     overrides += [_override(repository_ctx.attr.name,
                             "kind", repository_ctx.attr.kind)]
@@ -96,6 +100,7 @@ k8s_defaults = repository_rule(
         "context": attr.string(mandatory = False),
         "user": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
+        "kubectl_args": attr.string(mandatory = False),
         "image_chroot": attr.string(mandatory = False),
     },
     implementation = _impl,
