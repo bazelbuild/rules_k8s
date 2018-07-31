@@ -494,6 +494,17 @@ A rule for interacting with Kubernetes objects.
         <p>The repository under which to actually publish Docker images.</p>
       </td>
     </tr>
+    <tr>
+          <td><code>kubectl_args</code></td>
+          <td>
+            <p><code>string, optional</code></p>
+            <p>Additional arguments to pass to the kubectl command at execution.</p>
+            <p>I.E.</p>
+            <p>--prune</p>
+            <p>or</p>
+            <p>--dry-run=true --prune=true</p>
+          </td>
+        </tr>
   </tbody>
 </table>
 
