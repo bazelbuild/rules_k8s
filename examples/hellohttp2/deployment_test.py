@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+import json
+import os
+import unittest
+import yaml
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
+def TestData(name):
+  return os.path.join(os.environ['TEST_SRCDIR'], 'io_bazel_rules_k8s', name)
 
-# TODO(mattmoor): Should we create namespaces that do not exist?
+class DeploymentTest(unittest.TestCase):
 
-PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} %{args} create -f -
+  def test_things_match(self):
+    with open(TestData('examples/hellohttp/deployment.yaml'), 'r') as f:
+      static = yaml.load(f.read())
+    with open(TestData('examples/hellohttp/deployment.json'), 'r') as f:
+      generated = json.loads(f.read())
+
+    self.assertEqual(static, generated)
+
+if __name__ == '__main__':
+  unittest.main()

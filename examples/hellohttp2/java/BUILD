@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
+package(default_visibility = ["//visibility:public"])
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+licenses(["notice"])  # Apache 2.0
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
+load("@io_bazel_rules_docker//java:image.bzl", "war_image")
 
-# TODO(mattmoor): Should we create namespaces that do not exist?
+war_image(
+    name = "server",
+    srcs = ["Servlet.java"],
+    deps = [
+        "@javax_servlet_api//jar",
+    ],
+)
 
-PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} %{args} create -f -
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
+k8s_deploy(
+    name = "staging",
+    images = {
+        "hello-http-image": ":server",
+    },
+    template = "//examples/hellohttp:deployment.json",
+)

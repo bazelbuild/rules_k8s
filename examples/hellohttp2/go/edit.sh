@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
@@ -13,17 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+SUFFIX="$1"
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
-
-# TODO(mattmoor): Should we create namespaces that do not exist?
-
-PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} %{args} create -f -
+sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/hellohttp/go/main.go

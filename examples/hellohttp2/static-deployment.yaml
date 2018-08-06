@@ -1,0 +1,18 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: hello-http-static
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-http-static
+    spec:
+      containers:
+      - name: hello-http
+        # Pick a public image that's unlikely to become unavailable.
+        image: gcr.io/google-containers/pause:2.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
