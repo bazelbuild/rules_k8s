@@ -22,7 +22,7 @@ k8s_deploy(
     template = "deployment.yaml",
     args = [
     	"--validate=true",
-    	"--timeout=80s",
+    	"--record=true",
     ],
 )
 
@@ -33,7 +33,7 @@ k8s_deploy(
     template = "service.yaml",
     args = [
     	"--validate=true",
-    	"--timeout=80s",
+    	"--record=true",
     ],
 )
 
