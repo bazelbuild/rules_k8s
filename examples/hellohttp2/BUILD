@@ -20,6 +20,10 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 k8s_deploy(
     name = "staging",
     template = "deployment.yaml",
+    args = [
+    	"--validate=true",
+    	"--timeout=80s",
+    ],
 )
 
 load("@k8s_service//:defaults.bzl", "k8s_service")
@@ -27,6 +31,10 @@ load("@k8s_service//:defaults.bzl", "k8s_service")
 k8s_deploy(
     name = "staging-service",
     template = "service.yaml",
+    args = [
+    	"--validate=true",
+    	"--timeout=80s",
+    ],
 )
 
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
@@ -63,7 +71,6 @@ k8s_deploy(
         "hello-http_image": "//examples/hellohttp/go:server",
     },
     template = "deployment.yaml",
-    args = "--validate=true --timeout=80s"
 )
 
 # This is used by the e2e testing to make sure that we resolve

@@ -30,7 +30,7 @@ get_lb_ip() {
 
 # Ensure there is an ip address for hello-http-staging:8080
 apply-lb() {
-   bazel run examples/hellohttp:staging-service.apply
+   bazel run examples/hellohttp2:staging-service.apply
 }
 
 check_msg() {
@@ -40,22 +40,22 @@ check_msg() {
 }
 
 edit() {
-   ./examples/hellohttp/${LANGUAGE}/edit.sh "$1"
+   ./examples/hellohttp2/${LANGUAGE}/edit.sh "$1"
 }
 
 apply() {
-   bazel run examples/hellohttp/${LANGUAGE}:staging.apply
+   bazel run examples/hellohttp2/${LANGUAGE}:staging.apply
 }
 
 delete() {
    kubectl get all --namespace="${USER}" --selector=app=hello-http-staging
-   bazel run examples/hellohttp/${LANGUAGE}:staging.describe
-   bazel run examples/hellohttp/${LANGUAGE}:staging.delete
+   bazel run examples/hellohttp2/${LANGUAGE}:staging.describe
+   bazel run examples/hellohttp2/${LANGUAGE}:staging.delete
 }
 
 check_bad_substitution() {
     echo Checking a bad substitution
-    if ! bazel run examples/hellohttp:error-on-run;
+    if ! bazel run examples/hellohttp2:error-on-run;
     then
 	echo "Success, substitution failed."
 	return
@@ -67,8 +67,8 @@ check_bad_substitution() {
 
 check_no_images_resolution() {
     echo Checking resolution with no images attribute.
-    bazel build examples/hellohttp:resolve-external
-    OUTPUT=$(bazel-bin/examples/hellohttp/resolve-external 2>&1)
+    bazel build examples/hellohttp2:resolve-external
+    OUTPUT=$(bazel-bin/examples/hellohttp2/resolve-external 2>&1)
     echo Checking output: "${OUTPUT}" matches: "/pause@"
     echo "${OUTPUT}" | grep "[/]pause[@]"
 }
