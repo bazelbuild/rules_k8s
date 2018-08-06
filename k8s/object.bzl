@@ -170,18 +170,11 @@ def _common_impl(ctx):
   if namespace_arg:
     namespace_arg = "--namespace=\"" +  namespace_arg + "\""
 
-  # Support passing in arbitrary kubectl arguments
-  kubectl_args = ctx.attr.kubectl_args
-  kubectl_args = ctx.expand_make_variables("kubectl_args", kubectl_args, {})
-  #TODO: Will probably need to quote things here.
-  #TODO: Will probably want to change kubectl_args to kubectl-args as the flag passed on the command line for consistency (I'm not even sure if the underscore is supported) but we need to keep the underscore for the python variable name.
-
   substitutions = {
       "%{cluster}": cluster_arg,
       "%{context}": context_arg,
       "%{user}": user_arg,
       "%{namespace_arg}": namespace_arg,
-      "%{kubectl_args}": kubectl_args,
       "%{kind}": ctx.attr.kind,
   }
 
@@ -222,8 +215,6 @@ _common_attrs = {
         executable = True,
         allow_files = True,
     ),
-    # Extra arguments to pass to kubectl
-    "kubectl_args": attr.string(),
     # Extra arguments to pass to the resolver.
     "resolver_args": attr.string_list(),
     "_stamper": attr.label(
@@ -421,7 +412,6 @@ def k8s_object(name, **kwargs):
     kind: The object kind.
     template: The yaml template to instantiate.
     images: A dictionary from fully-qualified tag to label.
-    kubectl_args: Extra kubectl arguments to support flags not yet natively supported by rules_k8s.
   """
   for reserved in ["image_targets", "image_target_strings", "resolved", "reversed"]:
     if reserved in kwargs:
@@ -444,7 +434,6 @@ def k8s_object(name, **kwargs):
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
         visibility=kwargs.get("visibility"),
-        kubectl_args=kwargs.get("kubectl_args"),
     )
     _k8s_object_delete(
         name=name + ".delete",
@@ -455,7 +444,6 @@ def k8s_object(name, **kwargs):
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
         visibility=kwargs.get("visibility"),
-        kubectl_args=kwargs.get("kubectl_args"),
     )
     _k8s_object_replace(
         name=name + ".replace",
@@ -466,7 +454,6 @@ def k8s_object(name, **kwargs):
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
         visibility=kwargs.get("visibility"),
-        kubectl_args=kwargs.get("kubectl_args"),
     )
     _k8s_object_apply(
         name=name + ".apply",
@@ -477,7 +464,6 @@ def k8s_object(name, **kwargs):
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
         visibility=kwargs.get("visibility"),
-        kubectl_args=kwargs.get("kubectl_args"),
     )
     if "kind" in kwargs:
       _k8s_object_describe(
@@ -489,5 +475,4 @@ def k8s_object(name, **kwargs):
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
         visibility=kwargs.get("visibility"),
-        kubectl_args=kwargs.get("kubectl_args"),
     )

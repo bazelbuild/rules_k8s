@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
+"""Demo HTTP application."""
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+from flask import Flask
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
+app = Flask(__name__)
 
-# TODO(mattmoor): Should we create namespaces that do not exist?
+@app.route('/')
+def get():
+  return 'DEMO '
 
-PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} %{args} create -f -
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=8080, debug=True)
