@@ -495,14 +495,21 @@ A rule for interacting with Kubernetes objects.
       </td>
     </tr>
     <tr>
-          <td><code>kubectl_args</code></td>
+          <td><code>args</code></td>
           <td>
-            <p><code>string, optional</code></p>
+            <p><code>string_list, optional</code></p>
+            <p><pre>k8s_deploy(
+    name = "staging",
+    template = "deployment.yaml",
+    args = [
+        "--v=0",
+        "--alsologtostderr=true",
+        "--stderrthreshold=1",
+    ],
+)</pre></p>
             <p>Additional arguments to pass to the kubectl command at execution.</p>
-            <p>I.E.</p>
-            <p>--prune</p>
-            <p>or</p>
-            <p>--dry-run=true --prune=true</p>
+            <p>NOTE:</p>
+            <p>Not all options are availale for all kubectl commands. To view the list of global options run: <pre>kubectl options</pre></p>
           </td>
         </tr>
   </tbody>
