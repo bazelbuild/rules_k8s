@@ -21,8 +21,9 @@ k8s_deploy(
     name = "staging",
     template = "deployment.yaml",
     args = [
-    	"--validate=true",
-    	"--record=true",
+    	"--v=0",
+    	"--alsologtostderr=true",
+    	"--stderrthreshold=1",
     ],
 )
 
@@ -32,8 +33,9 @@ k8s_deploy(
     name = "staging-service",
     template = "service.yaml",
     args = [
-    	"--validate=true",
-    	"--record=true",
+    	"--v=0",
+    	"--alsologtostderr=true",
+    	"--stderrthreshold=1",
     ],
 )
 
