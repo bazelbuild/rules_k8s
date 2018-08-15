@@ -242,7 +242,7 @@ http_archive(
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")
 
-node_repositories(package_json = ["//examples/hellohttp/nodejs:package.json", "//examples/hellohttp/nodejs:package.json"])
+node_repositories(package_json = ["//examples/hellohttp/nodejs:package.json", "//examples/hellohttp2/nodejs:package.json"])
 
 # We use nodejs_image to build a sample service
 load(
