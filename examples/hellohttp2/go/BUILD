@@ -5,7 +5,7 @@ load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 go_image(
     name = "server",
     srcs = ["main.go"],
-    importpath = "github.com/bazelbuild/not-my-project/examples/hellohttp/go",
+    importpath = "github.com/bazelbuild/not-my-project/examples/hellohttp2/go",
 )
 
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
@@ -15,5 +15,5 @@ k8s_deploy(
     images = {
         "hello-http-image": ":server",
     },
-    template = "//examples/hellohttp:deployment.yaml",
+    template = "//examples/hellohttp2:deployment.yaml",
 )

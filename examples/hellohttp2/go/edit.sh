@@ -17,4 +17,4 @@ set -e
 
 SUFFIX="$1"
 
-sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/hellohttp/go/main.go
+sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/hellohttp2/go/main.go

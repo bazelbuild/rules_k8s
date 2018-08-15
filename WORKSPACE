@@ -187,6 +187,16 @@ load(
     httppip_install = "pip_install",
 )
 
+pip_import(
+    name = "examples_hellohttp2_pip",
+    requirements = "//examples/hellohttp/py:requirements.txt",
+)
+
+load(
+    "@examples_hellohttp2_pip//:requirements.bzl",
+    httppip_install = "pip_install",
+)
+
 httppip_install()
 
 # We use py_image to build a sample service
@@ -232,7 +242,7 @@ http_archive(
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")
 
-node_repositories(package_json = ["//examples/hellohttp/nodejs:package.json"])
+node_repositories(package_json = ["//examples/hellohttp/nodejs:package.json", "//examples/hellohttp/nodejs:package.json"])
 
 # We use nodejs_image to build a sample service
 load(
@@ -245,4 +255,9 @@ _nodejs_image_repos()
 npm_install(
     name = "examples_hellohttp_npm",
     package_json = "//examples/hellohttp/nodejs:package.json",
+)
+
+npm_install(
+    name = "examples_hellohttp2_npm",
+    package_json = "//examples/hellohttp2/nodejs:package.json",
 )

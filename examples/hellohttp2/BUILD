@@ -70,7 +70,7 @@ k8s_deploy(
     name = "error-on-run",
     images = {
         # Simulate a typo
-        "hello-http_image": "//examples/hellohttp/go:server",
+        "hello-http_image": "//examples/hellohttp2/go:server",
     },
     template = "deployment.yaml",
 )

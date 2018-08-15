@@ -15,6 +15,8 @@ set -e
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+NAMESPACE=metalstorm
+
 set -o errexit
 set -o nounset
 set -o pipefail
@@ -24,7 +26,7 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 get_lb_ip() {
-    kubectl --namespace=${USER} get service hello-http-staging \
+    kubectl --namespace=${NAMESPACE} get service hello-http-staging \
 	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
@@ -48,7 +50,7 @@ apply() {
 }
 
 delete() {
-   kubectl get all --namespace="${USER}" --selector=app=hello-http-staging
+   kubectl get all --namespace="${NAMESPACE}" --selector=app=hello-http-staging
    bazel run examples/hellohttp2/${LANGUAGE}:staging.describe
    bazel run examples/hellohttp2/${LANGUAGE}:staging.delete
 }
