@@ -32,5 +32,5 @@ k8s_deploy(
     images = {
         "hello-http-image": ":server",
     },
-    template = "//examples/hellohttp:deployment.json",
+    template = "//examples/hellohttp2:deployment.json",
 )

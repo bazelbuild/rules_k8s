@@ -23,9 +23,9 @@ def TestData(name):
 class DeploymentTest(unittest.TestCase):
 
   def test_things_match(self):
-    with open(TestData('examples/hellohttp/deployment.yaml'), 'r') as f:
+    with open(TestData('examples/hellohttp2/deployment.yaml'), 'r') as f:
       static = yaml.load(f.read())
-    with open(TestData('examples/hellohttp/deployment.json'), 'r') as f:
+    with open(TestData('examples/hellohttp2/deployment.json'), 'r') as f:
       generated = json.loads(f.read())
 
     self.assertEqual(static, generated)

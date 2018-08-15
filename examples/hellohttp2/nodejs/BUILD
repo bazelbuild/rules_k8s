@@ -20,8 +20,8 @@ load("@io_bazel_rules_docker//nodejs:image.bzl", "nodejs_image")
 nodejs_image(
     name = "server",
     data = [":server.js"],
-    entry_point = "io_bazel_rules_k8s/examples/hellohttp/nodejs/server.js",
-    node_modules = "@examples_hellohttp_npm//:node_modules",
+    entry_point = "io_bazel_rules_k8s/examples/hellohttp2/nodejs/server.js",
+    node_modules = "@examples_hellohttp2_npm//:node_modules",
 )
 
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
@@ -31,5 +31,5 @@ k8s_deploy(
     images = {
         "hello-http-image": ":server",
     },
-    template = "//examples/hellohttp:deployment.yaml",
+    template = "//examples/hellohttp2:deployment.yaml",
 )

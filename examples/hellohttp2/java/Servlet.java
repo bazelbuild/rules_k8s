@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package io.bazel.rules_k8s.hellohttp.java;
+package io.bazel.rules_k8s.hellohttp2.java;
 
 import java.io.IOException;
 import java.io.PrintWriter;

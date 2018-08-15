@@ -89,3 +89,5 @@ bazel test //...
 ./examples/hellohttp/e2e-test.sh java go py nodejs
 # Third, TODO Controller.
 ./examples/todocontroller/e2e-test.sh py
+# Second, HTTP with extra kubectl args.
+./examples/hellohttp2/e2e-test.sh java go py nodejs
