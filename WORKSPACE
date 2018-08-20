@@ -18,7 +18,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 git_repository(
     name = "io_bazel_rules_docker",
-    commit = "7401cb256222615c497c0dee5a4de5724a4f4cc7",
+    commit = "dc3982577c41f27770e970669ce8fee3d2e44f80",
     remote = "https://github.com/bazelbuild/rules_docker.git",
 )
 

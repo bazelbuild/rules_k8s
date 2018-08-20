@@ -72,6 +72,7 @@ set -o xtrace
 # Setup our credentials
 gcloud container clusters get-credentials testing --project=rules-k8s --zone=us-central1-f
 gcloud auth configure-docker --quiet
+gcloud config set container/use_client_certificate True
 
 # Check our installs.
 bazel version
