@@ -15,7 +15,7 @@ set -e
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-NAMESPACE=metalstorm
+NAMESPACE=${USER}
 
 set -o errexit
 set -o nounset
