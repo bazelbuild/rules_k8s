@@ -55,8 +55,7 @@ delete() {
 
 check_bad_substitution() {
     echo Checking a bad substitution
-    # redirect error output to dev/null so Prow does not think it failed
-    if ! bazel run examples/hellohttp:error-on-run &> /dev/null;
+    if ! bazel run examples/hellohttp:error-on-run;
     then
 	echo "Success, substitution failed."
 	return

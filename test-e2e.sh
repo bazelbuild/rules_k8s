@@ -61,7 +61,6 @@ check-plat() {
 check-plat
 
 set +o xtrace
-
 if [[ -n "${GOOGLE_JSON_KEY:-}" ]]; then
   # Log into gcloud
   echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
@@ -71,7 +70,6 @@ fi
 set -o xtrace
 
 # Setup our credentials
-export CLOUDSDK_CONTAINER_USE_CLIENT_CERTIFICATE=True
 gcloud container clusters get-credentials testing --project=rules-k8s --zone=us-central1-f
 gcloud auth configure-docker --quiet
 
