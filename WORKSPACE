@@ -16,10 +16,11 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-git_repository(
+http_archive(
     name = "io_bazel_rules_docker",
-    commit = "c66358ef1e9ccc9a540ea604e67619249c9ac144",
-    remote = "https://github.com/bazelbuild/rules_docker.git",
+    sha256 = "35c585261362a96b1fe777a7c4c41252b22fd404f24483e1c48b15d7eb2b55a5",
+    strip_prefix = "rules_docker-4282829a554058401f7ff63004c8870c8d35e29c",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/4282829a554058401f7ff63004c8870c8d35e29c.tar.gz"],
 )
 
 load(
