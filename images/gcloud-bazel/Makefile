@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PROJECT = rules-k8s
+PROJECT ?= rules-k8s
 # gcr.io/rule-k8s/gcloud-bazel by default
 IMG = gcr.io/$(PROJECT)/gcloud-bazel
 TAG := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
