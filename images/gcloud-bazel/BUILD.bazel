@@ -14,3 +14,58 @@
 
 # TODO(fejta): replace Dockerfile with an equivalent bazel rule. This seems promising:
 #   https://github.com/GoogleContainerTools/base-images-docker/blob/master/package_managers/bootstrap_image.bzl
+
+load("@io_bazel_rules_docker//container:image.bzl", "container_image")
+load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
+#load("@base_images_docker//package_managers:bootstrap_image.bzl",
+#    "bootstrap_image_macro")
+
+# Gcloud layer. Simply includes an extractec version of the gcloud installation
+# archive. Gcloud isn't fully installed as a result of this. The final containe
+# needs to run /google-cloud-sdk/install.sh -q and source /google-cloud-sdk/path.bash.inc
+# in their bashrc to complete the gcloud installation
+container_layer(
+    name = "gcloud-layer",
+    tars = [
+        "@gcloud_archive//file",
+    ],
+)
+
+# Build an image that uses the official bazel base image and includes the gcloud
+# layer on top
+container_image(
+    name = "image",
+    base = "@bazel_image//image",
+    layers=[
+        ":gcloud-layer",
+    ],
+    cmd = "",
+    entrypoint = "",
+)
+
+# Bootstrap the container image by installing some additional packages and
+# running a few post install steps. Currently fails because the config_stripper
+# logic in base_images_docker doesn't handle layers that are symlinked to other
+# layers. Need to look into whether the symlinking is an error or config_stripper
+# needs to be updated to handle that scenario
+#bootstrap_image_macro(
+#    name="image",
+#
+#    date="$DATE",
+#    image_tar=":image-intermediate.tar",
+#    packages=[
+#        "python-pip",
+#    ],
+#    installation_cleanup_commands= " && ".join([
+#        # Finalize the google cloud installation
+#        "/google-cloud-sdk/install.sh -q",
+#        # Add the google cloud sdk binaries to the PATH
+#        "echo 'source /google-cloud-sdk/path.bash.inc' >> ~/.bashrc",
+#        "apt-get clean",
+#        "python -m pip install --upgrade pip setuptools wheel",
+#        # Install kubernetes
+#        "/google-cloud-sdk/bin/gcloud components install --quiet kubectl",
+#    ]),
+#    store_location="images/gcloud-bazel/bootsteap_image_macro",
+#    output_image_name="gcr.io/rules-k8s/gcloud-bazel",
+#)

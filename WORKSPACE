@@ -23,9 +23,38 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/archive/4282829a554058401f7ff63004c8870c8d35e29c.tar.gz"],
 )
 
+#http_archive(
+#    name = "base_images_docker",
+#    sha256 = "e2b1b7254270bb7605e814a9dbf6d1e4ae04a11136ff1714fbfdabe3f87f7cf9",
+#    strip_prefix = "base-images-docker-12801524f867e657fbb5d1a74f31618aff181ac6",
+#    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/12801524f867e657fbb5d1a74f31618aff181ac6.tar.gz"],
+#)
+
 load(
     "@io_bazel_rules_docker//docker:docker.bzl",
     "docker_repositories",
+)
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+)
+
+container_pull(
+    name = "bazel_image",
+    registry = "launcher.gcr.io",
+    repository = "google/bazel",
+)
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+# Gcloud installer
+http_file(
+    name = "gcloud_archive",
+    downloaded_file_path = "google-cloud-sdk.tar.gz",
+    sha256 = "a2205e35b11136004d52d47774762fbec9145bf0bda74ca506f52b71452c570e",
+    urls = [
+        "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
+    ],
 )
 
 docker_repositories()
@@ -35,6 +64,7 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+
 _CONTEXT = _CLUSTER
 
 _NAMESPACE = "{BUILD_USER}"
