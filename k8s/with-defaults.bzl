@@ -68,6 +68,10 @@ def _impl(repository_ctx):
     overrides += [_override(repository_ctx.attr.name,
                             "namespace", repository_ctx.attr.namespace)]
 
+  if repository_ctx.attr.namespace_file:
+    overrides += [_override(repository_ctx.attr.name,
+                            "namespace_file", repository_ctx.attr.namespace_file.label_string)]
+
   if repository_ctx.attr.kind:
     overrides += [_override(repository_ctx.attr.name,
                             "kind", repository_ctx.attr.kind)]
@@ -83,6 +87,8 @@ load(
 )
 def {name}(**kwargs):
   {overrides}
+  if kwargs.get("namespace", None) and kwargs.get("namespace_file", None:
+    fail("you should choose one: 'namespace' or 'namespace_file'")
   _k8s_object(**kwargs)
 """.format(
   name=repository_ctx.attr.name,
@@ -96,6 +102,7 @@ k8s_defaults = repository_rule(
         "context": attr.string(mandatory = False),
         "user": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
+        "namespace_file": attr.label(allow_single_file=True, mandatory = False),
         "image_chroot": attr.string(mandatory = False),
     },
     implementation = _impl,

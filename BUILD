@@ -16,3 +16,19 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])  # Apache 2.0
 
 exports_files(["LICENSE"])
+exports_files([".git/HEAD"])
+
+genrule(
+    name = "git-HEAD",
+    output_to_bindir = 1,
+    srcs = [":.git/HEAD"],
+    outs = ["git.HEAD"],
+    cmd = """#!/bin/bash
+set -euo pipefail
+WORKSPACE="$$(realpath $<)"
+WORKSPACE="$$(dirname $$WORKSPACE)"
+WORKSPACE="$$(dirname $$WORKSPACE)"
+(cd $${WORKSPACE} && git rev-parse --abbrev-ref HEAD) > $@
+""",
+    visibility = ["//visibility:public"],
+)

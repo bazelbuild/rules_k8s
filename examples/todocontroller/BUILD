@@ -28,6 +28,7 @@ load("@k8s_todo//:defaults.bzl", "k8s_todo")
 
 k8s_todo(
     name = "example-todo",
+    namespace_file = ":git-HEAD",
     template = ":example.yaml",
 )
 
