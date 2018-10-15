@@ -17,8 +17,6 @@
 
 load("@io_bazel_rules_docker//container:image.bzl", "container_image")
 load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
-#load("@base_images_docker//package_managers:bootstrap_image.bzl",
-#    "bootstrap_image_macro")
 
 # Gcloud layer. Simply includes an extractec version of the gcloud installation
 # archive. Gcloud isn't fully installed as a result of this. The final containe
@@ -43,29 +41,13 @@ container_image(
     entrypoint = "",
 )
 
-# Bootstrap the container image by installing some additional packages and
-# running a few post install steps. Currently fails because the config_stripper
-# logic in base_images_docker doesn't handle layers that are symlinked to other
-# layers. Need to look into whether the symlinking is an error or config_stripper
-# needs to be updated to handle that scenario
-#bootstrap_image_macro(
-#    name="image",
-#
-#    date="$DATE",
-#    image_tar=":image-intermediate.tar",
-#    packages=[
-#        "python-pip",
-#    ],
-#    installation_cleanup_commands= " && ".join([
-#        # Finalize the google cloud installation
-#        "/google-cloud-sdk/install.sh -q",
-#        # Add the google cloud sdk binaries to the PATH
-#        "echo 'source /google-cloud-sdk/path.bash.inc' >> ~/.bashrc",
-#        "apt-get clean",
-#        "python -m pip install --upgrade pip setuptools wheel",
-#        # Install kubernetes
-#        "/google-cloud-sdk/bin/gcloud components install --quiet kubectl",
-#    ]),
-#    store_location="images/gcloud-bazel/bootsteap_image_macro",
-#    output_image_name="gcr.io/rules-k8s/gcloud-bazel",
-#)
+# TODO (smukherj1): Bootstrap the container image by installing some additional
+# packages and running the following post install steps:-
+# 1. Run /google/cloud-sdk/install.sh -q to extract the google-gcloud-sdk
+#    installation
+# 2. Add "source /google-cloud-sdk/path.bash.inc" to PATH to ensure gcloud
+#    binaries are in the path
+# 3. Run python -m pip install --upgrade pip setuptools wheel to install the
+#    latest version of pip, setuptools and wheel
+# 4. Run /google-cloud-sdk/bin/gcloud components install --quiet kubectl to
+#    install kubernetes as a component of gcloud

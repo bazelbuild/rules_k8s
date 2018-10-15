@@ -23,13 +23,6 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/archive/4282829a554058401f7ff63004c8870c8d35e29c.tar.gz"],
 )
 
-#http_archive(
-#    name = "base_images_docker",
-#    sha256 = "e2b1b7254270bb7605e814a9dbf6d1e4ae04a11136ff1714fbfdabe3f87f7cf9",
-#    strip_prefix = "base-images-docker-12801524f867e657fbb5d1a74f31618aff181ac6",
-#    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/12801524f867e657fbb5d1a74f31618aff181ac6.tar.gz"],
-#)
-
 load(
     "@io_bazel_rules_docker//docker:docker.bzl",
     "docker_repositories",
