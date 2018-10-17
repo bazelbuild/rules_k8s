@@ -17,6 +17,13 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
+    name = "base_images_docker",
+    sha256 = "c491e669299c842da1c1767c5bde73c3740b2fae19b9e38dae1732ca1725a2ef",
+    strip_prefix = "base-images-docker-635108c36ae89167a3ca8eb53706aed641145177",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/635108c36ae89167a3ca8eb53706aed641145177.tar.gz"],
+)
+
+http_archive(
     name = "io_bazel_rules_docker",
     sha256 = "35c585261362a96b1fe777a7c4c41252b22fd404f24483e1c48b15d7eb2b55a5",
     strip_prefix = "rules_docker-4282829a554058401f7ff63004c8870c8d35e29c",
