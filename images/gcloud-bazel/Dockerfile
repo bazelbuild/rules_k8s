@@ -31,19 +31,13 @@ RUN apt-key add /gcloud.pub.gpg \
 COPY sources.list /etc/apt/sources.list.d/gcloud.list
 
 # Install necessary dependencies:
-# * curl: needed by examples/hellohttp/e2e-test.sh
 # * gcloud: needed by rules_go and test-e2e.sh
-# * git: needed by rules_go
 # * kubectl: needed by rules_k8s
-# * openjdk-8-jdk: bazel
 # * pip setuptools wheel: needed by python rules
 # * python-pip: needed by python rules
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
     google-cloud-sdk \
-    git \
     kubectl \
-    openjdk-8-jdk \
     python-pip \
     && apt-get clean \
     && python -m pip install --upgrade pip setuptools wheel

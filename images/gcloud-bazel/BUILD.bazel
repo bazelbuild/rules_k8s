@@ -12,18 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO(fejta): replace Dockerfile with an equivalent bazel rule. This seems promising:
-#   https://github.com/GoogleContainerTools/base-images-docker/blob/master/package_managers/bootstrap_image.bzl
-
 load("@io_bazel_rules_docker//container:image.bzl", "container_image")
 load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
 load("@io_bazel_rules_docker//container:push.bzl", "container_push")
 load("@base_images_docker//util:run.bzl", "container_run_and_commit")
 
-# Gcloud layer. Simply includes an extractec version of the gcloud installation
-# archive. Gcloud isn't fully installed as a result of this. The final containe
-# needs to run /google-cloud-sdk/install.sh -q and source /google-cloud-sdk/path.bash.inc
-# in their bashrc to complete the gcloud installation
+# Includes the gcloud installation archive
 container_layer(
     name = "gcloud-layer",
     tars = [
@@ -31,10 +25,10 @@ container_layer(
     ],
 )
 
-# Build an image that uses the official bazel base image and includes the gcloud
-# layer on top
+# Build an image that uses the official bazel base image and includes the
+# gcloud layer on top
 container_image(
-    name = "image_intermediate",
+    name = "gcloud_installer",
     base = "@bazel_image//image",
     layers=[
         ":gcloud-layer",
@@ -46,8 +40,8 @@ container_image(
 # Bootstrap the container image by installing some additional
 # packages and running some post install steps
 container_run_and_commit(
-    name = "image",
-    image=":image_intermediate.tar",
+    name = "gcloud_install",
+    image=":gcloud_installer.tar",
     commands = [
         # Finalize the gcloud installation
         "/google-cloud-sdk/install.sh -q",
@@ -62,11 +56,11 @@ container_run_and_commit(
     ],
 )
 
-# Push the container to the image used by the K8s CI pod spec
+# Push the container so it can be used by the K8s CI pod spec
 # Pod spec: https://github.com/kubernetes/test-infra/blob/master/config/jobs/bazelbuild/rules_k8s/rules_k8s_config.yaml
 container_push(
-    name="image-push",
-    image=":image_commit.tar",
+    name="gcloud-push",
+    image=":gcloud_install_commit.tar",
     format="Docker",
     registry="gcr.io",
     repository="rules-k8s/gcloud-bazel",
