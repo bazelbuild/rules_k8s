@@ -79,7 +79,8 @@ gcloud version
 kubectl version
 
 # Check that all of our tools and samples build
-bazel build //...
+# Don't build the prow image as it requires docker
+bazel build -- //... -//images/gcloud-bazel:gcloud_install
 bazel test //...
 
 # Run end-to-end integration testing.
