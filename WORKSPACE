@@ -35,6 +35,7 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+
 _CONTEXT = _CLUSTER
 
 _NAMESPACE = "{BUILD_USER}"
@@ -127,10 +128,10 @@ load(
 
 _java_image_repos()
 
-git_repository(
+http_archive(
     name = "io_bazel_rules_go",
-    commit = "ae70411645c171b2056d38a6a959e491949f9afe",
-    remote = "https://github.com/bazelbuild/rules_go.git",
+    sha256 = "ee5fe78fe417c685ecb77a0a725dc9f6040ae5beb44a0ba4ddb55453aad23a8a",
+    url = "https://github.com/bazelbuild/rules_go/releases/download/0.16.0/rules_go-0.16.0.tar.gz",
 )
 
 load(
