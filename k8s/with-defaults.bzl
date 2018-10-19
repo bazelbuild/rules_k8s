@@ -76,6 +76,10 @@ def _impl(repository_ctx):
     overrides += [_override(repository_ctx.attr.name,
                             "image_chroot", repository_ctx.attr.image_chroot)]
 
+  if repository_ctx.attr.kubectl_args:
+    overrides += [_override(repository_ctx.attr.name,
+                            "kubectl_args", repository_ctx.attr.kubectl_args)]
+
   repository_ctx.file("defaults.bzl", """
 load(
   "@io_bazel_rules_k8s//k8s:object.bzl",
@@ -97,6 +101,7 @@ k8s_defaults = repository_rule(
         "user": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
         "image_chroot": attr.string(mandatory = False),
+        "kubectl_args": attr.string_list(mandatory = False),
     },
     implementation = _impl,
 )

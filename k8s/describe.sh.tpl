@@ -27,4 +27,4 @@ RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" -o name | cut -d'"' 
 
 %{kubectl_tool} \
   --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
-  %{namespace_arg} describe "${RESOURCE_NAME}"
+  %{namespace_arg} %{kubectl_args} describe "${RESOURCE_NAME}"
