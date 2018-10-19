@@ -93,8 +93,40 @@ check_no_images_resolution() {
     echo "${OUTPUT}" | grep "[/]pause[@]"
 }
 
+# e2e test that checks that --v=2 is added to the java kubectl apply command
+# also tests that --help can be passed in as a cli argument
+check_kubectl_args() {
+     
+    # checking that --v=2 is passed in via kubect_arguments in 
+    # the java BUILD file
+    FILE="./bazel-bin/examples/hellohttp/java/staging.apply"
+    echo Checking kubectl args in file: "$FILE"
+    bazel build examples/hellohttp/java:staging.apply
+    if [ ! -f "$FILE" ]; then
+        echo "FAIL: File '$FILE' not found!"
+        exit 1
+    fi
+    if grep -q -- "--v=2" "$FILE"; then
+      echo "PASS: Success, found argument."
+    else
+      echo "FAIL: Did not find --v=2 argument!"
+      exit 1
+    fi
+
+    # passing in --help to kubectl
+    OUTPUT=$(bazel run examples/hellohttp/go:staging.apply -- --help 2>&1)
+    if echo "$OUTPUT" | grep -q Examples:; then
+      echo "PASS: Success, found 'Examples:' argument was passed in"
+      return 0
+    else
+      echo "FAIL: Did not find ouput word 'Examples:' --help was not passed to kubectl"
+      exit 1
+    fi
+}
+
 check_bad_substitution
 check_no_images_resolution
+check_kubectl_args
 
 apply-lb
 

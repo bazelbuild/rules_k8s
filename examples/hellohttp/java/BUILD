@@ -33,4 +33,7 @@ k8s_deploy(
         "hello-http-image": ":server",
     },
     template = "//examples/hellohttp:deployment.json",
+    kubectl_args = [
+     "--v=2",
+    ],
 )
