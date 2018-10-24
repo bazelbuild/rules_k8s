@@ -19,7 +19,7 @@ cc_library(
     name = "simple_lib",
     srcs = ["simple.cc"],
     hdrs = ["simple.h"],
-    deps = ["//examples/hellogrpc/proto:cc"],
+    deps = ["//examples/hellogrpc/proto:simple_cc_grpc"],
 )
 
 cc_binary(

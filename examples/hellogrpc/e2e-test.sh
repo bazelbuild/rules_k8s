@@ -43,7 +43,6 @@ create() {
 
 check_msg() {
   bazel build examples/hellogrpc/${LANGUAGE}/client
-
   OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
   echo "${OUTPUT}" | grep "DEMO$1[ ]"

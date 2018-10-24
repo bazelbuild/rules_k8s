@@ -14,13 +14,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 
 	pb "github.com/bazelbuild/rules_k8s/examples/hellogrpc/proto/go"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
@@ -32,6 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	log.Printf("Server listening on :%s...", *port)
 	s := grpc.NewServer()
 	pb.RegisterSimpleServer(s, &server{})
 	if err := s.Serve(lis); err != nil {

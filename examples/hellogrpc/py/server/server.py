@@ -51,7 +51,9 @@ class _HelloServer(object):
 
 
 def main():
-    hello_server = _HelloServer(_SimpleService(), 50051)
+    port = 50051
+    hello_server = _HelloServer(_SimpleService(), port)
+    print("Server listening at :%d..." % port)
     hello_server.start()
     hello_server.await_termination()
 
