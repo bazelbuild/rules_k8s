@@ -16,15 +16,45 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-git_repository(
+http_archive(
+    name = "base_images_docker",
+    sha256 = "c491e669299c842da1c1767c5bde73c3740b2fae19b9e38dae1732ca1725a2ef",
+    strip_prefix = "base-images-docker-635108c36ae89167a3ca8eb53706aed641145177",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/635108c36ae89167a3ca8eb53706aed641145177.tar.gz"],
+)
+
+http_archive(
     name = "io_bazel_rules_docker",
-    commit = "7401cb256222615c497c0dee5a4de5724a4f4cc7",
-    remote = "https://github.com/bazelbuild/rules_docker.git",
+    sha256 = "35c585261362a96b1fe777a7c4c41252b22fd404f24483e1c48b15d7eb2b55a5",
+    strip_prefix = "rules_docker-4282829a554058401f7ff63004c8870c8d35e29c",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/4282829a554058401f7ff63004c8870c8d35e29c.tar.gz"],
 )
 
 load(
     "@io_bazel_rules_docker//docker:docker.bzl",
     "docker_repositories",
+)
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+)
+
+container_pull(
+    name = "bazel_image",
+    registry = "launcher.gcr.io",
+    repository = "google/bazel",
+)
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+# Gcloud installer
+http_file(
+    name = "gcloud_archive",
+    downloaded_file_path = "google-cloud-sdk.tar.gz",
+    sha256 = "a2205e35b11136004d52d47774762fbec9145bf0bda74ca506f52b71452c570e",
+    urls = [
+        "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
+    ],
 )
 
 docker_repositories()
@@ -34,6 +64,7 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+
 _CONTEXT = _CLUSTER
 
 _NAMESPACE = "{BUILD_USER}"
@@ -225,9 +256,9 @@ _controller_pip_install()
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "6139762b62b37c1fd171d7f22aa39566cb7dc2916f0f801d505a9aaf118c117f",
-    strip_prefix = "rules_nodejs-0.9.1",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.9.1.zip"],
+    sha256 = "779edee08986ab40dbf8b1ad0260f3cc8050f1e96ccd2a88dc499848bbdb787f",
+    strip_prefix = "rules_nodejs-0.11.1",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.11.1.zip"],
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")

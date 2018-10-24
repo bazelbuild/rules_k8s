@@ -78,9 +78,12 @@ bazel version
 gcloud version
 kubectl version
 
+# Don't build/test the prow image as it requires Docker
+EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
+
 # Check that all of our tools and samples build
-bazel build //...
-bazel test //...
+bazel build -- //... $EXCLUDED_TARGETS
+bazel test  -- //... $EXCLUDED_TARGETS
 
 # Run end-to-end integration testing.
 # First, GRPC.

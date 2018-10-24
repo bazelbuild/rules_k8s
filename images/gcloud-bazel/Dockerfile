@@ -14,7 +14,7 @@
 
 # Ubuntu with bazel, gcloud and its dependencies preinstalled.
 
-FROM launcher.gcr.io/google/ubuntu16_04:latest
+FROM launcher.gcr.io/google/bazel:latest
 # Based off github.com/kubernetes/test-infra/images/bazelbuild
 LABEL maintainer="fejta@google.com"
 
@@ -23,30 +23,21 @@ LABEL maintainer="fejta@google.com"
 # * https://cloud.google.com/sdk/docs/downloads-apt-get
 
 # Ensure new repos aren't compromised.
-COPY bazel.pub.gpg gcloud.pub.gpg /
-RUN apt-key add /bazel.pub.gpg \
-    && apt-key add /gcloud.pub.gpg \
-    && rm /bazel.pub.gpg /gcloud.pub.gpg
+COPY gcloud.pub.gpg /
+RUN apt-key add /gcloud.pub.gpg \
+    && rm /gcloud.pub.gpg
 
 # Add new repos to install bazel and google-cloud-sdk (including kubectl)
-COPY sources.list /etc/apt/sources.list.d/bazel-gcloud.list
+COPY sources.list /etc/apt/sources.list.d/gcloud.list
 
 # Install necessary dependencies:
-# * bazel: needed by test-e2e.sh
-# * curl: needed by examples/hellohttp/e2e-test.sh
 # * gcloud: needed by rules_go and test-e2e.sh
-# * git: needed by rules_go
 # * kubectl: needed by rules_k8s
-# * openjdk-8-jdk: bazel
 # * pip setuptools wheel: needed by python rules
 # * python-pip: needed by python rules
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bazel \
-    curl \
     google-cloud-sdk \
-    git \
     kubectl \
-    openjdk-8-jdk \
     python-pip \
     && apt-get clean \
     && python -m pip install --upgrade pip setuptools wheel
