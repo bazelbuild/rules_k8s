@@ -277,3 +277,9 @@ npm_install(
     name = "examples_hellohttp_npm",
     package_json = "//examples/hellohttp/nodejs:package.json",
 )
+
+# Register the default kubectl toolchain that expects the 'kubectl'
+# executable to be in the PATH
+register_toolchains(
+    "//tools:kubectl_linux_toolchain",
+)
