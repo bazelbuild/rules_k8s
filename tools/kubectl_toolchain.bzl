@@ -16,23 +16,23 @@ This module implements the kubectl toolchain rule.
 """
 
 KubectlInfo = provider(
-	doc = "Information about how to invoke the kubectl tool.",
-	fields = {
-		"tool_path": "Path to the kubectl executable",
-	},
+    doc = "Information about how to invoke the kubectl tool.",
+    fields = {
+        "tool_path": "Path to the kubectl executable",
+    },
 )
 
 def _kubectl_toolchain_impl(ctx):
-	toolchain_info = platform_common.ToolchainInfo(
-		kubectlinfo = KubectlInfo(
-			tool_path = ctx.attr.tool_path,
-		),
-	)
-	return [toolchain_info]
+    toolchain_info = platform_common.ToolchainInfo(
+        kubectlinfo = KubectlInfo(
+            tool_path = ctx.attr.tool_path,
+        ),
+    )
+    return [toolchain_info]
 
 kubectl_toolchain = rule(
-	implementation = _kubectl_toolchain_impl,
-	attrs = {
-	    "tool_path": attr.string(),
-	},
+    implementation = _kubectl_toolchain_impl,
+    attrs = {
+        "tool_path": attr.string(),
+    },
 )

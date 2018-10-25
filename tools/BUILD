@@ -21,8 +21,8 @@ toolchain_type(name = "toolchain_type_kubectl")
 # Default kubectl toolchain that expects the 'kubectl' executable
 # to be in the PATH
 kubectl_toolchain(
-	name = "kubectl_linux",
-	tool_path = "kubectl",
+    name = "kubectl_linux",
+    tool_path = "kubectl",
 )
 
 toolchain(
