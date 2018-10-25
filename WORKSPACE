@@ -16,15 +16,45 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-git_repository(
+http_archive(
+    name = "base_images_docker",
+    sha256 = "9540d8b1de4a0e294d5a5729c3c3f3720f4f5cdd966590e12b4dd98d5b7c10c7",
+    strip_prefix = "base-images-docker-55a4d060547899fdcd0ec662697e9212cac92996",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/55a4d060547899fdcd0ec662697e9212cac92996.tar.gz"],
+)
+
+http_archive(
     name = "io_bazel_rules_docker",
-    commit = "c66358ef1e9ccc9a540ea604e67619249c9ac144",
-    remote = "https://github.com/bazelbuild/rules_docker.git",
+    sha256 = "5235045774d2f40f37331636378f21fe11f69906c0386a790c5987a09211c3c4",
+    strip_prefix = "rules_docker-8010a50ef03d1e13f1bebabfc625478da075fa60",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/8010a50ef03d1e13f1bebabfc625478da075fa60.tar.gz"],
 )
 
 load(
     "@io_bazel_rules_docker//docker:docker.bzl",
     "docker_repositories",
+)
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+)
+
+container_pull(
+    name = "bazel_image",
+    registry = "launcher.gcr.io",
+    repository = "google/bazel",
+)
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+# Gcloud installer
+http_file(
+    name = "gcloud_archive",
+    downloaded_file_path = "google-cloud-sdk.tar.gz",
+    sha256 = "a2205e35b11136004d52d47774762fbec9145bf0bda74ca506f52b71452c570e",
+    urls = [
+        "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
+    ],
 )
 
 docker_repositories()
@@ -34,6 +64,7 @@ load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
+
 _CONTEXT = _CLUSTER
 
 _NAMESPACE = "{BUILD_USER}"

@@ -182,6 +182,7 @@ def main():
       unseen_strings.add(tag)
     except Exception as e:
       logging.fatal('Error publishing provided image: %s', e)
+      sys.exit(1)
 
   with open(args.template, 'r') as f:
     inputs = f.read()

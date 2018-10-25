@@ -24,44 +24,49 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 get_lb_ip() {
-    kubectl --namespace=${USER} get service hello-grpc-staging \
-	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+  kubectl --namespace=${USER} get service hello-grpc-staging \
+    -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
+  echo Applying service...
   bazel build examples/hellogrpc:staging-service.apply
   bazel-bin/examples/hellogrpc/staging-service.apply
 }
 
 create() {
-   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
-   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
+  echo Creating $LANGUAGE...
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
 }
 
 check_msg() {
-   bazel build examples/hellogrpc/${LANGUAGE}/client
+  bazel build examples/hellogrpc/${LANGUAGE}/client
 
-   OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
-   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
-   echo "${OUTPUT}" | grep "DEMO$1[ ]"
+  OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
+  echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
+  echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
 edit() {
-   ./examples/hellogrpc/${LANGUAGE}/server/edit.sh "$1"
+  echo Setting $LANGUAGE to "$1"
+  ./examples/hellogrpc/${LANGUAGE}/server/edit.sh "$1"
 }
 
 update() {
-   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
-   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
+  echo Updating $LANGUAGE...
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
 }
 
 delete() {
-   kubectl get all --namespace="${USER}" --selector=app=hello-grpc-staging
-   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
-   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe
-   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
-   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
+  echo Deleting $LANGUAGE...
+  kubectl get all --namespace="${USER}" --selector=app=hello-grpc-staging
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
 }
 
 
@@ -71,8 +76,9 @@ while [[ -n "${1:-}" ]]; do
   LANGUAGE="$1"
   shift
 
+  delete || true
   create
-  trap "delete" EXIT
+  trap "echo FAILED, cleaning up...; delete" EXIT
   sleep 25
   check_msg ""
 
