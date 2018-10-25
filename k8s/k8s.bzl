@@ -33,3 +33,9 @@ py_library(
            "/PyYAML-3.12.tar.gz")],
     strip_prefix = "PyYAML-3.12/lib/yaml",
   )
+
+  # Register the default kubectl toolchain that expects the 'kubectl'
+  # executable to be in the PATH
+  native.register_toolchains(
+    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_toolchain",
+  )
