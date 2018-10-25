@@ -11,18 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:private"])
 
 load(":kubectl_toolchain.bzl", "kubectl_toolchain")
 
 # kubectl toolchain type
-toolchain_type(name = "toolchain_type_kubectl")
+toolchain_type(name = "toolchain_type")
 
 # Default kubectl toolchain that expects the 'kubectl' executable
 # to be in the PATH
 kubectl_toolchain(
     name = "kubectl_linux",
     tool_path = "kubectl",
+    visibility = ["//visibility:public"],
 )
 
 toolchain(
@@ -36,5 +37,5 @@ toolchain(
         "@bazel_tools//platforms:x86_64",
     ],
     toolchain = ":kubectl_linux",
-    toolchain_type = ":toolchain_type_kubectl",
+    toolchain_type = ":toolchain_type",
 )
