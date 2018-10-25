@@ -23,7 +23,8 @@ function guess_runfiles() {
 
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
-RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" | cut -d'"' -f 2)
+RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" -o name | cut -d'"' -f 2)
 
-kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} $@ describe %{kind} \
-  "${RESOURCE_NAME}"
+kubectl \
+  --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
+  %{namespace_arg} $@ describe "${RESOURCE_NAME}"

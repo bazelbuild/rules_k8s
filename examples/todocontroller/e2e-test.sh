@@ -18,66 +18,72 @@ set -e
 LANGUAGE="$1"
 
 function get_lb_ip() {
-    kubectl --namespace=${USER} get service hello-grpc-staging \
-	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+  kubectl --namespace=${USER} get service hello-grpc-staging \
+    -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
 function create() {
-    bazel build examples/todocontroller/${LANGUAGE}:staging.create
-    bazel-bin/examples/todocontroller/${LANGUAGE}/staging.create
-    bazel build examples/todocontroller:example-todo.create
-    bazel-bin/examples/todocontroller/example-todo.create
+  echo Creating $LANGUAGE...
+  bazel build examples/todocontroller/${LANGUAGE}:staging.create
+  bazel-bin/examples/todocontroller/${LANGUAGE}/staging.create
+  bazel build examples/todocontroller:example-todo.create
+  bazel-bin/examples/todocontroller/example-todo.create
 }
 
 function check_msg() {
-    bazel build examples/todocontroller:example-todo.describe
+  bazel build examples/todocontroller:example-todo.describe
 
-    OUTPUT=$(./bazel-bin/examples/todocontroller/example-todo.describe)
-    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
-    echo "${OUTPUT}" | grep "DEMO$1[ ]"
+  OUTPUT=$(./bazel-bin/examples/todocontroller/example-todo.describe)
+  echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
+  echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
 
 function edit() {
-    ./examples/todocontroller/${LANGUAGE}/edit.sh "$1"
+  echo Editing $LANGUAGE to $1...
+  ./examples/todocontroller/${LANGUAGE}/edit.sh "$1"
 }
 
 function update_controller() {
-    bazel build examples/todocontroller/${LANGUAGE}:controller-deployment.replace
-    bazel-bin/examples/todocontroller/${LANGUAGE}/controller-deployment.replace
+  echo Replacing $LANGUAGE controller...
+  bazel build examples/todocontroller/${LANGUAGE}:controller-deployment.replace
+  bazel-bin/examples/todocontroller/${LANGUAGE}/controller-deployment.replace
 }
 
 function update_todo() {
-    bazel build examples/todocontroller:example-todo.replace
-    bazel-bin/examples/todocontroller/example-todo.replace
+  echo Replacing example-todo...
+  bazel build examples/todocontroller:example-todo.replace
+  bazel-bin/examples/todocontroller/example-todo.replace
 }
 
 function delete() {
-    bazel run examples/todocontroller/example-todo.describe
-    bazel run examples/todocontroller/${LANGUAGE}:controller-deployment.describe
+  echo Deleting $LANGUAGE...
+  bazel run examples/todocontroller/example-todo.describe
+  bazel run examples/todocontroller/${LANGUAGE}:controller-deployment.describe
 
-    bazel build examples/todocontroller/example-todo.delete
-    bazel-bin/examples/todocontroller/example-todo.delete
-    bazel build examples/todocontroller/${LANGUAGE}:staging.delete
-    bazel-bin/examples/todocontroller/${LANGUAGE}/staging.delete
+  bazel build examples/todocontroller/example-todo.delete
+  bazel-bin/examples/todocontroller/example-todo.delete
+  bazel build examples/todocontroller/${LANGUAGE}:staging.delete
+  bazel-bin/examples/todocontroller/${LANGUAGE}/staging.delete
 }
 
 function check_reverse_delete_k8s_object() {
-    echo Checking deletion in reverse order via k8s_object.
-    bazel run examples/todocontroller:joined.apply
-    bazel run examples/todocontroller:joined.delete
+  echo Checking deletion in reverse order via k8s_object...
+  bazel run examples/todocontroller:joined.apply
+  bazel run examples/todocontroller:joined.delete
 }
 
 function check_reverse_delete_k8s_objects() {
-    echo Checking deletion in reverse order via k8s_objects.
-    bazel run examples/todocontroller:everything.apply
-    bazel run examples/todocontroller:everything.delete
+  echo Checking deletion in reverse order via k8s_objects...
+  bazel run examples/todocontroller:everything.apply
+  bazel run examples/todocontroller:everything.delete
 }
 
 check_reverse_delete_k8s_object
 check_reverse_delete_k8s_objects
 
+delete || true
 create
-trap "delete" EXIT
+trap "echo FAILED, cleaning up...; delete" EXIT
 sleep 25
 check_msg
 

@@ -25,12 +25,13 @@ fi
 
 get_lb_ip() {
     kubectl --namespace=${USER} get service hello-http-staging \
-	-o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+      -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
 # Ensure there is an ip address for hello-http-staging:8080
 apply-lb() {
-   bazel run examples/hellohttp:staging-service.apply
+  echo Applying service...
+  bazel run examples/hellohttp:staging-service.apply
 }
 
 check_msg() {
@@ -40,33 +41,35 @@ check_msg() {
 }
 
 edit() {
-   ./examples/hellohttp/${LANGUAGE}/edit.sh "$1"
+  echo Setting $LANGUAGE to "$1"
+  ./examples/hellohttp/${LANGUAGE}/edit.sh "$1"
 }
 
 apply() {
-   bazel run examples/hellohttp/${LANGUAGE}:staging.apply
+  echo Applying $LANGUAGE...
+  bazel run examples/hellohttp/${LANGUAGE}:staging.apply
 }
 
 delete() {
-   kubectl get all --namespace="${USER}" --selector=app=hello-http-staging
-   bazel run examples/hellohttp/${LANGUAGE}:staging.describe
-   bazel run examples/hellohttp/${LANGUAGE}:staging.delete
+  echo Deleting $LANGUAGE...
+  kubectl get all --namespace="${USER}" --selector=app=hello-http-staging
+  bazel run examples/hellohttp/${LANGUAGE}:staging.describe
+  bazel run examples/hellohttp/${LANGUAGE}:staging.delete
 }
 
 check_bad_substitution() {
-    echo Checking a bad substitution
-    if ! bazel run examples/hellohttp:error-on-run;
-    then
-	echo "Success, substitution failed."
-	return
-    else
-	echo "Bad substitution should fail!"
-	exit 1
-    fi
+  echo Checking a bad substitution...
+  if ! bazel run examples/hellohttp:error-on-run; then
+    echo "Success, substitution failed."
+    return 0
+  else
+    echo "Bad substitution should fail!"
+    exit 1
+  fi
 }
 
 check_no_images_resolution() {
-    echo Checking resolution with no images attribute.
+    echo Checking resolution with no images attribute...
     bazel build examples/hellohttp:resolve-external
     OUTPUT=$(bazel-bin/examples/hellohttp/resolve-external 2>&1)
     echo Checking output: "${OUTPUT}" matches: "/pause@"
@@ -83,8 +86,8 @@ while [[ -n "${1:-}" ]]; do
   LANGUAGE="$1"
   shift
 
-  apply
-  trap "delete" EXIT
+  apply # apply will handle already created
+  trap "echo FAILED, cleaning up...; delete" EXIT
   sleep 25
   check_msg ""
 
