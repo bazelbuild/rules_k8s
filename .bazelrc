@@ -14,4 +14,4 @@
 
 build --workspace_status_command="bash print-workspace-status.sh"
 run --workspace_status_command="bash print-workspace-status.sh"
-test --workspace_status_command="bash print-workspace-status.sh"
+test --test_output=errors --workspace_status_command="bash print-workspace-status.sh"
