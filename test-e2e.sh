@@ -81,25 +81,23 @@ kubectl version
 # Don't build/test the prow image as it requires Docker
 EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
 
-# Create a unique namespace for this job using the repo name and the build id
-export E2E_NAMESPACE="build-${BUILD_ID:-0}"
-
-(cat <<EOF
-{
-  "kind": "Namespace",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "${E2E_NAMESPACE}",
-    "labels": {
-    }
-  }
-}
-EOF
-) |  kubectl create -f - || true
-
 # Check that all of our tools and samples build
 bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
+
+# Create a unique namespace for this job using the repo name and the build id
+export E2E_NAMESPACE="build-${BUILD_ID:-0}"
+
+kubectl get "namespaces/${E2E_NAMESPACE}" || kubectl create namespace "${E2E_NAMESPACE}"
+
+delete() {
+    # Delete the namespace
+    echo "Deleting kubernetes namespace ${E2E_NAMESPACE}"
+    kubectl delete namespace "${E2E_NAMESPACE}"
+}
+
+# Setup a trap to delete the namespace on error
+trap "echo FAILED, cleaning up...; delete" EXIT
 
 # Run end-to-end integration testing.
 # First, GRPC.
@@ -108,3 +106,6 @@ bazel test  -- //... $EXCLUDED_TARGETS
 ./examples/hellohttp/e2e-test.sh java go py nodejs
 # Third, TODO Controller.
 ./examples/todocontroller/e2e-test.sh py
+
+# Replace the exit trap with a pass message
+trap "echo PASS" EXIT

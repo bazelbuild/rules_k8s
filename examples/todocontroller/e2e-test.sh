@@ -18,7 +18,7 @@ set -e
 LANGUAGE="$1"
 
 function get_lb_ip() {
-  kubectl --namespace=${E2E_NAMESPACE} get service hello-grpc-staging \
+  kubectl --namespace="${E2E_NAMESPACE}" get service hello-grpc-staging \
     -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 

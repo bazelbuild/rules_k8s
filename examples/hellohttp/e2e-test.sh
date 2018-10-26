@@ -24,7 +24,7 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 get_lb_ip() {
-    kubectl --namespace=${E2E_NAMESPACE} get service hello-http-staging \
+    kubectl --namespace="${E2E_NAMESPACE}" get service hello-http-staging \
       -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
