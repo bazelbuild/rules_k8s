@@ -82,7 +82,7 @@ kubectl version
 EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
 
 # Create a unique namespace for this job using the repo name and the build id
-export E2E_NAMESPACE="${REPO_OWNER:-default-owner}-${REPO_NAME:-default-name}-${BUILD_ID:-0}"
+export E2E_NAMESPACE="${BUILD_ID:-0}"
 
 (cat <<EOF
 {

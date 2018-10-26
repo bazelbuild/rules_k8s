@@ -19,5 +19,5 @@ set -o nounset
 set -o pipefail
 
 cat <<EOF
-E2E_NAMESPACE "${REPO_OWNER:-default-owner}-${REPO_NAME:-default-name}-${BUILD_ID:-0}"
+E2E_NAMESPACE "${BUILD_ID:-0}"
 EOF
