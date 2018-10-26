@@ -18,6 +18,7 @@ set -e
 set -o errexit
 set -o nounset
 set -o pipefail
+set -o xtrace
 
 if [[ -z "${1:-}" ]]; then
   echo "Usage: $(basename $0) <language ...>"
@@ -32,17 +33,22 @@ get_lb_ip() {
 apply-lb() {
   echo Applying service...
   bazel build examples/hellogrpc:staging-service.apply
-  bazel-bin/examples/hellogrpc/staging-service.apply
+  bazel run examples/hellogrpc/staging-service.apply
 }
 
 create() {
   echo Creating $LANGUAGE...
   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
+  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.create
 }
 
 check_msg() {
   bazel build examples/hellogrpc/${LANGUAGE}/client
+
+  while [[ -z $(get_lb_ip) ]]; do
+    echo "service has not yet received an IP address, sleeping for 5s..."
+    sleep 5
+  done
 
   OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
@@ -57,16 +63,16 @@ edit() {
 update() {
   echo Updating $LANGUAGE...
   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
+  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.replace
 }
 
 delete() {
   echo Deleting $LANGUAGE...
   kubectl get all --namespace="${USER}" --selector=app=hello-grpc-staging
   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe
+  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe
   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
+  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.delete
 }
 
 
