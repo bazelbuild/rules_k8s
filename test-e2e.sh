@@ -93,8 +93,6 @@ kubectl get "namespaces/${E2E_NAMESPACE}" || kubectl create namespace "${E2E_NAM
 delete() {
     # Delete the namespace
     echo "Deleting kubernetes namespace ${E2E_NAMESPACE}"
-    # Delete everything in the namespace
-    kubectl delete --all --namespace=$E2E_NAMESPACE
     # Delete the namespace
     kubectl delete namespaces/$E2E_NAMESPACE
 }
