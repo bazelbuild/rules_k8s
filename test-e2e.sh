@@ -81,12 +81,25 @@ kubectl version
 # Don't build/test the prow image as it requires Docker
 EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
 
-echo $(pwd)
+# Create a unique namespace for this job using the repo name and the build id
+export E2E_NAMESPACE="${REPO_OWNER:-default-owner}-${REPO_NAME:-default-name}-${BUILD_ID:-0}"
+
+(cat <<EOF
+{
+  "kind": "Namespace",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "${E2E_NAMESPACE}",
+    "labels": {
+    }
+  }
+}
+EOF
+) |  kubectl create -f - || true
+
 # Check that all of our tools and samples build
 bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
-
-export E2E_NAMESPACE="${REPO_OWNER:-default-owner}-${REPO_NAME:-default-name}-${BUILD_ID:-0}"
 
 # Run end-to-end integration testing.
 # First, GRPC.
