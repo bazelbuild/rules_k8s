@@ -24,7 +24,7 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 get_lb_ip() {
-    kubectl --namespace=${USER} get service hello-http-staging \
+    kubectl --namespace=${E2E_NAMESPACE} get service hello-http-staging \
       -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
@@ -52,7 +52,7 @@ apply() {
 
 delete() {
   echo Deleting $LANGUAGE...
-  kubectl get all --namespace="${USER}" --selector=app=hello-http-staging
+  kubectl get all --namespace="${E2E_NAMESPACE}" --selector=app=hello-http-staging
   bazel run examples/hellohttp/${LANGUAGE}:staging.describe
   bazel run examples/hellohttp/${LANGUAGE}:staging.delete
 }
