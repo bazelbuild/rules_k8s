@@ -88,7 +88,7 @@ bazel test  -- //... $EXCLUDED_TARGETS
 # Create a unique namespace for this job using the repo name and the build id
 export E2E_NAMESPACE="build-${BUILD_ID:-0}"
 
-kubectl get "namespaces/${E2E_NAMESPACE}" || kubectl create namespace "${E2E_NAMESPACE}"
+kubectl get "namespaces/${E2E_NAMESPACE}" &> /dev/null || kubectl create namespace "${E2E_NAMESPACE}"
 
 delete() {
     # Delete the namespace
