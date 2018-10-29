@@ -32,13 +32,11 @@ get_lb_ip() {
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
   echo Applying service...
-  bazel build examples/hellogrpc:staging-service.apply
   bazel run examples/hellogrpc/staging-service.apply
 }
 
 create() {
   echo Creating $LANGUAGE...
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.create
 }
 
@@ -62,16 +60,13 @@ edit() {
 
 update() {
   echo Updating $LANGUAGE...
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.replace
 }
 
 delete() {
   echo Deleting $LANGUAGE...
   kubectl get all --namespace="${E2E_NAMESPACE}" --selector=app=hello-grpc-staging
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
-  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
+  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe || echo "Resource didn't exist!"
   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.delete
 }
 
