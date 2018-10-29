@@ -68,7 +68,7 @@ update() {
 
 delete() {
   echo Deleting $LANGUAGE...
-  kubectl get all --namespace="${USER}" --selector=app=hello-grpc-staging
+  kubectl get all --namespace="${E2E_NAMESPACE}" --selector=app=hello-grpc-staging
   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
   bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe
   bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
