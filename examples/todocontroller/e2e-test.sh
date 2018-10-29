@@ -82,9 +82,11 @@ function check_reverse_delete_k8s_objects() {
 check_reverse_delete_k8s_object
 check_reverse_delete_k8s_objects
 
-delete || true
+delete &> /dev/null || true
 create
+set +o xtrace
 trap "echo FAILED, cleaning up...; delete" EXIT
+set -o xtrace
 sleep 25
 check_msg
 
@@ -100,4 +102,4 @@ for i in $RANDOM $RANDOM; do
 done
 
 # Replace the trap with a success message.
-trap "delete; echo PASS" EXIT
+trap "echo PASS" EXIT

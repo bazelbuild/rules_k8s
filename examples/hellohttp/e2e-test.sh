@@ -92,7 +92,9 @@ while [[ -n "${1:-}" ]]; do
   shift
 
   apply # apply will handle already created
+  set +o xtrace
   trap "echo FAILED, cleaning up...; delete" EXIT
+  set -o xtrace
   sleep 25
   check_msg ""
 
@@ -106,4 +108,4 @@ while [[ -n "${1:-}" ]]; do
 done
 
 # Replace the trap with a success message.
-trap "delete; echo PASS" EXIT
+trap "echo PASS" EXIT

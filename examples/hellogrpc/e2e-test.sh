@@ -77,9 +77,11 @@ while [[ -n "${1:-}" ]]; do
   LANGUAGE="$1"
   shift
 
-  delete || true
+  delete &> /dev/null || true
   create
+  set +o xtrace
   trap "echo FAILED, cleaning up...; delete" EXIT
+  set -o xtrace
   sleep 25
   check_msg ""
 

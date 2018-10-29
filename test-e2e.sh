@@ -98,7 +98,9 @@ delete() {
 }
 
 # Setup a trap to delete the namespace on error
+set +o xtrace
 trap "echo FAILED, cleaning up...; delete" EXIT
+set -o xtrace
 
 # Run end-to-end integration testing.
 # First, GRPC.
