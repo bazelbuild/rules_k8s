@@ -18,6 +18,7 @@ set -e
 set -o errexit
 set -o nounset
 set -o pipefail
+set -o xtrace
 
 if [[ -z "${1:-}" ]]; then
   echo "Usage: $(basename $0) <language ...>"
@@ -35,6 +36,10 @@ apply-lb() {
 }
 
 check_msg() {
+   while [[ -z $(get_lb_ip) ]]; do
+     echo "service has not yet received an IP address, sleeping for 5s..."
+     sleep 5
+   done
    OUTPUT=$(curl http://$(get_lb_ip):8080)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"

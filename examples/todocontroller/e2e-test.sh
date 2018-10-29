@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+set -o xtrace
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
