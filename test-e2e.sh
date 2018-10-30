@@ -110,5 +110,8 @@ set -o xtrace
 # Third, TODO Controller.
 ./examples/todocontroller/e2e-test.sh py
 
+# Delete everything as we are now done
+delete
+
 # Replace the exit trap with a pass message
 trap "echo PASS" EXIT
