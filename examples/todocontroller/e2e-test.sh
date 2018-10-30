@@ -101,7 +101,7 @@ set +o xtrace
 trap "echo FAILED, cleaning up...; delete" EXIT
 set -o xtrace
 sleep 25
-check_msg
+check_msg ""
 
 for i in $RANDOM $RANDOM; do
   edit "$i"
