@@ -170,7 +170,10 @@ def _common_impl(ctx):
   if namespace_arg:
     namespace_arg = "--namespace=\"" +  namespace_arg + "\""
 
+  kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
+
   substitutions = {
+      "%{kubectl_tool}": kubectl_tool_info.tool_path,
       "%{cluster}": cluster_arg,
       "%{context}": context_arg,
       "%{user}": user_arg,
@@ -317,6 +320,7 @@ _k8s_object_apply = rule(
     ),
     executable = True,
     implementation = _common_impl,
+    toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
 )
 
 _k8s_object_create = rule(
@@ -337,6 +341,7 @@ _k8s_object_create = rule(
     ),
     executable = True,
     implementation = _common_impl,
+    toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
 )
 
 _k8s_object_replace = rule(
@@ -357,6 +362,7 @@ _k8s_object_replace = rule(
     ),
     executable = True,
     implementation = _common_impl,
+    toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
 )
 
 _k8s_object_describe = rule(
@@ -380,6 +386,7 @@ _k8s_object_describe = rule(
     ),
     executable = True,
     implementation = _common_impl,
+    toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
 )
 
 _k8s_object_delete = rule(
@@ -400,6 +407,7 @@ _k8s_object_delete = rule(
     ),
     executable = True,
     implementation = _common_impl,
+    toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
 )
 
 # See "attrs" parameter at https://docs.bazel.build/versions/master/skylark/lib/globals.html#parameters-26

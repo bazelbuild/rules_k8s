@@ -24,4 +24,4 @@ function guess_runfiles() {
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} apply -f -
+  %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} apply -f -
