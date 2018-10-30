@@ -21,23 +21,33 @@ set -o pipefail
 set -o xtrace
 
 if [[ -z "${1:-}" ]]; then
-  echo "Usage: $(basename $0) <language ...>"
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
+fi
+namespace="$1"
+shift
+if [[ -z "${1:-}" ]]; then
+  echo "ERROR: Languages not provided!"
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
 fi
 
 get_lb_ip() {
-  kubectl --namespace="${E2E_NAMESPACE}" get service hello-grpc-staging \
+  kubectl --namespace="${namespace}" get service hello-grpc-staging \
     -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
   echo Applying service...
-  bazel run examples/hellogrpc/staging-service.apply
+  bazel build examples/hellogrpc:staging-service.apply
+  bazel-bin/examples/hellogrpc/staging-service.apply
 }
 
 create() {
   echo Creating $LANGUAGE...
-  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.create
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
 }
 
 check_msg() {
@@ -60,14 +70,17 @@ edit() {
 
 update() {
   echo Updating $LANGUAGE...
-  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.replace
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
 }
 
 delete() {
   echo Deleting $LANGUAGE...
-  kubectl get all --namespace="${E2E_NAMESPACE}" --selector=app=hello-grpc-staging
-  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.describe || echo "Resource didn't exist!"
-  bazel run examples/hellogrpc/${LANGUAGE}/server:staging.delete
+  kubectl get all --namespace="${namespace}" --selector=app=hello-grpc-staging
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe || echo "Resource didn't exist!"
+  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
+  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
 }
 
 

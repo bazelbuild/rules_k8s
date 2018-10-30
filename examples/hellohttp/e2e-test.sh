@@ -21,11 +21,19 @@ set -o pipefail
 set -o xtrace
 
 if [[ -z "${1:-}" ]]; then
-  echo "Usage: $(basename $0) <language ...>"
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
+fi
+namespace="$1"
+shift
+if [[ -z "${1:-}" ]]; then
+  echo "ERROR: Languages not provided!"
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
 fi
 
 get_lb_ip() {
-    kubectl --namespace="${E2E_NAMESPACE}" get service hello-http-staging \
+    kubectl --namespace="${namespace}" get service hello-http-staging \
       -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
@@ -57,7 +65,7 @@ apply() {
 
 delete() {
   echo Deleting $LANGUAGE...
-  kubectl get all --namespace="${E2E_NAMESPACE}" --selector=app=hello-http-staging
+  kubectl get all --namespace="${namespace}" --selector=app=hello-http-staging
   bazel run examples/hellohttp/${LANGUAGE}:staging.describe
   bazel run examples/hellohttp/${LANGUAGE}:staging.delete
 }

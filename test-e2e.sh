@@ -86,7 +86,7 @@ bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
 
 # Create a unique namespace for this job using the repo name and the build id
-export E2E_NAMESPACE="build-${BUILD_ID:-0}"
+E2E_NAMESPACE="build-${BUILD_ID:-0}"
 
 kubectl get "namespaces/${E2E_NAMESPACE}" &> /dev/null || kubectl create namespace "${E2E_NAMESPACE}"
 
@@ -104,11 +104,11 @@ set -o xtrace
 
 # Run end-to-end integration testing.
 # First, GRPC.
-./examples/hellogrpc/e2e-test.sh cc java go py
+./examples/hellogrpc/e2e-test.sh $E2E_NAMESPACE cc java go py
 # Second, HTTP.
-./examples/hellohttp/e2e-test.sh java go py nodejs
+./examples/hellohttp/e2e-test.sh $E2E_NAMESPACE java go py nodejs
 # Third, TODO Controller.
-./examples/todocontroller/e2e-test.sh py
+./examples/todocontroller/e2e-test.sh $E2E_NAMESPACE py
 
 # Delete everything as we are now done
 delete

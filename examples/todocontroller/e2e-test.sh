@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -e
+set -o errexit
+set -o nounset
+set -o pipefail
 set -o xtrace
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
@@ -16,10 +18,21 @@ set -o xtrace
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
+fi
+namespace="$1"
+shift
+if [[ -z "${1:-}" ]]; then
+  echo "ERROR: Languages not provided!"
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
+fi
 LANGUAGE="$1"
 
 function get_lb_ip() {
-  kubectl --namespace="${E2E_NAMESPACE}" get service hello-grpc-staging \
+  kubectl --namespace="${namespace}" get service hello-grpc-staging \
     -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
