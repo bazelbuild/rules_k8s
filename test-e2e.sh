@@ -85,10 +85,33 @@ EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:g
 bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
 
+# Create a unique namespace for this job using the repo name and the build id
+E2E_NAMESPACE="build-${BUILD_ID:-0}"
+
+kubectl get "namespaces/${E2E_NAMESPACE}" &> /dev/null || kubectl create namespace "${E2E_NAMESPACE}"
+
+delete() {
+    # Delete the namespace
+    echo "Deleting kubernetes namespace ${E2E_NAMESPACE}"
+    # Delete the namespace
+    kubectl delete namespaces/$E2E_NAMESPACE
+}
+
+# Setup a trap to delete the namespace on error
+set +o xtrace
+trap "echo FAILED, cleaning up...; delete" EXIT
+set -o xtrace
+
 # Run end-to-end integration testing.
 # First, GRPC.
-./examples/hellogrpc/e2e-test.sh cc java go py
+./examples/hellogrpc/e2e-test.sh $E2E_NAMESPACE cc java go py
 # Second, HTTP.
-./examples/hellohttp/e2e-test.sh java go py nodejs
+./examples/hellohttp/e2e-test.sh $E2E_NAMESPACE java go py nodejs
 # Third, TODO Controller.
-./examples/todocontroller/e2e-test.sh py
+./examples/todocontroller/e2e-test.sh $E2E_NAMESPACE py
+
+# Delete everything as we are now done
+delete
+
+# Replace the exit trap with a pass message
+trap "echo PASS" EXIT
