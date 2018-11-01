@@ -38,4 +38,6 @@ py_library(
   # executable to be in the PATH
   native.register_toolchains(
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_toolchain",
+    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_toolchain",
+    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
   )
