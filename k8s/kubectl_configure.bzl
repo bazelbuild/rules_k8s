@@ -16,15 +16,17 @@ This defined a repository rule for configuring the kubectl tool.
 """
 
 def _impl(repository_ctx):
-    # Add an empty top-level BUILD file (required by Bazel).
-    repository_ctx.file("BUILD", "")
 
     kubectl_tool_path = repository_ctx.which("kubectl")
 
-    repository_ctx.file("kubectl_configs.bzl", """
-kubectl_configs = {
-    "tool_path": "%s",
-}
+    repository_ctx.file("BUILD", """
+load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_toolchain.bzl", "kubectl_toolchain")
+
+kubectl_toolchain(
+    name = "toolchain",
+    tool_path = "%s",
+    visibility = ["//visibility:public"],
+)
 """ % kubectl_tool_path)
 
 kubectl_configure = repository_rule(

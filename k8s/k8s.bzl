@@ -44,4 +44,4 @@ py_library(
   )
 
   # WORKSPACE target allowing to autoconfigure the kubectl tool
-  kubectl_configure(name = "autoconfiguration")
+  kubectl_configure(name = "local_k8s_config")
