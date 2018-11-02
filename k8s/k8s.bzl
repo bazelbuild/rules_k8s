@@ -14,6 +14,7 @@
 """Rules for manipulation of K8s constructs."""
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load(":with-defaults.bzl", "k8s_defaults")
+load(":kubectl_configure.bzl", "kubectl_configure")
 
 def k8s_repositories():
   """Download dependencies of k8s rules."""
@@ -41,3 +42,6 @@ py_library(
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
   )
+
+  # WORKSPACE target allowing to autoconfigure the kubectl tool
+  kubectl_configure(name = "autoconfiguration")

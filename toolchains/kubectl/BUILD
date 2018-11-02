@@ -14,6 +14,7 @@
 package(default_visibility = ["//visibility:private"])
 
 load(":kubectl_toolchain.bzl", "kubectl_toolchain")
+load("@autoconfiguration//:kubectl_configs.bzl", "kubectl_configs")
 
 # kubectl toolchain type
 toolchain_type(name = "toolchain_type")
@@ -23,6 +24,13 @@ toolchain_type(name = "toolchain_type")
 kubectl_toolchain(
     name = "default_kubectl",
     tool_path = "kubectl",
+    visibility = ["//visibility:public"],
+)
+
+# Toolchain that auto-detects the kubectl tool
+kubectl_toolchain(
+    name = "autodetect_kubectl",
+    tool_path = kubectl_configs["tool_path"],
     visibility = ["//visibility:public"],
 )
 
@@ -36,7 +44,7 @@ toolchain(
         "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":default_kubectl",
+    toolchain = ":autodetect_kubectl",
     toolchain_type = ":toolchain_type",
 )
 
@@ -50,7 +58,7 @@ toolchain(
         "@bazel_tools//platforms:osx",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":default_kubectl",
+    toolchain = ":autodetect_kubectl",
     toolchain_type = ":toolchain_type",
 )
 
@@ -64,6 +72,6 @@ toolchain(
         "@bazel_tools//platforms:windows",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":default_kubectl",
+    toolchain = ":autodetect_kubectl",
     toolchain_type = ":toolchain_type",
 )
