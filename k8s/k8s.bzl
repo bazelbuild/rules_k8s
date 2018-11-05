@@ -43,5 +43,5 @@ py_library(
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
   )
 
-  # WORKSPACE target allowing to autoconfigure the kubectl tool
+  # WORKSPACE target to configure the kubectl tool
   kubectl_configure(name = "local_k8s_config")

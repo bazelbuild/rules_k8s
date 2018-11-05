@@ -11,21 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Defines a repository rule for configuring the kubectl tool.
-"""
+package(default_visibility = ["//visibility:public"])
 
-def _impl(repository_ctx):
+load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_toolchain.bzl", "kubectl_toolchain")
 
-    kubectl_tool_path = repository_ctx.which("kubectl")
-
-    repository_ctx.template(
-        "BUILD",
-        Label("//toolchains/kubectl:BUILD.tpl"),
-        {"%{kubectl_tool}": "%s" % kubectl_tool_path},
-        False
-    )
-
-kubectl_configure = repository_rule(
-    implementation = _impl,
+kubectl_toolchain(
+    name = "toolchain",
+    tool_path = "%{kubectl_tool}",
 )
