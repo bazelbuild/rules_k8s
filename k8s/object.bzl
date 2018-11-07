@@ -465,9 +465,8 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
-        **implicit_args
-        visibility=kwargs.get("visibility"),
         kubectl_args=kwargs.get("kubectl_args"),
+        **implicit_args
     )
     _k8s_object_delete(
         name=name + ".delete",
@@ -477,9 +476,8 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
-        **implicit_args
-        visibility=kwargs.get("visibility"),
         kubectl_args=kwargs.get("kubectl_args"),
+        **implicit_args
     )
     _k8s_object_replace(
         name=name + ".replace",
@@ -489,9 +487,8 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
-        **implicit_args
-        visibility=kwargs.get("visibility"),
         kubectl_args=kwargs.get("kubectl_args"),
+        **implicit_args
     )
     _k8s_object_apply(
         name=name + ".apply",
@@ -501,9 +498,8 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
-        **implicit_args
-        visibility=kwargs.get("visibility"),
         kubectl_args=kwargs.get("kubectl_args"),
+        **implicit_args
     )
     if "kind" in kwargs:
       _k8s_object_describe(
