@@ -55,8 +55,13 @@ check_msg() {
 
   while [[ -z $(get_lb_ip) ]]; do
     echo "service has not yet received an IP address, sleeping for 5s..."
-    sleep 5
+    sleep 10
   done
+
+  # Wait some more for after IP address allocation for the service to come
+  # alive
+  echo "Got IP Adress! Sleeping 30s more for service to come alive..."
+  sleep 30
 
   OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"

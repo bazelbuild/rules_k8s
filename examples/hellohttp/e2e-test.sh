@@ -46,8 +46,12 @@ apply-lb() {
 check_msg() {
    while [[ -z $(get_lb_ip) ]]; do
      echo "service has not yet received an IP address, sleeping for 5s..."
-     sleep 5
+     sleep 10
    done
+   # Wait some more for after IP address allocation for the service to come
+   # alive
+   echo "Got IP Adress! Sleeping 30s more for service to come alive..."
+   sleep 30
    OUTPUT=$(curl http://$(get_lb_ip):8080)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
