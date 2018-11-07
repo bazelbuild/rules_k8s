@@ -83,12 +83,20 @@ function delete() {
 function check_reverse_delete_k8s_object() {
   echo Checking deletion in reverse order via k8s_object...
   bazel run examples/todocontroller:joined.apply
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
+  echo "Done with apply. Wait 60s before triggering delete"
+  sleep 60
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
   bazel run examples/todocontroller:joined.delete
 }
 
 function check_reverse_delete_k8s_objects() {
   echo Checking deletion in reverse order via k8s_objects...
   bazel run examples/todocontroller:everything.apply
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
+  echo "Done with apply. Wait 60s before triggering delete"
+  sleep 60
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
   bazel run examples/todocontroller:everything.delete
 }
 
