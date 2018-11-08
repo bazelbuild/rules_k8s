@@ -118,7 +118,7 @@ for i in $RANDOM $RANDOM; do
   sleep 40
   update_todo
   # Don't let K8s slowness cause flakes.
-  sleep 10
+  sleep 40
   check_msg "$i"
 done
 
