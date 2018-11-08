@@ -28,10 +28,6 @@ kubectl_toolchain(
 
 toolchain(
     name = "kubectl_linux_toolchain",
-    exec_compatible_with = [
-        "@bazel_tools//platforms:linux",
-        "@bazel_tools//platforms:x86_64",
-    ],
     target_compatible_with = [
         "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:x86_64",
@@ -42,10 +38,6 @@ toolchain(
 
 toolchain(
     name = "kubectl_osx_toolchain",
-    exec_compatible_with = [
-        "@bazel_tools//platforms:osx",
-        "@bazel_tools//platforms:x86_64",
-    ],
     target_compatible_with = [
         "@bazel_tools//platforms:osx",
         "@bazel_tools//platforms:x86_64",
@@ -56,10 +48,6 @@ toolchain(
 
 toolchain(
     name = "kubectl_windows_toolchain",
-    exec_compatible_with = [
-        "@bazel_tools//platforms:windows",
-        "@bazel_tools//platforms:x86_64",
-    ],
     target_compatible_with = [
         "@bazel_tools//platforms:windows",
         "@bazel_tools//platforms:x86_64",
