@@ -14,7 +14,7 @@
 """Rules for manipulation of K8s constructs."""
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load(":with-defaults.bzl", "k8s_defaults")
-load(":kubectl_configure.bzl", "kubectl_configure")
+load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
 
 def k8s_repositories():
   """Download dependencies of k8s rules."""

@@ -22,10 +22,13 @@ def _impl(repository_ctx):
     repository_ctx.template(
         "BUILD",
         Label("//toolchains/kubectl:BUILD.tpl"),
-        {"%{kubectl_tool}": "%s" % kubectl_tool_path},
+        {"%{KUBECTL_TOOL}": "%s" % kubectl_tool_path},
         False
     )
 
 kubectl_configure = repository_rule(
     implementation = _impl,
 )
+
+# Specifying a string or path will be relative to the local_k8s_config repo.
+# Using Label requires using an absolute path.

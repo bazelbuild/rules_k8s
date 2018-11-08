@@ -11,11 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+This BUILD file is auto-generated from toolchains/kubectl/BUILD.tpl
+"""
+
 package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_toolchain.bzl", "kubectl_toolchain")
 
 kubectl_toolchain(
     name = "toolchain",
-    tool_path = "%{kubectl_tool}",
+    tool_path = "%{KUBECTL_TOOL}",
 )
