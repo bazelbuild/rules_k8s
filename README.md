@@ -394,6 +394,16 @@ Users can "describe" their environment by running:
 bazel run :dev.describe
 ```
 
+### kubectl Arguments Via the Command Line
+
+The apply, create, delete, and describe commands will accept kubectl arguments passed in
+via a cli command. 
+
+To use `--dry-run` for example:
+```shell
+bazel run :dev.delete -- --dry-run
+```
+
 <a name="k8s_object"></a>
 ## k8s_object
 
@@ -492,6 +502,13 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>string, optional</code></p>
         <p>The repository under which to actually publish Docker images.</p>
+      </td>
+    </tr>
+    <tr>
+      <td><code>kubectl_args</code></td>
+      <td>
+        <p><code>string list, optional</code></p>
+        <p>A list of strings that will be passed into kubectl as additional arguments.</p>
       </td>
     </tr>
   </tbody>
