@@ -47,7 +47,20 @@ function create() {
 function check_msg() {
   bazel build examples/todocontroller:example-todo.describe
 
-  OUTPUT=$(./bazel-bin/examples/todocontroller/example-todo.describe)
+  NUM_ATTEMPTS=10
+  OUTPUT=""
+  for iattempt in $(seq 1 $NUM_ATTEMPTS); do
+    OUTPUT=$(./bazel-bin/examples/todocontroller/example-todo.describe)
+    echo "Attempt ${iattempt}/${NUM_ATTEMPTS}: Checking whether server is done with update"
+    echo "${OUTPUT}" | grep "Done:[ ]*true"
+    retval=$?
+    if [ $retval -ne 0 ]; then
+      echo "Controller update isn't done yet. Sleeping 40s..."
+      sleep 40
+    else
+      break
+    fi
+  done;
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
   echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
@@ -117,8 +130,6 @@ for i in $RANDOM $RANDOM; do
   # Don't let K8s slowness cause flakes.
   sleep 40
   update_todo
-  # Don't let K8s slowness cause flakes.
-  sleep 40
   check_msg "$i"
 done
 
