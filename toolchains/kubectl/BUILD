@@ -36,7 +36,7 @@ toolchain(
         "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":default_kubectl",
+    toolchain = "@local_k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
 )
 
@@ -50,7 +50,7 @@ toolchain(
         "@bazel_tools//platforms:osx",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":default_kubectl",
+    toolchain = "@local_k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
 )
 
@@ -64,6 +64,6 @@ toolchain(
         "@bazel_tools//platforms:windows",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":default_kubectl",
+    toolchain = "@local_k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
 )
