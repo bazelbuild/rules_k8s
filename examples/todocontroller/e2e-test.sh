@@ -52,11 +52,15 @@ function check_msg() {
   for iattempt in $(seq 1 $NUM_ATTEMPTS); do
     OUTPUT=$(./bazel-bin/examples/todocontroller/example-todo.describe)
     echo "Attempt ${iattempt}/${NUM_ATTEMPTS}: Checking whether server is done with update"
+    # Disable errexit temporarily because we expect the following command to
+    # fail a few times
+    set +o errexit
     echo "${OUTPUT}" | grep "Done:[ ]*true"
+    set -o errexit
     retval=$?
     if [ $retval -ne 0 ]; then
-      echo "Controller update isn't done yet. Sleeping 40s..."
-      sleep 40
+      echo "Controller update isn't done yet. Sleeping 60s..."
+      sleep 60
     else
       break
     fi
