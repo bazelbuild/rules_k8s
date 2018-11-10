@@ -122,7 +122,7 @@ check_kubectl_args() {
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply) -- --v=1" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply -- --v=1)" "apply --v=2 --v=1"
 }
 
 check_bad_substitution

@@ -509,6 +509,11 @@ A rule for interacting with Kubernetes objects.
 )</pre></p>
         <p>Additional arguments to pass to the kubectl command at execution.</p>
         <p>NOTE:</p>
+        <p>You can also run something like:</p>
+        <p><pre>bazel run <target> -- <args><pre>
+        <p>to pass additional arguments to the kubectl command in a given bazel
+        invocation.</p>
+        <p>NOTE:</p>
         <p>Not all options are available for all kubectl commands. To view the list of global options run: <pre>kubectl options</pre></p>
       </td>
     </tr>
