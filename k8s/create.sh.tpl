@@ -27,8 +27,3 @@ RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
   ( set -x ; %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} create $@ -f - )
-
-if [ $? -eq 0 ] ; then
-    echo "create failed"
-    exit 1
-fi

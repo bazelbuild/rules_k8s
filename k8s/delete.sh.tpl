@@ -25,8 +25,3 @@ RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{reverse_script} | \
   ( set -x ; %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} delete $@ --ignore-not-found=true -f - )
-
-if [ $? -eq 0 ] ; then
-    echo "delete failed"
-    exit 1
-fi

@@ -28,8 +28,3 @@ RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" -o name | cut -d'"' 
 ( set -x ; %{kubectl_tool} \
   --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
   %{namespace_arg} describe $@ "${RESOURCE_NAME}" )
-
-if [ $? -eq 0 ] ; then
-    echo "describe failed"
-    exit 1
-fi
