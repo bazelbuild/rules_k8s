@@ -454,6 +454,7 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
+        args=kwargs.get("args"),
         **implicit_args
     )
     _k8s_object_delete(
@@ -464,6 +465,7 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
+        args=kwargs.get("args"),
         **implicit_args
     )
     _k8s_object_replace(
@@ -474,6 +476,7 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
+        args=kwargs.get("args"),
         **implicit_args
     )
     _k8s_object_apply(
@@ -484,6 +487,7 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
+        args=kwargs.get("args"),
         **implicit_args
     )
     if "kind" in kwargs:
@@ -495,5 +499,6 @@ def k8s_object(name, **kwargs):
         context=kwargs.get("context"),
         user=kwargs.get("user"),
         namespace=kwargs.get("namespace"),
+        args=kwargs.get("args"),
         **implicit_args
     )
