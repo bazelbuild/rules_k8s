@@ -20,6 +20,27 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+function fail() {
+  echo "FAILURE: $1"
+  exit 1
+}
+
+function CONTAINS() {
+  local complete="${1}"
+  local substring="${2}"
+
+  echo "${complete}" | grep -Fsq -- "${substring}"
+}
+
+function EXPECT_CONTAINS() {
+  local complete="${1}"
+  local substring="${2}"
+  local message="${3:-Expected '${substring}' not found in '${complete}'}"
+
+  echo Checking "$1" contains "$2"
+  CONTAINS "${complete}" "${substring}" || fail "$message"
+}
+
 if [[ -z "${1:-}" ]]; then
   echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
   exit 1
@@ -93,8 +114,15 @@ check_no_images_resolution() {
     echo "${OUTPUT}" | grep "[/]pause[@]"
 }
 
+# e2e test that checks that --v=2 is added to the java kubectl apply command
+check_kubectl_args() {
+    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply)" "--v=2"
+    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply) --v=1" "--v=2 --v=1"
+}
+
 check_bad_substitution
 check_no_images_resolution
+check_kubectl_args
 
 apply-lb
 
