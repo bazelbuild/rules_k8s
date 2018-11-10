@@ -24,4 +24,9 @@ function guess_runfiles() {
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} apply $@ -f -
+  ( set -x ;  %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} apply $@ -f - )
+
+if [ $? -eq 0 ] ; then
+    echo "apply failed"
+    exit 1
+fi

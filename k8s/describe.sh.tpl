@@ -25,6 +25,11 @@ RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" -o name | cut -d'"' -f 2)
 
-%{kubectl_tool} \
+( set -x ; %{kubectl_tool} \
   --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
-  %{namespace_arg} describe $@ "${RESOURCE_NAME}"
+  %{namespace_arg} describe $@ "${RESOURCE_NAME}" )
+
+if [ $? -eq 0 ] ; then
+    echo "describe failed"
+    exit 1
+fi
