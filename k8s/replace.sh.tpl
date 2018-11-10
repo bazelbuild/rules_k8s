@@ -21,7 +21,9 @@ function guess_runfiles() {
     popd > /dev/null 2>&1
 }
 
+function exe() { echo "\$ ${@/eval/}" ; "$@" ; }
+
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  ( set -x ; %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} replace $@ -f - )
+  exe %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} replace $@ -f -
