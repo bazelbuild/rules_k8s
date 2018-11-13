@@ -19,7 +19,7 @@ load(
 )
 
 def _runfiles(ctx, f):
-  return "PYTHON_RUNFILES=${RUNFILES} ${RUNFILES}/%s" % _get_runfile_path(ctx, f)
+  return "PYTHON_RUNFILES=${RUNFILES} ${RUNFILES}/%s $@" % _get_runfile_path(ctx, f)
 
 def _run_all_impl(ctx):
   ctx.actions.expand_template(
