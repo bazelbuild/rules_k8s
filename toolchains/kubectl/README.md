@@ -1,13 +1,17 @@
 # kubectl Toolchain
 
 ## Overview
-This section describes how the `kubectl` tool is configured using a toolchain rule.
-At the moment, the tool's configuration only detects the path to the `kubectl` tool.
+This section describes how the `kubectl` tool is configured using a toolchain
+rule. At the moment, the tool's configuration only detects the path to the
+`kubectl` tool.
 
 The information below will be helpful if:
 
 1. You wish to write a new Bazel rule that uses the `kubectl` tool.
-2. You wish to extend rules from this repository that are using the kubectl toolchain. You will know if your underlying rules depend on the kubectl toolchain and the toolchain is not properly configured if you get one of the following errors
+2. You wish to extend rules from this repository that are using the kubectl
+toolchain. You will know if your underlying rules depend on the kubectl
+toolchain and the toolchain is not properly configured if you get one of the
+following errors
    ```
    In <rule name> rule <build target>, toolchain type
    @io_bazel_rules_k8s//toolchains/kubectl:toolchain_type was requested but only types [] are configured
@@ -20,11 +24,13 @@ The information below will be helpful if:
    ```
    ERROR: Analysis of target '<build target>' failed; build aborted: no such package '@local_k8s_config//': The repository could not be resolved
    ```
-First read the official Bazel toolchain docs [here](https://docs.bazel.build/versions/master/toolchains.html)
-on how toolchain rules work. Then, continue reading below.
+First read the official Bazel toolchain docs
+[here](https://docs.bazel.build/versions/master/toolchains.html) on how
+toolchain rules work. Then, continue reading below.
 
 ## How to use the kubectl Toolchain
-Register the toolchains exported by this repository in your WORKSPACE and add a `kubectl_configure` target called "local_k8s_config".
+Register the toolchains exported by this repository in your WORKSPACE and add a
+`kubectl_configure` target called "local_k8s_config".
 ```python
 register_toolchains(
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_toolchain",
@@ -56,4 +62,5 @@ def _impl(ctx):
     kubectl_path = kubectl_tool_info.tool_path
     ...
 ```
-See [kubectl_toolchain.bzl](kubectl_toolchain.bzl) for the definition of the KubectlInfo provider.
+See [kubectl_toolchain.bzl](kubectl_toolchain.bzl) for the definition of the
+KubectlInfo provider.
