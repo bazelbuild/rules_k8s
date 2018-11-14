@@ -20,7 +20,8 @@ The information below will be helpful if:
    ```
    ERROR: Analysis of target '<build target>' failed; build aborted: no such package '@local_k8s_config//': The repository could not be resolved
    ```
-First read the official Bazel toolchain docs [here](https://docs.bazel.build/versions/master/toolchains.html) on how toolchain rules work. Then, continue reading below.
+First read the official Bazel toolchain docs [here](https://docs.bazel.build/versions/master/toolchains.html)
+on how toolchain rules work. Then, continue reading below.
 
 ## How to use the kubectl Toolchain
 Register the toolchains exported by this repository in your WORKSPACE and add a `kubectl_configure` target called "local_k8s_config".
