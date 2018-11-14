@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -e
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o xtrace
 
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
@@ -15,10 +18,21 @@ set -e
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
+fi
+namespace="$1"
+shift
+if [[ -z "${1:-}" ]]; then
+  echo "ERROR: Languages not provided!"
+  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  exit 1
+fi
 LANGUAGE="$1"
 
 function get_lb_ip() {
-  kubectl --namespace=${USER} get service hello-grpc-staging \
+  kubectl --namespace="${namespace}" get service hello-grpc-staging \
     -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 }
 
@@ -69,23 +83,33 @@ function delete() {
 function check_reverse_delete_k8s_object() {
   echo Checking deletion in reverse order via k8s_object...
   bazel run examples/todocontroller:joined.apply
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
+  echo "Done with apply. Wait 60s before triggering delete"
+  sleep 60
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
   bazel run examples/todocontroller:joined.delete
 }
 
 function check_reverse_delete_k8s_objects() {
   echo Checking deletion in reverse order via k8s_objects...
   bazel run examples/todocontroller:everything.apply
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
+  echo "Done with apply. Wait 60s before triggering delete"
+  sleep 60
+  gcloud compute project-info describe | grep -B 1 -A 1 ADDRESSES
   bazel run examples/todocontroller:everything.delete
 }
 
 check_reverse_delete_k8s_object
 check_reverse_delete_k8s_objects
 
-delete || true
+delete &> /dev/null || true
 create
+set +o xtrace
 trap "echo FAILED, cleaning up...; delete" EXIT
+set -o xtrace
 sleep 25
-check_msg
+check_msg ""
 
 for i in $RANDOM $RANDOM; do
   edit "$i"
@@ -99,4 +123,4 @@ for i in $RANDOM $RANDOM; do
 done
 
 # Replace the trap with a success message.
-trap "delete; echo PASS" EXIT
+trap "echo PASS" EXIT

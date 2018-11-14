@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
@@ -35,6 +34,8 @@ k8s_deploy(
         "us.gcr.io/not-my-project/todo-controller:staging": ":controller",
     },
     template = "//examples/todocontroller:deployment.yaml",
+    visibility = ["//examples/todocontroller:__pkg__"],
+    tags = ["propogate"],
 )
 
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")

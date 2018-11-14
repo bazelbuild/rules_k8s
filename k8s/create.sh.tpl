@@ -21,9 +21,11 @@ function guess_runfiles() {
     popd > /dev/null 2>&1
 }
 
+function exe() { echo "\$ ${@/eval/}" ; "$@" ; }
+
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
 # TODO(mattmoor): Should we create namespaces that do not exist?
 
 PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  kubectl --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} create -f -
+  exe %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} create $@ -f -

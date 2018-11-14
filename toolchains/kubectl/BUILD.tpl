@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-# Copyright 2017 The Bazel Authors. All rights reserved.
+# Copyright 2018 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,20 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
+"""
+This BUILD file is auto-generated from toolchains/kubectl/BUILD.tpl
+"""
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+package(default_visibility = ["//visibility:public"])
 
-function exe() { echo "\$ ${@/eval/}" ; "$@" ; }
+load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_toolchain.bzl", "kubectl_toolchain")
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
-
-RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" -o name | cut -d'"' -f 2)
-
-exe %{kubectl_tool} \
-  --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
-  %{namespace_arg} describe $@ "${RESOURCE_NAME}"
+kubectl_toolchain(
+    name = "toolchain",
+    tool_path = "%{KUBECTL_TOOL}",
+)

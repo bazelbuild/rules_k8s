@@ -29,6 +29,9 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",
+    args = [
+        "--v=2",
+    ],
     images = {
         "hello-http-image": ":server",
     },

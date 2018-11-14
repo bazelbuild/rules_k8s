@@ -11,27 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+This module implements the kubectl toolchain rule.
+"""
 
-PROJECT ?= rules-k8s
-# gcr.io/rule-k8s/gcloud-bazel by default
-IMG = gcr.io/$(PROJECT)/gcloud-bazel
-TAG := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
+KubectlInfo = provider(
+    doc = "Information about how to invoke the kubectl tool.",
+    fields = {
+        "tool_path": "Path to the kubectl executable",
+    },
+)
 
-build:
-	docker build --pull -t $(IMG):latest-$(USER) .
+def _kubectl_toolchain_impl(ctx):
+    toolchain_info = platform_common.ToolchainInfo(
+        kubectlinfo = KubectlInfo(
+            tool_path = ctx.attr.tool_path,
+        ),
+    )
+    return [toolchain_info]
 
-push:
-	gcloud builds submit \
-		--config=cloudbuild.yaml \
-		--substitutions=_IMG=$(IMG),_USER=$(USER),SHORT_SHA=$(TAG) \
-		--project=$(PROJECT) \
-		.
-
-pull: push
-	docker pull $(IMG):latest
-	docker pull $(IMG):latest-$(USER)
-	docker pull $(IMG):$(TAG)
-
-all: pull
-
-.PHONY: all build push
+kubectl_toolchain = rule(
+    implementation = _kubectl_toolchain_impl,
+    attrs = {
+        "tool_path": attr.string(),
+    },
+)
