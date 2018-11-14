@@ -69,7 +69,7 @@ gcloud container clusters get-credentials <CLUSTER NAME>
 ## Dependencies
 
 The rules will require the `kubectl` tool when executing the `run` action from
-bazel. The `kubectl` tool is configured via a toolchain rule. Read more about the kubectl toolchain <a href="toolchains/kubectl/readme.md">here.
+bazel. The `kubectl` tool is configured via a toolchain rule. Read more about the kubectl toolchain [here](toolchains/kubectl#kubectl-toolchain).
 
 If GKE is used, also the `gcloud` sdk need to be installed.
 

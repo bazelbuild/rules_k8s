@@ -14,11 +14,11 @@ The information below will be helpful if:
    ```
    or
    ```
-   **ERROR:** While resolving toolchains for target <build target>: no matching toolchains found for types @io_bazel_rules_k8s//toolchains/kubectl:toolchain_type
+   ERROR: While resolving toolchains for target <build target>: no matching toolchains found for types @io_bazel_rules_k8s//toolchains/kubectl:toolchain_type
    ```
    or
    ```
-   **ERROR:** Analysis of target '<build target>' failed; build aborted: no such package '@local_k8s_config//': The repository could not be resolved
+   ERROR: Analysis of target '<build target>' failed; build aborted: no such package '@local_k8s_config//': The repository could not be resolved
    ```
 First read the official Bazel toolchain docs [here](https://docs.bazel.build/versions/master/toolchains.html) on how toolchain rules work. Then, continue reading below.
 
