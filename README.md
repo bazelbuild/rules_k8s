@@ -498,6 +498,14 @@ A rule for interacting with Kubernetes objects.
       </td>
     </tr>
     <tr>
+      <td><code>resolver</code></td>
+      <td>
+        <p><code>target, optional</code></p>
+        <p>A build target for the binary that's called to resolves references
+           inside the Kubernetes YAML files.</p>
+      </td>
+    </tr>
+    <tr>
       <td><code>args</code></td>
       <td>
         <p><code>string_list, optional</code></p>
