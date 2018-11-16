@@ -20,6 +20,27 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+function fail() {
+  echo "FAILURE: $1"
+  exit 1
+}
+
+function CONTAINS() {
+  local complete="${1}"
+  local substring="${2}"
+
+  echo "${complete}" | grep -Fsq -- "${substring}"
+}
+
+function EXPECT_CONTAINS() {
+  local complete="${1}"
+  local substring="${2}"
+  local message="${3:-Expected '${substring}' not found in '${complete}'}"
+
+  echo Checking "$1" contains "$2"
+  CONTAINS "${complete}" "${substring}" || fail "$message"
+}
+
 if [[ -z "${1:-}" ]]; then
   echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
   exit 1
@@ -88,6 +109,18 @@ delete() {
   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
 }
 
+# e2e test that checks that args are added to the kubectl apply command
+check_kubectl_args() {
+    # Checks that bazel run <some target> does pick up the args attr and
+    # passes it to the execution of the template
+    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply)" "apply --v=2"
+    # Checks that bazel run <some target> -- <some extra arg> does pass both the
+    # args in the attr as well as the <some extra arg> to the execution of the
+    # template
+    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply -- --v=1)" "apply --v=2 --v=1"
+}
+
+check_kubectl_args
 
 apply-lb
 
