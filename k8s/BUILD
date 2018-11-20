@@ -34,7 +34,7 @@ py_library(
         "//:__init__.py",
         "__init__.py",
         "resolver.py",
-        ],
+    ],
     deps = [
         "@containerregistry",
         "@yaml",
