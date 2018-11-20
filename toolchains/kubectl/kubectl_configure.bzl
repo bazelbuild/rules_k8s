@@ -16,16 +16,29 @@ Defines a repository rule for configuring the kubectl tool.
 """
 
 def _impl(repository_ctx):
-
+    kubectl_tool_path = None
+    if repository_ctx.attr.build_kubectl:
+      repository_ctx.download_and_extract(
+          "https://github.com/kubernetes/kubernetes/archive/v1.10.10.tar.gz",
+          "",
+          "4737d3b10b27e391924f89b5ac3aaa5470619b92b75fe1ff5210cc30c56e2e53",
+          "tar.gz",
+          "kubernetes-1.10.10",)
+     # kubectl_tool_path = 
+    #else:
     kubectl_tool_path = repository_ctx.which("kubectl")
 
     repository_ctx.template(
         "BUILD",
         Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.tpl"),
         {"%{KUBECTL_TOOL}": "%s" % kubectl_tool_path},
-        False
+        False,
     )
 
 kubectl_configure = repository_rule(
     implementation = _impl,
+    attrs = {"build_kubectl": attr.bool(
+        default = False,
+        mandatory = False,
+    )},
 )
