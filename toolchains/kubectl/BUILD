@@ -21,21 +21,37 @@ toolchain_type(name = "toolchain_type")
 # Default kubectl toolchain that expects the 'kubectl' executable
 # to be in the PATH
 kubectl_toolchain(
-    name = "kubectl_linux",
+    name = "default_kubectl",
     tool_path = "kubectl",
     visibility = ["//visibility:public"],
 )
 
 toolchain(
     name = "kubectl_linux_toolchain",
-    exec_compatible_with = [
-        "@bazel_tools//platforms:linux",
-        "@bazel_tools//platforms:x86_64",
-    ],
     target_compatible_with = [
         "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:x86_64",
     ],
-    toolchain = ":kubectl_linux",
+    toolchain = "@local_k8s_config//:toolchain",
+    toolchain_type = ":toolchain_type",
+)
+
+toolchain(
+    name = "kubectl_osx_toolchain",
+    target_compatible_with = [
+        "@bazel_tools//platforms:osx",
+        "@bazel_tools//platforms:x86_64",
+    ],
+    toolchain = "@local_k8s_config//:toolchain",
+    toolchain_type = ":toolchain_type",
+)
+
+toolchain(
+    name = "kubectl_windows_toolchain",
+    target_compatible_with = [
+        "@bazel_tools//platforms:windows",
+        "@bazel_tools//platforms:x86_64",
+    ],
+    toolchain = "@local_k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
 )

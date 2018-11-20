@@ -18,10 +18,10 @@ IMG = gcr.io/$(PROJECT)/gcloud-bazel
 TAG := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
 
 build:
-	docker build --pull -t $(IMG):latest-user .
+	docker build --pull -t $(IMG):latest-$(USER) .
 
 push:
-	gcloud container builds submit \
+	gcloud builds submit \
 		--config=cloudbuild.yaml \
 		--substitutions=_IMG=$(IMG),_USER=$(USER),SHORT_SHA=$(TAG) \
 		--project=$(PROJECT) \

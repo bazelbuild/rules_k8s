@@ -69,7 +69,10 @@ gcloud container clusters get-credentials <CLUSTER NAME>
 ## Dependencies
 
 The rules will require the `kubectl` tool when executing the `run` action from
-bazel. If GKE is used, also the `gcloud` sdk need to be installed.
+bazel. The `kubectl` tool is configured via a toolchain rule. Read more about
+the kubectl toolchain [here](toolchains/kubectl#kubectl-toolchain).
+
+If GKE is used, also the `gcloud` sdk need to be installed.
 
 ## Examples
 
@@ -106,7 +109,7 @@ k8s_defaults(
   name = "k8s_deploy",
   kind = "deployment",
   # This is the name of the cluster as it appears in:
-  #   kubectl config current-context
+  #   kubectl config view --minify -o=jsonpath='{.contexts[0].context.cluster}'
   cluster = "my-gke-cluster",
 )
 ```
@@ -494,6 +497,16 @@ A rule for interacting with Kubernetes objects.
         <p>The repository under which to actually publish Docker images.</p>
       </td>
     </tr>
+    <tr>
+      <td><code>args</code></td>
+      <td>
+        <p><code>string_list, optional</code></p>
+        <p>Additional arguments to pass to the kubectl command at execution.</p>
+        <p>NOTE: You can also pass args via the cli by run something like:
+	      <code>bazel run some_target -- some_args</code></p>
+        <p>NOTE: Not all options are available for all kubectl commands. To view the list of global options run: <code>kubectl options</code></p>
+      </td>
+    </tr>
   </tbody>
 </table>
 
@@ -582,7 +595,7 @@ A repository rule that allows users to alias `k8s_object` with default values.
         <p>The name of the cluster to which <code>create, replace, delete,
            describe</code> should speak.</p>
 	<p>This should match the cluster name as it would appear in
-           <code>kubectl config current-context</code></p>
+           <code>kubectl config view --minify -o=jsonpath='{.contexts[0].context.cluster}'</code></p>
       </td>
     </tr>
     <tr>
