@@ -1,2 +1,1 @@
-grpcio==1.6.0
 setuptools==39.2.0
