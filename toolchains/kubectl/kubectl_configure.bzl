@@ -19,13 +19,13 @@ def _impl(repository_ctx):
     substitutions = None
     label = None
     if repository_ctx.attr.build_srcs:
-      kubectl_target = "@io_kubernetes//cmd/kubectl:kubectl"
-      substitutions = {"%{KUBECTL_TARGET}": "%s" % kubectl_target}
-      template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.target.tpl")
+        kubectl_target = "@io_kubernetes//cmd/kubectl:kubectl"
+        substitutions = {"%{KUBECTL_TARGET}": "%s" % kubectl_target}
+        template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.target.tpl")
     else:
-      kubectl_tool_path = repository_ctx.which("kubectl")
-      substitutions = {"%{KUBECTL_TOOL}": "%s" % kubectl_tool_path}
-      template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.path.tpl")
+        kubectl_tool_path = repository_ctx.which("kubectl")
+        substitutions = {"%{KUBECTL_TOOL}": "%s" % kubectl_tool_path}
+        template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.path.tpl")
 
     repository_ctx.template(
         "BUILD",
