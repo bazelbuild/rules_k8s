@@ -49,15 +49,27 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def kubectl_configure(name, **kwargs):
     """
+    Creates an external repository with a kubectl_toolchain target
+    properly configured.
+
     Args:
         **kwargs:
       Required Args
         name: A unique name for this rule.
       Default Args:
         build_srcs: Optional. Set to true to build kubectl from sources. Default: False
-        k8s_commit: Otional. Commit / release tag at which to build kubectl from. Default "v1.13.0-beta.1"
-        k8s_sha256: Otional. sha256 of commit at which to build kubectl from. Default "dfb39ce36284c1ce228954ca12bf016c09be61e40a875e8af4fff84e116bd3a7".
-        k8s_prefix: Otional. Prefix to strip from commit / release archive (typically the same as the commit, or Kubernetes-<release tag>. Default "kubernetes-1.13.0-beta.1".
+        k8s_commit: Otional. Commit / release tag at which to build kubectl
+          from. Default "v1.13.0-beta.1"
+        k8s_sha256: Otional. sha256 of commit at which to build kubectl from.
+          Default <valid sha for default version>.
+        k8s_prefix: Otional. Prefix to strip from commit / release archive.
+          Typically the same as the commit, or Kubernetes-<release tag>.
+          Default <valid prefix for default version>.
+      Note: Not all versions/commits of kubernetes project can be used to compile
+      kubectl from an external repo. Notably, we have only tested with v1.13.0-beta.1
+      or above. Note this rule has a hardcoded pointer to io_kubernetes_build repo
+      if your commit (above v1.13.0-beta.1) does not work due to problems,
+      related to @io_kubernetes_build repo, please send a PR to update these values.
     """
     build_srcs = False
     if "build_srcs" in kwargs and kwargs["build_srcs"]:

@@ -178,9 +178,10 @@ def _common_impl(ctx):
     kubectl_tool = kubectl_tool_info.tool_path
     if not kubectl_tool_info.tool_path:
         kubectl_tool = kubectl_tool_info.tool_target.files.to_list()[0].path
+        files += kubectl_tool_info.tool_target.files.to_list()
 
     substitutions = {
-        "%{kubectl_tool}": kubectl_tool_info.tool_path,
+        "%{kubectl_tool}": kubectl_tool,
         "%{cluster}": cluster_arg,
         "%{context}": context_arg,
         "%{user}": user_arg,
