@@ -42,9 +42,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 def kubectl_build(name, **kwargs):
   http_archive(
       name = "io_kubernetes",
-      sha256 = "4737d3b10b27e391924f89b5ac3aaa5470619b92b75fe1ff5210cc30c56e2e53",
-      strip_prefix = "kubernetes-1.10.10",
-      urls = ["https://github.com/kubernetes/kubernetes/archive/v1.10.10.tar.gz"],
+      sha256 = "dfb39ce36284c1ce228954ca12bf016c09be61e40a875e8af4fff84e116bd3a7",
+      strip_prefix = "kubernetes-1.13.0-beta.1",
+      urls = ["https://github.com/kubernetes/kubernetes/archive/v1.13.0-beta.1.tar.gz"],
   )
   http_archive(
       name = "io_kubernetes_build",
