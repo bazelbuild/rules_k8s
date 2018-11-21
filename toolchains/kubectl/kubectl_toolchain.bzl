@@ -25,7 +25,7 @@ KubectlInfo = provider(
 
 def _kubectl_toolchain_impl(ctx):
     if not ctx.attr.tool_path and not ctx.attr.tool_target:
-        fail("Invalid kubectl_toolchain. kubectl_toolchain must have either tool_path or tool_target")
+        fail("Invalid kubectl_toolchain. kubectl_toolchain must have either tool_path or tool_target.")
     toolchain_info = platform_common.ToolchainInfo(
         kubectlinfo = KubectlInfo(
             tool_path = ctx.attr.tool_path,
