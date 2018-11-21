@@ -38,11 +38,11 @@ kubectl_toolchain = rule(
     implementation = _kubectl_toolchain_impl,
     attrs = {
         "tool_path": attr.string(
-            doc = "Absolute path to a pre-installed kubectl binary",
+            doc = "Absolute path to a pre-installed kubectl binary.",
             mandatory = False,
         ),
         "tool_target": attr.label(
-            doc = "Target to build kubectl from source",
+            doc = "Target to build kubectl from source.",
             mandatory = False,
         ),
     },
