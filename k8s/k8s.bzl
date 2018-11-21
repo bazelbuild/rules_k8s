@@ -14,7 +14,7 @@
 """Rules for manipulation of K8s constructs."""
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load(":with-defaults.bzl", "k8s_defaults")
-load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure", "kubectl_build")
+load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
 
 def k8s_repositories():
   """Download dependencies of k8s rules."""
@@ -35,13 +35,15 @@ py_library(
     strip_prefix = "PyYAML-3.12/lib/yaml",
   )
 
-  # Register the default kubectl toolchain that expects the 'kubectl'
-  # executable to be in the PATH
+  # Register the default kubectl toolchain targets for supported platforms
+  # note these work with the autoconfigured toolchain
   native.register_toolchains(
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
   )
 
-  # WORKSPACE target to configure the kubectl tool
-  kubectl_build(name = "local_k8s_config")
+  excludes = native.existing_rules().keys()
+  if "k8s_config" not in excludes:
+    # WORKSPACE target to configure the kubectl tool
+    kubectl_configure(name = "k8s_config", build_srcs = True)
