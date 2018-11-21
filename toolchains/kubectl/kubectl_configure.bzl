@@ -45,7 +45,6 @@ def kubectl_build(name, **kwargs):
       sha256 = "4737d3b10b27e391924f89b5ac3aaa5470619b92b75fe1ff5210cc30c56e2e53",
       strip_prefix = "kubernetes-1.10.10",
       urls = ["https://github.com/kubernetes/kubernetes/archive/v1.10.10.tar.gz"],
-      **kwargs
   )
   http_archive(
       name = "io_kubernetes_build",
