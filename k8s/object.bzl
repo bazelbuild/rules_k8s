@@ -173,9 +173,13 @@ def _common_impl(ctx):
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
+    kubectl_tool = kubectl_tool_info.tool_path
+    if not kubectl_tool_info.tool_path:
+        kubectl_tool = _runfiles(ctx, kubectl_tool_info.tool_target.files.to_list()[0])
+        files += kubectl_tool_info.tool_target.files.to_list()
 
     substitutions = {
-        "%{kubectl_tool}": kubectl_tool_info.tool_path,
+        "%{kubectl_tool}": kubectl_tool,
         "%{cluster}": cluster_arg,
         "%{context}": context_arg,
         "%{user}": user_arg,
