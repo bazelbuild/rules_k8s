@@ -173,8 +173,6 @@ def _common_impl(ctx):
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
-    if not kubectl_tool_info.tool_path and not kubectl_tool_info.tool_target:
-        fail("Invalid kubectl_toolchain: %s. kubectl_toolchain must have either tool_path or tool_target", kubectl_tool_info)
     kubectl_tool = kubectl_tool_info.tool_path
     if not kubectl_tool_info.tool_path:
         kubectl_tool = kubectl_tool_info.tool_target.files.to_list()[0].path
