@@ -22,9 +22,8 @@ java_image(
     srcs = ["HelloServer.java"],
     main_class = "io.bazel.rules_k8s.examples.helloworld.java.server.HelloServer",
     deps = [
-        "//examples/hellogrpc/proto:java",
-        "//examples/hellogrpc/proto:java_compile_imports",
-        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+        "//examples/hellogrpc/proto:simple_java_grpc",
+        "@build_stack_rules_proto//java:grpc_netty",
     ],
 )
 

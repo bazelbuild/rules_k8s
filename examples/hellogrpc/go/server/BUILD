@@ -14,15 +14,15 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_docker//go:image.bzl", "go_image")
-load("@org_pubref_rules_protobuf//go:rules.bzl", "GRPC_COMPILE_DEPS")
 
 go_image(
     name = "server",
     srcs = ["main.go"],
     importpath = "github.com/bazelbuild/not-my-project/examples/hellogrpc/go/server",
     deps = [
-        "//examples/hellogrpc/proto:go",
-    ] + GRPC_COMPILE_DEPS,
+        "//examples/hellogrpc/proto:simple_go_grpc",
+        "@org_golang_google_grpc//:go_default_library",
+    ],
 )
 
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")

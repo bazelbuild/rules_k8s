@@ -20,7 +20,7 @@ load("@io_bazel_rules_docker//cc:image.bzl", "cc_image")
 cc_image(
     name = "server",
     srcs = ["main.cc"],
-    deps = ["//examples/hellogrpc/proto:cc"],
+    deps = ["//examples/hellogrpc/proto:simple_cc_grpc"],
 )
 
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")

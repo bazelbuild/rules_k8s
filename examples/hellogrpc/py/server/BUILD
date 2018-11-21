@@ -27,9 +27,8 @@ py_image(
     # ~400KB.  By partitioning things this way, the large grpcio layer remains
     # unchanging and we can reduce the amount of image data we repush by ~99%!
     layers = [
-        requirement("grpcio"),
         requirement("setuptools"),
-        "//examples/hellogrpc/proto:py",
+        "//examples/hellogrpc/proto:simple_python_grpc",
     ],
     main = "server.py",
 )
