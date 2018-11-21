@@ -175,7 +175,7 @@ def _common_impl(ctx):
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
     kubectl_tool = kubectl_tool_info.tool_path
     if not kubectl_tool_info.tool_path:
-        kubectl_tool = kubectl_tool_info.tool_target.files.to_list()[0].path
+        kubectl_tool = kubectl_tool_info.tool_target.files.to_list()[0].short_path
         files += kubectl_tool_info.tool_target.files.to_list()
 
     substitutions = {
