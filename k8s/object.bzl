@@ -28,179 +28,181 @@ load(
 )
 
 def _runfiles(ctx, f):
-  return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
+    return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
 
 def _deduplicate(iterable):
-  """
-  Performs a deduplication (similar to `list(set(...))`,
-  but `set` is not available in Skylark).
-  """
-  return {k: None for k in iterable}.keys()
+    """
+    Performs a deduplication (similar to `list(set(...))`,
+    but `set` is not available in Skylark).
+    """
+    return {k: None for k in iterable}.keys()
 
 def _add_dicts(*dicts):
-  """
-  Creates a new dict with a union of the elements of the arguments
-  """
-  result = {}
-  for d in dicts:
-    result.update(d)
-  return result
+    """
+    Creates a new dict with a union of the elements of the arguments
+    """
+    result = {}
+    for d in dicts:
+        result.update(d)
+    return result
 
 def _impl(ctx):
-  """Core implementation of k8s_object."""
+    """Core implementation of k8s_object."""
 
-  all_inputs = []
-  image_specs = []
-  if ctx.attr.images:
-    # Compute the set of layers from the image_targets.
-    image_target_dict = _string_to_label(
-        ctx.attr.image_targets, ctx.attr.image_target_strings)
+    all_inputs = []
+    image_specs = []
+    if ctx.attr.images:
+        # Compute the set of layers from the image_targets.
+        image_target_dict = _string_to_label(
+            ctx.attr.image_targets,
+            ctx.attr.image_target_strings,
+        )
 
-    # Walk the collection of images passed and for each key/value pair
-    # collect the parts to pass to the resolver as --image_spec arguments.
-    # Each images entry results in a single --image_spec argument.
-    # As part of this walk, we also collect all of the image's input files
-    # to include as runfiles, so they are accessible to be pushed.
-    for tag in ctx.attr.images:
-      target = ctx.attr.images[tag]
-      image = _get_layers(ctx, ctx.label.name, image_target_dict[target])
+        # Walk the collection of images passed and for each key/value pair
+        # collect the parts to pass to the resolver as --image_spec arguments.
+        # Each images entry results in a single --image_spec argument.
+        # As part of this walk, we also collect all of the image's input files
+        # to include as runfiles, so they are accessible to be pushed.
+        for tag in ctx.attr.images:
+            target = ctx.attr.images[tag]
+            image = _get_layers(ctx, ctx.label.name, image_target_dict[target])
 
-      image_spec = {"name": tag}
-      if image.get("legacy"):
-        image_spec["tarball"] = _runfiles(ctx, image["legacy"])
-        all_inputs += [image["legacy"]]
+            image_spec = {"name": tag}
+            if image.get("legacy"):
+                image_spec["tarball"] = _runfiles(ctx, image["legacy"])
+                all_inputs += [image["legacy"]]
 
-      blobsums = image.get("blobsum", [])
-      image_spec["digest"] = ",".join([_runfiles(ctx, f) for f in blobsums])
-      all_inputs += blobsums
+            blobsums = image.get("blobsum", [])
+            image_spec["digest"] = ",".join([_runfiles(ctx, f) for f in blobsums])
+            all_inputs += blobsums
 
-      blobs = image.get("zipped_layer", [])
-      image_spec["layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
-      all_inputs += blobs
+            blobs = image.get("zipped_layer", [])
+            image_spec["layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
+            all_inputs += blobs
 
-      image_spec["config"] = _runfiles(ctx, image["config"])
-      all_inputs += [image["config"]]
+            image_spec["config"] = _runfiles(ctx, image["config"])
+            all_inputs += [image["config"]]
 
-      # Quote the semi-colons so they don't complete the command.
-      image_specs += ["';'".join([
-        "%s=%s" % (k, v)
-        for (k, v) in image_spec.items()
-      ])]
+            # Quote the semi-colons so they don't complete the command.
+            image_specs += ["';'".join([
+                "%s=%s" % (k, v)
+                for (k, v) in image_spec.items()
+            ])]
 
-  image_chroot_arg = ctx.attr.image_chroot
-  image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
-  if "{" in ctx.attr.image_chroot:
-    image_chroot_file = ctx.new_file(ctx.label.name + ".image-chroot-name")
-    _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
-    image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
-    all_inputs += [image_chroot_file]
+    image_chroot_arg = ctx.attr.image_chroot
+    image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
+    if "{" in ctx.attr.image_chroot:
+        image_chroot_file = ctx.new_file(ctx.label.name + ".image-chroot-name")
+        _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
+        image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
+        all_inputs += [image_chroot_file]
 
-  ctx.actions.expand_template(
-      template = ctx.file._template,
-      substitutions = {
-        "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
-        "%{yaml}": _runfiles(ctx, ctx.file.template),
-        "%{image_chroot}": image_chroot_arg,
-        "%{images}": " ".join([
-          "--image_spec=%s" % spec
-          for spec in image_specs
-        ]),
-        "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
-      },
-      output = ctx.outputs.executable,
-  )
+    ctx.actions.expand_template(
+        template = ctx.file._template,
+        substitutions = {
+            "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
+            "%{yaml}": _runfiles(ctx, ctx.file.template),
+            "%{image_chroot}": image_chroot_arg,
+            "%{images}": " ".join([
+                "--image_spec=%s" % spec
+                for spec in image_specs
+            ]),
+            "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
+        },
+        output = ctx.outputs.executable,
+    )
 
-  return struct(runfiles = ctx.runfiles(files = [
-    ctx.executable.resolver,
-    ctx.file.template,
-  ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
+    return struct(runfiles = ctx.runfiles(files = [
+        ctx.executable.resolver,
+        ctx.file.template,
+    ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
 
 def _resolve(ctx, string, output):
-  stamps = [ctx.info_file, ctx.version_file]
-  stamp_args = [
-    "--stamp-info-file=%s" % sf.path
-    for sf in stamps
-  ]
-  ctx.action(
-    executable = ctx.executable._stamper,
-    arguments = [
-      "--format=%s" % string,
-      "--output=%s" % output.path,
-    ] + stamp_args,
-    inputs = [ctx.executable._stamper] + stamps,
-    outputs = [output],
-    mnemonic = "Stamp"
-  )
+    stamps = [ctx.info_file, ctx.version_file]
+    stamp_args = [
+        "--stamp-info-file=%s" % sf.path
+        for sf in stamps
+    ]
+    ctx.action(
+        executable = ctx.executable._stamper,
+        arguments = [
+            "--format=%s" % string,
+            "--output=%s" % output.path,
+        ] + stamp_args,
+        inputs = [ctx.executable._stamper] + stamps,
+        outputs = [output],
+        mnemonic = "Stamp",
+    )
 
 def _common_impl(ctx):
-  files = [ctx.executable.resolver]
+    files = [ctx.executable.resolver]
 
-  cluster_arg = ctx.attr.cluster
-  cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
-  if "{" in ctx.attr.cluster:
-    cluster_file = ctx.new_file(ctx.label.name + ".cluster-name")
-    _resolve(ctx, ctx.attr.cluster, cluster_file)
-    cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
-    files += [cluster_file]
+    cluster_arg = ctx.attr.cluster
+    cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
+    if "{" in ctx.attr.cluster:
+        cluster_file = ctx.new_file(ctx.label.name + ".cluster-name")
+        _resolve(ctx, ctx.attr.cluster, cluster_file)
+        cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
+        files += [cluster_file]
 
-  context_arg = ctx.attr.context
-  context_arg = ctx.expand_make_variables("context", context_arg, {})
-  if "{" in ctx.attr.context:
-    context_file = ctx.new_file(ctx.label.name + ".context-name")
-    _resolve(ctx, ctx.attr.context, context_file)
-    context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
-    files += [context_file]
+    context_arg = ctx.attr.context
+    context_arg = ctx.expand_make_variables("context", context_arg, {})
+    if "{" in ctx.attr.context:
+        context_file = ctx.new_file(ctx.label.name + ".context-name")
+        _resolve(ctx, ctx.attr.context, context_file)
+        context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
+        files += [context_file]
 
-  user_arg = ctx.attr.user
-  user_arg = ctx.expand_make_variables("user", user_arg, {})
-  if "{" in ctx.attr.user:
-    user_file = ctx.new_file(ctx.label.name + ".user-name")
-    _resolve(ctx, ctx.attr.user, user_file)
-    user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
-    files += [user_file]
+    user_arg = ctx.attr.user
+    user_arg = ctx.expand_make_variables("user", user_arg, {})
+    if "{" in ctx.attr.user:
+        user_file = ctx.new_file(ctx.label.name + ".user-name")
+        _resolve(ctx, ctx.attr.user, user_file)
+        user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
+        files += [user_file]
 
-  namespace_arg = ctx.attr.namespace
-  namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
-  if "{" in ctx.attr.namespace:
-    namespace_file = ctx.new_file(ctx.label.name + ".namespace-name")
-    _resolve(ctx, ctx.attr.namespace, namespace_file)
-    namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
-    files += [namespace_file]
+    namespace_arg = ctx.attr.namespace
+    namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
+    if "{" in ctx.attr.namespace:
+        namespace_file = ctx.new_file(ctx.label.name + ".namespace-name")
+        _resolve(ctx, ctx.attr.namespace, namespace_file)
+        namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
+        files += [namespace_file]
 
-  if namespace_arg:
-    namespace_arg = "--namespace=\"" +  namespace_arg + "\""
+    if namespace_arg:
+        namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
-  kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
+    kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
 
-  substitutions = {
-      "%{kubectl_tool}": kubectl_tool_info.tool_path,
-      "%{cluster}": cluster_arg,
-      "%{context}": context_arg,
-      "%{user}": user_arg,
-      "%{namespace_arg}": namespace_arg,
-      "%{kind}": ctx.attr.kind,
-  }
+    substitutions = {
+        "%{kubectl_tool}": kubectl_tool_info.tool_path,
+        "%{cluster}": cluster_arg,
+        "%{context}": context_arg,
+        "%{user}": user_arg,
+        "%{namespace_arg}": namespace_arg,
+        "%{kind}": ctx.attr.kind,
+    }
 
-  if hasattr(ctx.executable, "resolved"):
-    substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
-    files += [ctx.executable.resolved]
-    files += list(ctx.attr.resolved.default_runfiles.files)
+    if hasattr(ctx.executable, "resolved"):
+        substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
+        files += [ctx.executable.resolved]
+        files += list(ctx.attr.resolved.default_runfiles.files)
 
-  if hasattr(ctx.executable, "reversed"):
-    substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
-    files += [ctx.executable.reversed]
-    files += list(ctx.attr.reversed.default_runfiles.files)
+    if hasattr(ctx.executable, "reversed"):
+        substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
+        files += [ctx.executable.reversed]
+        files += list(ctx.attr.reversed.default_runfiles.files)
 
-  if hasattr(ctx.files, "unresolved"):
-    substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
-    files += ctx.files.unresolved
+    if hasattr(ctx.files, "unresolved"):
+        substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
+        files += ctx.files.unresolved
 
-  ctx.actions.expand_template(
-      template = ctx.file._template,
-      substitutions = substitutions,
-      output = ctx.outputs.executable,
-  )
-  return struct(runfiles = ctx.runfiles(files = files))
+    ctx.actions.expand_template(
+        template = ctx.file._template,
+        substitutions = substitutions,
+        output = ctx.outputs.executable,
+    )
+    return struct(runfiles = ctx.runfiles(files = files))
 
 _common_attrs = {
     "namespace": attr.string(),
@@ -229,20 +231,20 @@ _common_attrs = {
 }
 
 def _reverse(ctx):
-  """Implementation of _reversed."""
-  ctx.actions.expand_template(
-      template = ctx.file._template,
-      substitutions = {
-        "%{reverser}": _runfiles(ctx, ctx.executable.reverser),
-        "%{yaml}": _runfiles(ctx, ctx.file.template),
-      },
-      output = ctx.outputs.executable,
-  )
+    """Implementation of _reversed."""
+    ctx.actions.expand_template(
+        template = ctx.file._template,
+        substitutions = {
+            "%{reverser}": _runfiles(ctx, ctx.executable.reverser),
+            "%{yaml}": _runfiles(ctx, ctx.file.template),
+        },
+        output = ctx.outputs.executable,
+    )
 
-  return struct(runfiles = ctx.runfiles(files = [
-    ctx.executable.reverser,
-    ctx.file.template,
-  ] + list(ctx.attr.reverser.default_runfiles.files)))
+    return struct(runfiles = ctx.runfiles(files = [
+        ctx.executable.reverser,
+        ctx.file.template,
+    ] + list(ctx.attr.reverser.default_runfiles.files)))
 
 _reversed = rule(
     attrs = _add_dicts(
@@ -416,89 +418,92 @@ _implicit_attrs = ["visibility", "deprecation", "tags", "testonly", "features"]
 def _implicit_args_as_dict(**kwargs):
     implicit_args = {}
     for attr_name in _implicit_attrs:
-      if attr_name in kwargs:
-        implicit_args[attr_name] = kwargs[attr_name]
+        if attr_name in kwargs:
+            implicit_args[attr_name] = kwargs[attr_name]
 
     return implicit_args
 
 def k8s_object(name, **kwargs):
-  """Interact with a K8s object.
-  Args:
-    name: name of the rule.
-    cluster: the name of the cluster.
-    user: the user which has access to the cluster.
-    namespace: the namespace within the cluster.
-    kind: the object kind.
-    template: the yaml template to instantiate.
-    images: a dictionary from fully-qualified tag to label.
-  """
-  for reserved in ["image_targets", "image_target_strings", "resolved", "reversed"]:
-    if reserved in kwargs:
-      fail("reserved for internal use by docker_bundle macro", attr=reserved)
+    """Interact with a K8s object.
+    Args:
+      name: name of the rule.
+      cluster: the name of the cluster.
+      user: the user which has access to the cluster.
+      namespace: the namespace within the cluster.
+      kind: the object kind.
+      template: the yaml template to instantiate.
+      images: a dictionary from fully-qualified tag to label.
+    """
+    for reserved in ["image_targets", "image_target_strings", "resolved", "reversed"]:
+        if reserved in kwargs:
+            fail("reserved for internal use by docker_bundle macro", attr = reserved)
 
-  implicit_args = _implicit_args_as_dict(**kwargs)
+    implicit_args = _implicit_args_as_dict(**kwargs)
 
-  kwargs["image_targets"] = _deduplicate(kwargs.get("images", {}).values())
-  kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
+    kwargs["image_targets"] = _deduplicate(kwargs.get("images", {}).values())
+    kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
-  _k8s_object(name=name, **kwargs)
-  _reversed(name=name + ".reversed", template=kwargs.get("template"),
-            **implicit_args)
+    _k8s_object(name = name, **kwargs)
+    _reversed(
+        name = name + ".reversed",
+        template = kwargs.get("template"),
+        **implicit_args
+    )
 
-  if "cluster" in kwargs or "context" in kwargs:
-    _k8s_object_create(
-        name=name + ".create",
-        resolved=name,
-        kind=kwargs.get("kind"),
-        cluster=kwargs.get("cluster"),
-        context=kwargs.get("context"),
-        user=kwargs.get("user"),
-        namespace=kwargs.get("namespace"),
-        args=kwargs.get("args"),
-        **implicit_args
-    )
-    _k8s_object_delete(
-        name=name + ".delete",
-        reversed=name + ".reversed",
-        kind=kwargs.get("kind"),
-        cluster=kwargs.get("cluster"),
-        context=kwargs.get("context"),
-        user=kwargs.get("user"),
-        namespace=kwargs.get("namespace"),
-        args=kwargs.get("args"),
-        **implicit_args
-    )
-    _k8s_object_replace(
-        name=name + ".replace",
-        resolved=name,
-        kind=kwargs.get("kind"),
-        cluster=kwargs.get("cluster"),
-        context=kwargs.get("context"),
-        user=kwargs.get("user"),
-        namespace=kwargs.get("namespace"),
-        args=kwargs.get("args"),
-        **implicit_args
-    )
-    _k8s_object_apply(
-        name=name + ".apply",
-        resolved=name,
-        kind=kwargs.get("kind"),
-        cluster=kwargs.get("cluster"),
-        context=kwargs.get("context"),
-        user=kwargs.get("user"),
-        namespace=kwargs.get("namespace"),
-        args=kwargs.get("args"),
-        **implicit_args
-    )
-    if "kind" in kwargs:
-      _k8s_object_describe(
-        name=name + ".describe",
-        unresolved=kwargs.get("template"),
-        kind=kwargs.get("kind"),
-        cluster=kwargs.get("cluster"),
-        context=kwargs.get("context"),
-        user=kwargs.get("user"),
-        namespace=kwargs.get("namespace"),
-        args=kwargs.get("args"),
-        **implicit_args
-    )
+    if "cluster" in kwargs or "context" in kwargs:
+        _k8s_object_create(
+            name = name + ".create",
+            resolved = name,
+            kind = kwargs.get("kind"),
+            cluster = kwargs.get("cluster"),
+            context = kwargs.get("context"),
+            user = kwargs.get("user"),
+            namespace = kwargs.get("namespace"),
+            args = kwargs.get("args"),
+            **implicit_args
+        )
+        _k8s_object_delete(
+            name = name + ".delete",
+            reversed = name + ".reversed",
+            kind = kwargs.get("kind"),
+            cluster = kwargs.get("cluster"),
+            context = kwargs.get("context"),
+            user = kwargs.get("user"),
+            namespace = kwargs.get("namespace"),
+            args = kwargs.get("args"),
+            **implicit_args
+        )
+        _k8s_object_replace(
+            name = name + ".replace",
+            resolved = name,
+            kind = kwargs.get("kind"),
+            cluster = kwargs.get("cluster"),
+            context = kwargs.get("context"),
+            user = kwargs.get("user"),
+            namespace = kwargs.get("namespace"),
+            args = kwargs.get("args"),
+            **implicit_args
+        )
+        _k8s_object_apply(
+            name = name + ".apply",
+            resolved = name,
+            kind = kwargs.get("kind"),
+            cluster = kwargs.get("cluster"),
+            context = kwargs.get("context"),
+            user = kwargs.get("user"),
+            namespace = kwargs.get("namespace"),
+            args = kwargs.get("args"),
+            **implicit_args
+        )
+        if "kind" in kwargs:
+            _k8s_object_describe(
+                name = name + ".describe",
+                unresolved = kwargs.get("template"),
+                kind = kwargs.get("kind"),
+                cluster = kwargs.get("cluster"),
+                context = kwargs.get("context"),
+                user = kwargs.get("user"),
+                namespace = kwargs.get("namespace"),
+                args = kwargs.get("args"),
+                **implicit_args
+            )
