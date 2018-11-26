@@ -173,39 +173,50 @@ def _common_impl(ctx):
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
-    kubectl_tool = kubectl_tool_info.tool_path
-    if not kubectl_tool_info.tool_path:
-        kubectl_tool = _runfiles(ctx, kubectl_tool_info.tool_target.files.to_list()[0])
-        files += kubectl_tool_info.tool_target.files.to_list()
+    if not kubectl_tool_info.tool_path and not kubectl_tool_info.tool_target:
+        # If tool_path is None and tool_target is None then there is no local
+        # kubectl tool, we will just print a nice error message if the user
+        # attempts to do bazel run
+        ctx.actions.write(
+            content = "echo kubectl toolchain was not properly configured so this target cannot be executed",
+            output = ctx.outputs.executable,
+        )
 
-    substitutions = {
-        "%{kubectl_tool}": kubectl_tool,
-        "%{cluster}": cluster_arg,
-        "%{context}": context_arg,
-        "%{user}": user_arg,
-        "%{namespace_arg}": namespace_arg,
-        "%{kind}": ctx.attr.kind,
-    }
+    else:
+        kubectl_tool = kubectl_tool_info.tool_path
+        if kubectl_tool_info.tool_target:
+            kubectl_tool = _runfiles(ctx, kubectl_tool_info.tool_target.files.to_list()[0])
+            files += kubectl_tool_info.tool_target.files.to_list()
 
-    if hasattr(ctx.executable, "resolved"):
-        substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
-        files += [ctx.executable.resolved]
-        files += list(ctx.attr.resolved.default_runfiles.files)
+        substitutions = {
+            "%{kubectl_tool}": kubectl_tool,
+            "%{cluster}": cluster_arg,
+            "%{context}": context_arg,
+            "%{user}": user_arg,
+            "%{namespace_arg}": namespace_arg,
+            "%{kind}": ctx.attr.kind,
+        }
 
-    if hasattr(ctx.executable, "reversed"):
-        substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
-        files += [ctx.executable.reversed]
-        files += list(ctx.attr.reversed.default_runfiles.files)
+        if hasattr(ctx.executable, "resolved"):
+            substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
+            files += [ctx.executable.resolved]
+            files += list(ctx.attr.resolved.default_runfiles.files)
 
-    if hasattr(ctx.files, "unresolved"):
-        substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
-        files += ctx.files.unresolved
+        if hasattr(ctx.executable, "reversed"):
+            substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
+            files += [ctx.executable.reversed]
+            files += list(ctx.attr.reversed.default_runfiles.files)
 
-    ctx.actions.expand_template(
-        template = ctx.file._template,
-        substitutions = substitutions,
-        output = ctx.outputs.executable,
-    )
+        if hasattr(ctx.files, "unresolved"):
+            substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
+            files += ctx.files.unresolved
+
+        ctx.actions.expand_template(
+            template = ctx.file._template,
+            substitutions = substitutions,
+            output = ctx.outputs.executable,
+        )
+
     return struct(runfiles = ctx.runfiles(files = files))
 
 _common_attrs = {

@@ -2,13 +2,46 @@
 
 ## Overview
 This section describes how the `kubectl` tool is configured using a toolchain
-rule. At the moment, the tool's configuration only detects the path to the
-`kubectl` tool.
+rule. At the moment, the tool's configuration does one of the following:
+
+1. Build the `kubectl` tool from source (default).
+2. Detect the path to the `kubectl` tool.
+
+If you want to use the default (build the `kubectl` tool from source) you will
+need to add to your `WORKSPACE` file the following dependency:
+
+```python
+ http_archive(
+    name = "io_bazel_rules_go",
+    urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.1.tar.gz"],
+    sha256 = "ced2749527318abeddd9d91f5e1555ed86e2b6bfd08677b750396e0ec5462bec",
+    strip_prefix = "rules_go-0.16.1",
+ )
+```
+
+If you want the rules to detect the path to the `kubectl` tool you will
+need to add to your `WORKSPACE` file the `kubectl_configure` target before the
+`k8s_repositories` target:
+
+```python
+load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
+
+kubectl_configure(name = "k8s_config")
+
+load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
+
+k8s_repositories()
+```
+
+*NOTE: we are currently experimenting with toolchain features in these rules
+so there will be changes upcoming to how this configuration is performed*
+
+## Using the kubectl toolchain
 
 The information below will be helpful if:
 
-1. You wish to write a new Bazel rule that uses the `kubectl` tool.
-2. You wish to extend rules from this repository that are using the kubectl
+1. You want to write a new Bazel rule that uses the `kubectl` tool.
+2. You want to extend rules from this repository that are using the kubectl
 toolchain. You will know if your underlying rules depend on the kubectl
 toolchain and the toolchain is not properly configured if you get one of the
 following errors
