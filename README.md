@@ -50,7 +50,7 @@ k8s_repositories()
 
 *New: Starting https://github.com/bazelbuild/rules_k8s/commit/ff2cbf09ae1f0a9c7ebdfc1fa337044158a7f57b
 you need to configure your WORKSPACE properly for the `kubectl` tool.
-See more below in * [Dependencies](#Dependencies)
+See more below in [Dependencies](#Dependencies)*
 
 To build the `kubectl` tool from source (default) you will also
 need to add to your `WORKSPACE` file the following dependency:
