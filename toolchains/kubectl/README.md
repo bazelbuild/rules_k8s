@@ -7,7 +7,7 @@ rule. At the moment, the tool's configuration does one of the following:
 1. Detect the path to the `kubectl` tool (default).
 2. Build the `kubectl` tool from source.
 
-If you want to use the default (build the `kubectl` tool from source) you will
+If you want to build the `kubectl` tool from source you will
 need to add to your `WORKSPACE` file the following lines (note the extra arg
 in the call to `k8s_repositories()`):
 
