@@ -173,15 +173,14 @@ def _common_impl(ctx):
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
-    if not kubectl_tool_info.tool_path and not kubectl_tool_info.tool_target:
-        # If tool_path is None and tool_target is None then there is no local
+    if kubectl_tool_info.tool_path == "" and not kubectl_tool_info.tool_target:
+        # If tool_path is empty and tool_target is None then there is no local
         # kubectl tool, we will just print a nice error message if the user
         # attempts to do bazel run
         ctx.actions.write(
-            content = "echo kubectl toolchain was not properly configured so this target cannot be executed",
+            content = ("echo kubectl toolchain was not properly configured so %s cannot be executed." % ctx.attr.name),
             output = ctx.outputs.executable,
         )
-
     else:
         kubectl_tool = kubectl_tool_info.tool_path
         if kubectl_tool_info.tool_target:

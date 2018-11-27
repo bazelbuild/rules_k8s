@@ -60,7 +60,7 @@ docker_repositories()
 
 load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
 
-k8s_repositories(build_kubectl_srcs = True)
+k8s_repositories(build_kubectl_srcs = False)
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
