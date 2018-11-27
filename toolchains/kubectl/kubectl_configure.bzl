@@ -23,7 +23,7 @@ def _impl(repository_ctx):
         substitutions = {"%{KUBECTL_TARGET}": "%s" % kubectl_target}
         template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.target.tpl")
     else:
-        kubectl_tool_path = repository_ctx.which("kubectl")
+        kubectl_tool_path = repository_ctx.which("kubectl") or ""
         substitutions = {"%{KUBECTL_TOOL}": "%s" % kubectl_tool_path}
         template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.path.tpl")
 

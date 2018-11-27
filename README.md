@@ -57,6 +57,9 @@ you might interact with.
 For more information on how to configure `kubectl` authentication, see the
 Kubernetes [documentation](https://kubernetes.io/docs/admin/authentication/).
 
+*NOTE: we are currently experimenting with toolchain features in these rules
+so there will be changes upcoming to how this configuration is performed*
+
 ### Container Engine Authentication
 
 For Google Container Engine (GKE), the `gcloud` CLI provides a [simple
@@ -66,13 +69,25 @@ for setting up authentication:
 gcloud container clusters get-credentials <CLUSTER NAME>
 ```
 
+*NOTE: we are currently experimenting with toolchain features in these rules
+so there will be changes upcoming to how this configuration is performed*
+
 ## Dependencies
 
-The rules will require the `kubectl` tool when executing the `run` action from
-bazel. The `kubectl` tool is configured via a toolchain rule. Read more about
+*New: Starting https://github.com/bazelbuild/rules_k8s/commit/ff2cbf09ae1f0a9c7ebdfc1fa337044158a7f57b*
+
+These rules can either use a pre-installed `kubectl` tool (default) or
+build the `kubectl` tool from sources.
+
+The `kubectl` tool is used when executing the `run` action from bazel.
+
+The `kubectl` tool is configured via a toolchain rule. Read more about
 the kubectl toolchain [here](toolchains/kubectl#kubectl-toolchain).
 
-If GKE is used, also the `gcloud` sdk need to be installed.
+If GKE is used, also the `gcloud` sdk needs to be installed.
+
+*NOTE: we are currently experimenting with toolchain features in these rules
+so there will be changes upcoming to how this configuration is performed*
 
 ## Examples
 
