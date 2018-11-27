@@ -48,47 +48,6 @@ load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
 k8s_repositories()
 ```
 
-*New: Starting https://github.com/bazelbuild/rules_k8s/commit/ff2cbf09ae1f0a9c7ebdfc1fa337044158a7f57b
-you need to configure your WORKSPACE properly for the `kubectl` tool.
-See more details below in [Dependencies](#Dependencies)*
-
-To properly configure these rules you also need to select either to:
-
-1. Build the `kubectl` tool from source (default).
-2. Detect the path to the `kubectl` tool.
-
-To build the `kubectl` tool from source (default) you will also
-need to add to your `WORKSPACE` file the following dependency:
-
-```python
- http_archive(
-    name = "io_bazel_rules_go",
-    urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.1.tar.gz"],
-    sha256 = "ced2749527318abeddd9d91f5e1555ed86e2b6bfd08677b750396e0ec5462bec",
-    strip_prefix = "rules_go-0.16.1",
- )
-```
-
-To detect the path to the `kubectl` tool you will
-need to add to your `WORKSPACE` file the `kubectl_configure` target before the
-`k8s_repositories` target:
-
-```python
-load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
-
-kubectl_configure(name = "k8s_config")
-
-load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
-
-k8s_repositories()
-```
-
-Note if no `kubectl` tool is found trying to execute bazel run for any targets
-will fail.
-
-*NOTE: we are currently experimenting with toolchain features in these rules
-so there will be changes upcoming to how this configuration is performed*
-
 ## Kubernetes Authentication
 
 As is somewhat standard for Bazel, the expectation is that the
@@ -115,10 +74,11 @@ so there will be changes upcoming to how this configuration is performed*
 
 ## Dependencies
 
-*New: Starting https://github.com/bazelbuild/rules_k8s/commit/ff2cbf09ae1f0a9c7ebdfc1fa337044158a7f57b
-these rules can either build the `kubectl` tool (default) or use a
-pre-installed `kubectl` tool when executing the `run` action from
-bazel.*
+*New: Starting https://github.com/bazelbuild/rules_k8s/commit/ff2cbf09ae1f0a9c7ebdfc1fa337044158a7f57b*
+
+These rules can either use a pre-installed `kubectl` tool (default) or
+build the `kubectl` tool. The `kubectl` tool is used when executing the
+`run` action from bazel.
 
 The `kubectl` tool is configured via a toolchain rule. Read more about
 the kubectl toolchain [here](toolchains/kubectl#kubectl-toolchain).
