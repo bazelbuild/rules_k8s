@@ -3,18 +3,36 @@ platforms:
   ubuntu1404:
     build_targets:
     - "..."
+    # TODO(nlopezgi) remove once https://github.com/stackb/rules_proto/pull/2 is in.
+    build_flags:
+    - "--incompatible_remove_native_http_archive=false"
     test_targets:
     - "..."
+    # TODO(nlopezgi) remove once https://github.com/stackb/rules_proto/pull/2 is in.
+    test_flags:
+    - "--incompatible_remove_native_http_archive=false"
   ubuntu1604:
     build_targets:
     - "..."
+    # TODO(nlopezgi) remove once https://github.com/stackb/rules_proto/pull/2 is in.
+    build_flags:
+    - "--incompatible_remove_native_http_archive=false"
     test_targets:
     - "..."
+    # TODO(nlopezgi) remove once https://github.com/stackb/rules_proto/pull/2 is in.
+    test_flags:
+    - "--incompatible_remove_native_http_archive=false"
   macos:
     build_targets:
     - "--"
     - "..."
     - "-//images/gcloud-bazel:gcloud_install"
     - "-//images/gcloud-bazel:gcloud_push"
+    # TODO(nlopezgi) remove once https://github.com/stackb/rules_proto/pull/2 is in.
+    build_flags:
+    - "--incompatible_remove_native_http_archive=false"
     test_targets:
     - "..."
+    # TODO(nlopezgi) remove once https://github.com/stackb/rules_proto/pull/2 is in.
+    test_flags:
+    - "--incompatible_remove_native_http_archive=false"
