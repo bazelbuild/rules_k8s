@@ -136,7 +136,7 @@ go_register_toolchains()
 
 http_archive(
     name = "build_stack_rules_proto",
-    #sha256 = "0be90d609fcefae9cc5e404540b9b23176fb609c9d62f4f9f68528f66a6839bf",
+    sha256 = "1d966be7d7dd2b22a3f684fafc6d138ad461edaa8a3133011e3a71dd1292a10d",
     strip_prefix = "rules_proto-8087f91f3d1080ce84c6d5a716ddc4993d325b69",
     urls = ["https://github.com/stackb/rules_proto/archive/8087f91f3d1080ce84c6d5a716ddc4993d325b69.tar.gz"],
 )
