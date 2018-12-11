@@ -16,6 +16,16 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
+# Get a recent version of protobuf (one that's compatible with Bazel >= 0.20.0).
+# Protobuf is a transitive dep of this repo, but we need
+# to overload it with a version >= 3.6.1.1 before any other repos load it.
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "983975ab66113cbaabea4b8ec9f3a73406d89ed74db9ae75c74888e685f956f8",
+    strip_prefix = "protobuf-66dc42d891a4fc8e9190c524fd67961688a37bbe",
+    url = "https://github.com/google/protobuf/archive/66dc42d891a4fc8e9190c524fd67961688a37bbe.tar.gz",
+)
+
 http_archive(
     name = "base_images_docker",
     sha256 = "9540d8b1de4a0e294d5a5729c3c3f3720f4f5cdd966590e12b4dd98d5b7c10c7",
