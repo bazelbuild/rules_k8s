@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_tools//tools/build_rules:test_rules.bzl", "file_test")
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
@@ -28,7 +29,32 @@ k8s_deploy(
 
 k8s_service(
     name = "staging-service",
+    substitutions = {
+        "%{SUBSTITUTED_ARGUMENT}": "substituted-value",
+    },
     template = "service.yaml",
+)
+
+file_test(
+    name = "staging-service-substitution-test",
+    content = """\
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hello-grpc-staging
+    extratag: substituted-value
+  name: hello-grpc-staging
+spec:
+  ports:
+  - port: 50051
+    protocol: TCP
+    targetPort: 50051
+  selector:
+    app: hello-grpc-staging
+  type: LoadBalancer
+""",
+    file = ":staging-service.substituted.yaml",
 )
 
 k8s_objects(

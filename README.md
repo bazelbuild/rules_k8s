@@ -489,6 +489,40 @@ A rule for interacting with Kubernetes objects.
       </td>
     </tr>
     <tr>
+      <td><code>substitutions</code></td>
+      <td>
+        <p><code>string_dict, optional</code></p>
+        <p>Substitutions to make when expanding the template.</p>
+        <p>Follows the same rules as
+          <a href="https://docs.bazel.build/versions/master/skylark/lib/actions.html#expand_template">expand_template</a>
+          Values are <a href="https://docs.bazel.build/versions/master/be/make-variables.html">"make variable substituted."</a>
+          You can also use the Bazel command line option <code>--define</code>
+          to define your own custom variables.
+        </p>
+        <p><pre>
+  # Example
+  k8s_object(
+    name = "my_ingress",
+    kind = "ingress",
+
+    # A template of a Kubernetes ingress object yaml.
+    template = ":ingress.yaml",
+
+    # An optional collection of docker_build images to publish
+    # when this target is bazel run.  The digest of the published
+    # image is substituted as a part of the resolution process.
+    substitutions = {
+      "%{expand_template_variable}": "$(make_expanded_variable}",
+    })
+  </pre></p>
+        <p>Which is then invoked with <code>bazel run --define make_expanded_variable=value :target</code>
+        and will replace any occurrences of the literal token <code>%{expand_template_variable}</code> in your
+        template with the value "value" by way of first make variable
+        substitution and then expand_template replacement.
+        </p>
+      </td>
+    </tr>
+    <tr>
       <td><code>template</code></td>
       <td>
         <p><code>yaml or json file; required</code></p>
