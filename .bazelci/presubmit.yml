@@ -11,5 +11,7 @@ platforms:
     test_targets:
     - "..."
   macos:
-    test_targets:
+    build_targets:
     - "//examples/hellogrpc/java/..."
+    test_targets:
+    - "//k8s:resolver_test"
