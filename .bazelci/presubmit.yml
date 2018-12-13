@@ -11,5 +11,7 @@ platforms:
     test_targets:
     - "..."
   macos:
+    build_targets:
+    - "//examples/hellohttp:deployment_test"
     test_targets:
     - "//examples/hellohttp:deployment_test"
