@@ -11,10 +11,5 @@ platforms:
     test_targets:
     - "..."
   macos:
-    build_targets:
-    - "--"
-    - "..."
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud_push"
     test_targets:
-    - "..."
+    - "//examples/hellogrpc/java/..."
