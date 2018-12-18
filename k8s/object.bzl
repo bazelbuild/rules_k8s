@@ -92,7 +92,7 @@ def _impl(ctx):
     image_chroot_arg = ctx.attr.image_chroot
     image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
     if "{" in ctx.attr.image_chroot:
-        image_chroot_file = ctx.new_file(ctx.label.name + ".image-chroot-name")
+        image_chroot_file = ctx.actions.declare_file(ctx.label.name + ".image-chroot-name")
         _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
         image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
         all_inputs += [image_chroot_file]
@@ -100,14 +100,14 @@ def _impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file._template,
         substitutions = {
-            "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
-            "%{yaml}": _runfiles(ctx, ctx.file.template),
             "%{image_chroot}": image_chroot_arg,
             "%{images}": " ".join([
                 "--image_spec=%s" % spec
                 for spec in image_specs
             ]),
             "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
+            "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
+            "%{yaml}": _runfiles(ctx, ctx.file.template),
         },
         output = ctx.outputs.executable,
     )
@@ -123,7 +123,7 @@ def _resolve(ctx, string, output):
         "--stamp-info-file=%s" % sf.path
         for sf in stamps
     ]
-    ctx.action(
+    ctx.actions.run(
         executable = ctx.executable._stamper,
         arguments = [
             "--format=%s" % string,
@@ -140,7 +140,7 @@ def _common_impl(ctx):
     cluster_arg = ctx.attr.cluster
     cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
     if "{" in ctx.attr.cluster:
-        cluster_file = ctx.new_file(ctx.label.name + ".cluster-name")
+        cluster_file = ctx.actions.declare_file(ctx.label.name + ".cluster-name")
         _resolve(ctx, ctx.attr.cluster, cluster_file)
         cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
         files += [cluster_file]
@@ -148,7 +148,7 @@ def _common_impl(ctx):
     context_arg = ctx.attr.context
     context_arg = ctx.expand_make_variables("context", context_arg, {})
     if "{" in ctx.attr.context:
-        context_file = ctx.new_file(ctx.label.name + ".context-name")
+        context_file = ctx.actions.declare_file(ctx.label.name + ".context-name")
         _resolve(ctx, ctx.attr.context, context_file)
         context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
         files += [context_file]
@@ -156,7 +156,7 @@ def _common_impl(ctx):
     user_arg = ctx.attr.user
     user_arg = ctx.expand_make_variables("user", user_arg, {})
     if "{" in ctx.attr.user:
-        user_file = ctx.new_file(ctx.label.name + ".user-name")
+        user_file = ctx.actions.declare_file(ctx.label.name + ".user-name")
         _resolve(ctx, ctx.attr.user, user_file)
         user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
         files += [user_file]
@@ -164,7 +164,7 @@ def _common_impl(ctx):
     namespace_arg = ctx.attr.namespace
     namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
     if "{" in ctx.attr.namespace:
-        namespace_file = ctx.new_file(ctx.label.name + ".namespace-name")
+        namespace_file = ctx.actions.declare_file(ctx.label.name + ".namespace-name")
         _resolve(ctx, ctx.attr.namespace, namespace_file)
         namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
         files += [namespace_file]
@@ -188,12 +188,12 @@ def _common_impl(ctx):
             files += kubectl_tool_info.tool_target.files.to_list()
 
         substitutions = {
-            "%{kubectl_tool}": kubectl_tool,
             "%{cluster}": cluster_arg,
             "%{context}": context_arg,
-            "%{user}": user_arg,
-            "%{namespace_arg}": namespace_arg,
             "%{kind}": ctx.attr.kind,
+            "%{kubectl_tool}": kubectl_tool,
+            "%{namespace_arg}": namespace_arg,
+            "%{user}": user_arg,
         }
 
         if hasattr(ctx.executable, "resolved"):
@@ -219,15 +219,14 @@ def _common_impl(ctx):
     return struct(runfiles = ctx.runfiles(files = files))
 
 _common_attrs = {
-    "namespace": attr.string(),
     # We allow cluster to be omitted, and we just
     # don't expose the extra actions.
     "cluster": attr.string(),
     "context": attr.string(),
-    "user": attr.string(),
+    "image_chroot": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
-    "image_chroot": attr.string(),
+    "namespace": attr.string(),
     "resolver": attr.label(
         default = Label("//k8s:resolver"),
         cfg = "host",
@@ -236,6 +235,7 @@ _common_attrs = {
     ),
     # Extra arguments to pass to the resolver.
     "resolver_args": attr.string_list(),
+    "user": attr.string(),
     "_stamper": attr.label(
         default = Label("//k8s:stamper"),
         cfg = "host",
@@ -263,24 +263,22 @@ def _reverse(ctx):
 _reversed = rule(
     attrs = _add_dicts(
         {
-            "template": attr.label(
-                allow_files = [
-                    ".yaml",
-                    ".json",
-                ],
-                single_file = True,
-                mandatory = True,
-            ),
             "reverser": attr.label(
                 default = Label("//k8s:reverser"),
                 cfg = "host",
                 executable = True,
                 allow_files = True,
             ),
+            "template": attr.label(
+                allow_single_file = [
+                    ".yaml",
+                    ".json",
+                ],
+                mandatory = True,
+            ),
             "_template": attr.label(
                 default = Label("//k8s:reverse.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
@@ -293,22 +291,20 @@ _reversed = rule(
 _k8s_object = rule(
     attrs = _add_dicts(
         {
+            "image_target_strings": attr.string_list(),
+            # Implicit dependencies.
+            "image_targets": attr.label_list(allow_files = True),
+            "images": attr.string_dict(),
             "template": attr.label(
-                allow_files = [
+                allow_single_file = [
                     ".yaml",
                     ".json",
                 ],
-                single_file = True,
                 mandatory = True,
             ),
-            "images": attr.string_dict(),
-            # Implicit dependencies.
-            "image_targets": attr.label_list(allow_files = True),
-            "image_target_strings": attr.string_list(),
             "_template": attr.label(
                 default = Label("//k8s:resolve.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
@@ -328,8 +324,7 @@ _k8s_object_apply = rule(
             ),
             "_template": attr.label(
                 default = Label("//k8s:apply.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
@@ -349,8 +344,7 @@ _k8s_object_create = rule(
             ),
             "_template": attr.label(
                 default = Label("//k8s:create.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
@@ -370,8 +364,7 @@ _k8s_object_replace = rule(
             ),
             "_template": attr.label(
                 default = Label("//k8s:replace.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
@@ -385,17 +378,15 @@ _k8s_object_describe = rule(
     attrs = _add_dicts(
         {
             "unresolved": attr.label(
-                allow_files = [
+                allow_single_file = [
                     ".yaml",
                     ".json",
                 ],
-                single_file = True,
                 mandatory = True,
             ),
             "_template": attr.label(
                 default = Label("//k8s:describe.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
@@ -415,8 +406,7 @@ _k8s_object_delete = rule(
             ),
             "_template": attr.label(
                 default = Label("//k8s:delete.sh.tpl"),
-                single_file = True,
-                allow_files = True,
+                allow_single_file = True,
             ),
         },
         _common_attrs,
