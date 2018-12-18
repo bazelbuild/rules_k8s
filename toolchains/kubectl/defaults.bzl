@@ -36,5 +36,8 @@ k8s_repo_tools_repo = "repo-infra"
 # The commit pin to use for the kuebernetes repository infrastructure tools
 # repository.
 k8s_repo_tools_commit = "b4bc4f1552c7fc1d4654753ca9b0e5e13883429f"
+# The archive prefix. This is the name of the top level directory in the
+# downloaded repository archive tarball.
+k8s_repo_tools_prefix = "{}-{}".format(k8s_repo_tools_repo, k8s_repo_tools_commit)
 # The SHA256 of the kubernetes repository infrastructure tools repository.
 k8s_repo_tools_sha = "21160531ea8a9a4001610223ad815622bf60671d308988c7057168a495a7e2e8"

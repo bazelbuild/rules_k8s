@@ -24,6 +24,7 @@ load(":defaults.bzl",
     _k8s_sha256="k8s_sha256",
     _k8s_repo_tools_repo="k8s_repo_tools_repo",
     _k8s_repo_tools_commit="k8s_repo_tools_commit",
+    _k8s_repo_tools_prefix="k8s_repo_tools_prefix",
     _k8s_repo_tools_sha="k8s_repo_tools_sha"
 )
 
@@ -115,6 +116,13 @@ def kubectl_configure(name, **kwargs):
         k8s_sha256 = kwargs["k8s_sha256"] if "k8s_sha256" in kwargs else _k8s_sha256
         k8s_prefix = kwargs["k8s_prefix"] if "k8s_prefix" in kwargs else _k8s_prefix
 
+        _ensure_all_provided("kubectl_configure",
+            ["k8s_repo_tools_sha", "k8s_repo_tools_commit", "k8s_repo_tools_prefix"],
+            kwargs)
+        k8s_repo_tools_sha = kwargs["k8s_repo_tools_sha"] if "k8s_repo_tools_sha" in kwargs else _k8s_repo_tools_sha
+        k8s_repo_tools_commit = kwargs["k8s_repo_tools_commit"] if "k8s_repo_tools_commit" in kwargs else _k8s_repo_tools_commit
+        k8s_repo_tools_prefix = kwargs["k8s_repo_tools_prefix"] if "k8s_repo_tools_prefix" in kwargs else _k8s_repo_tools_prefix
+
         http_archive(
             name = "io_kubernetes",
             sha256 = k8s_sha256,
@@ -127,15 +135,12 @@ def kubectl_configure(name, **kwargs):
         )
         http_archive(
             name = "io_kubernetes_build",
-            sha256 = _k8s_repo_tools_sha,
-            strip_prefix = "{}-{}".format(
-                _k8s_repo_tools_repo,
-                _k8s_repo_tools_commit
-            ),
+            sha256 = k8s_repo_tools_sha,
+            strip_prefix = k8s_repo_tools_prefix,
             urls = ["https://github.com/{}/{}/archive/{}.tar.gz".format(
                 _k8s_org,
                 _k8s_repo_tools_repo,
-                _k8s_repo_tools_commit
+                k8s_repo_tools_commit
             )],
         )
     _kubectl_configure(name = name, build_srcs = build_srcs)

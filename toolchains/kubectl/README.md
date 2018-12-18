@@ -24,9 +24,9 @@ go_rules_dependencies()
 go_register_toolchains()
 ```
 
-By default, the kubectl sources pulled in is defined [here](defaults.bzl).
-However, if you wanted to use release v1.13.1, call `kubectl_configure` as
-follows:
+By default, the kubectl sources and kubernetes repository infrastructure tools
+pulled in is defined [here](defaults.bzl). To use e.g., kubernetes release
+v1.13.1, call `kubectl_configure` as follows:
 
 ```python
 kubectl_configure(mame="k8s_config", build_srcs=True,
@@ -38,6 +38,37 @@ kubectl_configure(mame="k8s_config", build_srcs=True,
     # Open the archive downloaded from https://github.com/kubernetes/kubernetes/archive/v1.13.1.tar.gz.
     # This attribute is the name of the top level directory in that archive.
     k8s_prefix = "kubernetes-1.13.1"
+)
+```
+
+To use e.g., kubernetes repository infrastructure tools at commit
+`b4bc4f1552c7fc1d4654753ca9b0e5e13883429f`, call `kubectl_configure` as follows:
+
+```python
+kubectl_configure(mame="k8s_config", build_srcs=True,
+    k8s_repo_tools_commit = "b4bc4f1552c7fc1d4654753ca9b0e5e13883429f",
+    # Run wget https://github.com/kubernetes/kubernetes/archive/b4bc4f1552c7fc1d4654753ca9b0e5e13883429f.tar.gz
+    # to download b4bc4f1552c7fc1d4654753ca9b0e5e13883429f.tar.gz and run
+    # sha256sum on the downloaded archive to get the value of this attribute.
+    k8s_repo_tools_sha256 = "21160531ea8a9a4001610223ad815622bf60671d308988c7057168a495a7e2e8",
+    # Open the archive downloaded from https://github.com/kubernetes/kubernetes/archive/b4bc4f1552c7fc1d4654753ca9b0e5e13883429f.tar.gz
+    # This attribute is the name of the top level directory in that archive.
+    k8s_repo_tools_prefix = "repo-infra-b4bc4f1552c7fc1d4654753ca9b0e5e13883429f"
+)
+```
+
+The use e.g., kubernetes release v1.13.1 with repository infrastructure tools
+at commit `b4bc4f1552c7fc1d4654753ca9b0e5e13883429f`, call `kubectl_configure`
+as follows:
+
+```python
+kubectl_configure(mame="k8s_config", build_srcs=True,
+    k8s_commit = "v1.13.1",
+    k8s_sha256 = "677d2a5021c3826a9122de5a9c8827fed4f28352c6abacb336a1a5a007e434b7",
+    k8s_prefix = "kubernetes-1.13.1",
+    k8s_repo_tools_commit = "b4bc4f1552c7fc1d4654753ca9b0e5e13883429f",
+    k8s_repo_tools_sha256 = "21160531ea8a9a4001610223ad815622bf60671d308988c7057168a495a7e2e8",
+    k8s_repo_tools_prefix = "repo-infra-b4bc4f1552c7fc1d4654753ca9b0e5e13883429f"
 )
 ```
 
