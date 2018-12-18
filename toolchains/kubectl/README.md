@@ -84,6 +84,13 @@ the toolchain needed to build kubectl. If your project already imports*
 *NOTE: We are currently experimenting with toolchain features in these rules
 so there will be changes upcoming to how this configuration is performed.*
 
+*NOTE: If you change the default kubernetes source repository version via the
+`k8s_commit` attribute to `kubectl_configure`, you must also find out the right
+version of the kubernetes repository tools infrastructure the new kubernetes
+source repository is compatible with. Look at the `http_archive` invocation in
+https://github.com/kubernetes/kubernetes/blob/{k8s_commit}/build/root/WORKSPACE
+for the `@io_kubernetes_build` to get the commit pin, sha256 and prefix values.*
+
 ## Using the kubectl toolchain
 
 The information below will be helpful if:
