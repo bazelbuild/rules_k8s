@@ -16,6 +16,16 @@ Defines a repository rule for configuring the kubectl tool.
 """
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load(":defaults.bzl",
+    _k8s_org="k8s_org",
+    _k8s_repo="k8s_repo",
+    _k8s_commit="k8s_commit",
+    _k8s_prefix="k8s_prefix",
+    _k8s_sha256="k8s_sha256",
+    _k8s_repo_tools_repo="k8s_repo_tools_repo",
+    _k8s_repo_tools_commit="k8s_repo_tools_commit",
+    _k8s_repo_tools_sha="k8s_repo_tools_sha"
+)
 
 def _impl(repository_ctx):
     substitutions = None
@@ -47,6 +57,34 @@ _kubectl_configure = repository_rule(
     },
 )
 
+def _ensure_all_provided(func_name, attrs, kwargs):
+    """
+    For function func_name, ensure either all attributes in 'attrs' were
+    specified in kwargs or none were specified.
+    """
+    any_specified = False
+    for key in kwargs.keys():
+        if key in attrs:
+            any_specified = True
+            break
+    if not any_specified:
+        return
+    provided = []
+    missing = []
+    for attr in attrs:
+        if attr in kwargs:
+            provided.append(attr)
+        else:
+            missing.append(attr)
+    if len(missing) != 0:
+        fail("Attribute(s) {} are required for function {} because attribute(s) {} were specified.".format(
+        ", ".join(missing),
+        func_name,
+        ", ".join(provided),
+    ))
+
+
+
 def kubectl_configure(name, **kwargs):
     """
     Creates an external repository with a kubectl_toolchain target
@@ -59,12 +97,9 @@ def kubectl_configure(name, **kwargs):
       Default Args:
         build_srcs: Optional. Set to true to build kubectl from sources. Default: False
         k8s_commit: Otional. Commit / release tag at which to build kubectl
-          from. Default "v1.13.0-beta.1"
-        k8s_sha256: Otional. sha256 of commit at which to build kubectl from.
-          Default <valid sha for default version>.
-        k8s_prefix: Otional. Prefix to strip from commit / release archive.
-          Typically the same as the commit, or Kubernetes-<release tag>.
-          Default <valid prefix for default version>.
+          from. Default is defined as k8s_tag in :defaults.bzl.
+        k8s_sha256: Optional. sha256 of commit at which to build kubectl from.
+          Default is defined as k8s_sha256 in :defaults.bzl.
       Note: Not all versions/commits of kubernetes project can be used to compile
       kubectl from an external repo. Notably, we have only tested with v1.13.0-beta.1
       or above. Note this rule has a hardcoded pointer to io_kubernetes_build repo
@@ -74,21 +109,33 @@ def kubectl_configure(name, **kwargs):
     build_srcs = False
     if "build_srcs" in kwargs and kwargs["build_srcs"]:
         build_srcs = True
+        _ensure_all_provided("kubectl_configure",
+            ["k8s_commit", "k8s_sha256", "k8s_prefix"], kwargs)
+        k8s_commit = kwargs["k8s_commit"] if "k8s_commit" in kwargs else _k8s_commit
+        k8s_sha256 = kwargs["k8s_sha256"] if "k8s_sha256" in kwargs else _k8s_sha256
+        k8s_prefix = kwargs["k8s_prefix"] if "k8s_prefix" in kwargs else _k8s_prefix
 
-        # We keep these defaults here as they are only used by in this macro and not by the repo rule.
-        k8s_commit = kwargs["k8s_commit"] if "k8s_commit" in kwargs else "v1.13.0-beta.1"
-        k8s_sha256 = kwargs["k8s_sha256"] if "k8s_sha256" in kwargs else "dfb39ce36284c1ce228954ca12bf016c09be61e40a875e8af4fff84e116bd3a7"
-        k8s_prefix = kwargs["k8s_prefix"] if "k8s_prefix" in kwargs else "kubernetes-1.13.0-beta.1"
         http_archive(
             name = "io_kubernetes",
             sha256 = k8s_sha256,
             strip_prefix = k8s_prefix,
-            urls = [("https://github.com/kubernetes/kubernetes/archive/%s.tar.gz" % k8s_commit)],
+            urls = [("https://github.com/{}/{}/archive/{}.tar.gz".format(
+                _k8s_org,
+                _k8s_repo,
+                k8s_commit
+            ))],
         )
         http_archive(
             name = "io_kubernetes_build",
-            sha256 = "21160531ea8a9a4001610223ad815622bf60671d308988c7057168a495a7e2e8",
-            strip_prefix = "repo-infra-b4bc4f1552c7fc1d4654753ca9b0e5e13883429f",
-            urls = ["https://github.com/kubernetes/repo-infra/archive/b4bc4f1552c7fc1d4654753ca9b0e5e13883429f.tar.gz"],
+            sha256 = _k8s_repo_tools_sha,
+            strip_prefix = "{}-{}".format(
+                _k8s_repo_tools_repo,
+                _k8s_repo_tools_commit
+            ),
+            urls = ["https://github.com/{}/{}/archive/{}.tar.gz".format(
+                _k8s_org,
+                _k8s_repo_tools_repo,
+                _k8s_repo_tools_commit
+            )],
         )
     _kubectl_configure(name = name, build_srcs = build_srcs)

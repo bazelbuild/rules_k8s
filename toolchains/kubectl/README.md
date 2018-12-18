@@ -8,23 +8,43 @@ rule. At the moment, the tool's configuration does one of the following:
 2. Build the `kubectl` tool from source.
 
 If you want to build the `kubectl` tool from source you will
-need to add to your `WORKSPACE` file the following lines (note the extra arg
-in the call to `k8s_repositories()`):
+need to add to your `WORKSPACE` file the following lines (Note:
+The call to `kubectl_configure` must be before the call to
+`k8s_repositories`):
 
 ```python
-k8s_repositories(build_kubectl_srcs = True)
+load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
+
+kubectl_configure(name="k8s_config", build_srcs=True)
+k8s_repositories()
 
 load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")
 
 go_rules_dependencies()
-
 go_register_toolchains()
 ```
 
-Note that by default the `k8s_repositories()` call configures a
-`kubectl_toolchain` that looks for the `kubectl` tool in the path.
-If no `kubectl` tool is found, trying to execute `bazel run` for any targets
-will not work.
+By default, the kubectl sources pulled in is defined [here](defaults.bzl).
+However, if you wanted to use release v1.13.1, call `kubectl_configure` as
+follows:
+
+```python
+kubectl_configure(mame="k8s_config", build_srcs=True,
+    k8s_commit = "v1.13.1",
+    # Run wget https://github.com/kubernetes/kubernetes/archive/v1.13.1.tar.gz
+    # to download v1.13.1.tar.gz and run sha256sum on the downloaded archive
+    # to get the value of this attribute.
+    k8s_sha256 = "677d2a5021c3826a9122de5a9c8827fed4f28352c6abacb336a1a5a007e434b7",
+    # Open the archive downloaded from https://github.com/kubernetes/kubernetes/archive/v1.13.1.tar.gz.
+    # This attribute is the name of the top level directory in that archive.
+    k8s_prefix = "kubernetes-1.13.1"
+)
+```
+
+Note that by default the `k8s_repositories()` calls `kubectl_configure` if it
+hasn't already been called. This configures a `kubectl_toolchain` that looks for
+the `kubectl` tool in the sytem path. If no `kubectl` tool is found, trying to
+execute `bazel run` for any targets will not work.
 
 *NOTE: The lines above are required to create the dependencies and register
 the toolchain needed to build kubectl. If your project already imports*

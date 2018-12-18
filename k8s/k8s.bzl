@@ -19,7 +19,7 @@ load(":with-defaults.bzl", _k8s_defaults = "k8s_defaults")
 
 k8s_defaults = _k8s_defaults
 
-def k8s_repositories(build_kubectl_srcs = False):
+def k8s_repositories():
     """Download dependencies of k8s rules."""
 
     # Used by utilities for roundtripping yaml.
@@ -47,13 +47,15 @@ py_library(
     )
 
     excludes = native.existing_rules().keys()
+    if "io_bazel_rules_go" not in excludes:
+        # Only needed when building kubectl from source. It's always included
+        # here to keep all the http_archive calls in one function for simplicity.
+        http_archive(
+            name = "io_bazel_rules_go",
+            urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.1.tar.gz"],
+            sha256 = "ced2749527318abeddd9d91f5e1555ed86e2b6bfd08677b750396e0ec5462bec",
+            strip_prefix = "rules_go-0.16.1",
+        )
     if "k8s_config" not in excludes:
         # WORKSPACE target to configure the kubectl tool
-        kubectl_configure(name = "k8s_config", build_srcs = build_kubectl_srcs)
-        if build_kubectl_srcs and "io_bazel_rules_go" not in excludes:
-            http_archive(
-                name = "io_bazel_rules_go",
-                urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.1.tar.gz"],
-                sha256 = "ced2749527318abeddd9d91f5e1555ed86e2b6bfd08677b750396e0ec5462bec",
-                strip_prefix = "rules_go-0.16.1",
-            )
+        kubectl_configure(name = "k8s_config", build_srcs = False)
