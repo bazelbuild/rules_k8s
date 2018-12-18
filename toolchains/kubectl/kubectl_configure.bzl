@@ -15,6 +15,8 @@
 Defines a repository rule for configuring the kubectl tool.
 """
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 def _impl(repository_ctx):
     substitutions = None
     label = None
@@ -44,8 +46,6 @@ _kubectl_configure = repository_rule(
         ),
     },
 )
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def kubectl_configure(name, **kwargs):
     """

@@ -39,48 +39,69 @@ The default can be specified as follows:
 
 # Generate an override statement for a particular attribute.
 def _override(name, attr, value):
-  return """
+    return """
   if "{attr}" in kwargs:
     fail("Cannot override '{attr}' in '{name}' rule.",
          attr="{attr}")
   kwargs["{attr}"] = "{value}"
-""".format(name=name, attr=attr, value=value)
+""".format(name = name, attr = attr, value = value)
 
 def _impl(repository_ctx):
-  """Core implementation of k8s_defaults."""
+    """Core implementation of k8s_defaults."""
 
-  # This is required by Bazel.
-  repository_ctx.file("BUILD", "")
+    # This is required by Bazel.
+    repository_ctx.file("BUILD", "")
 
-  overrides = []
-  if repository_ctx.attr.cluster:
-    overrides += [_override(repository_ctx.attr.name,
-                            "cluster", repository_ctx.attr.cluster)]
+    overrides = []
+    if repository_ctx.attr.cluster:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "cluster",
+            repository_ctx.attr.cluster,
+        )]
 
-  if repository_ctx.attr.context:
-    overrides += [_override(repository_ctx.attr.name,
-                            "context", repository_ctx.attr.context)]
-  if repository_ctx.attr.user:
-    overrides += [_override(repository_ctx.attr.name,
-                            "user", repository_ctx.attr.user)]
+    if repository_ctx.attr.context:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "context",
+            repository_ctx.attr.context,
+        )]
+    if repository_ctx.attr.user:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "user",
+            repository_ctx.attr.user,
+        )]
 
-  if repository_ctx.attr.namespace:
-    overrides += [_override(repository_ctx.attr.name,
-                            "namespace", repository_ctx.attr.namespace)]
+    if repository_ctx.attr.namespace:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "namespace",
+            repository_ctx.attr.namespace,
+        )]
 
-  if repository_ctx.attr.kind:
-    overrides += [_override(repository_ctx.attr.name,
-                            "kind", repository_ctx.attr.kind)]
+    if repository_ctx.attr.kind:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "kind",
+            repository_ctx.attr.kind,
+        )]
 
-  if repository_ctx.attr.image_chroot:
-    overrides += [_override(repository_ctx.attr.name,
-                            "image_chroot", repository_ctx.attr.image_chroot)]
+    if repository_ctx.attr.image_chroot:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "image_chroot",
+            repository_ctx.attr.image_chroot,
+        )]
 
-  if repository_ctx.attr.resolver:
-    overrides += [_override(repository_ctx.attr.name,
-                            "resolver", repository_ctx.attr.resolver)]
+    if repository_ctx.attr.resolver:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "resolver",
+            repository_ctx.attr.resolver,
+        )]
 
-  repository_ctx.file("defaults.bzl", """
+    repository_ctx.file("defaults.bzl", """
 load(
   "@io_bazel_rules_k8s//k8s:object.bzl",
   _k8s_object="k8s_object"
@@ -89,9 +110,9 @@ def {name}(**kwargs):
   {overrides}
   _k8s_object(**kwargs)
 """.format(
-  name=repository_ctx.attr.name,
-  overrides="\n".join(overrides)
-))
+        name = repository_ctx.attr.name,
+        overrides = "\n".join(overrides),
+    ))
 
 k8s_defaults = repository_rule(
     attrs = {

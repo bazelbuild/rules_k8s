@@ -19,25 +19,25 @@ load(
 )
 
 def _runfiles(ctx, f):
-  return "PYTHON_RUNFILES=${RUNFILES} ${RUNFILES}/%s $@" % _get_runfile_path(ctx, f)
+    return "PYTHON_RUNFILES=${RUNFILES} ${RUNFILES}/%s $@" % _get_runfile_path(ctx, f)
 
 def _run_all_impl(ctx):
-  ctx.actions.expand_template(
-      template = ctx.file._template,
-      substitutions = {
-          "%{resolve_statements}": ("\n" + ctx.attr.delimiter).join([
-              _runfiles(ctx, exe.files_to_run.executable)
-              for exe in ctx.attr.objects
-          ]),
-      },
-      output = ctx.outputs.executable,
-  )
+    ctx.actions.expand_template(
+        template = ctx.file._template,
+        substitutions = {
+            "%{resolve_statements}": ("\n" + ctx.attr.delimiter).join([
+                _runfiles(ctx, exe.files_to_run.executable)
+                for exe in ctx.attr.objects
+            ]),
+        },
+        output = ctx.outputs.executable,
+    )
 
-  runfiles = [obj.files_to_run.executable for obj in ctx.attr.objects]
-  for obj in ctx.attr.objects:
-    runfiles += list(obj.default_runfiles.files)
+    runfiles = [obj.files_to_run.executable for obj in ctx.attr.objects]
+    for obj in ctx.attr.objects:
+        runfiles += list(obj.default_runfiles.files)
 
-  return struct(runfiles = ctx.runfiles(files = runfiles))
+    return struct(runfiles = ctx.runfiles(files = runfiles))
 
 _run_all = rule(
     attrs = {
@@ -56,18 +56,18 @@ _run_all = rule(
 )
 
 def k8s_objects(name, objects, **kwargs):
-  """Interact with a collection of K8s objects.
+    """Interact with a collection of K8s objects.
 
-  Args:
-    name: name of the rule.
-    objects: list of k8s_object rules.
-  """
+    Args:
+      name: name of the rule.
+      objects: list of k8s_object rules.
+    """
 
-  # TODO(mattmoor): We may have to normalize the labels that come
-  # in through objects.
+    # TODO(mattmoor): We may have to normalize the labels that come
+    # in through objects.
 
-  _run_all(name=name, objects=objects, delimiter="echo ---\n", **kwargs)
-  _run_all(name=name + ".create", objects=[x + ".create" for x in objects], **kwargs)
-  _run_all(name=name + ".delete", objects=[x + ".delete" for x in reversed(objects)], **kwargs)
-  _run_all(name=name + ".replace", objects=[x + ".replace" for x in objects], **kwargs)
-  _run_all(name=name + ".apply", objects=[x + ".apply" for x in objects], **kwargs)
+    _run_all(name = name, objects = objects, delimiter = "echo ---\n", **kwargs)
+    _run_all(name = name + ".create", objects = [x + ".create" for x in objects], **kwargs)
+    _run_all(name = name + ".delete", objects = [x + ".delete" for x in reversed(objects)], **kwargs)
+    _run_all(name = name + ".replace", objects = [x + ".replace" for x in objects], **kwargs)
+    _run_all(name = name + ".apply", objects = [x + ".apply" for x in objects], **kwargs)
