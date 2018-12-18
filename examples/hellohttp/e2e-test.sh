@@ -42,20 +42,38 @@ function EXPECT_CONTAINS() {
 }
 
 if [[ -z "${1:-}" ]]; then
-  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
+  exit 1
+fi
+
+local=false
+if [[ "$1" == "local" ]]; then
+  local=true
+elif [[ "$1" != "remote" ]]; then
+  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
+  exit 1
+fi
+shift
+
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
   exit 1
 fi
 namespace="$1"
 shift
 if [[ -z "${1:-}" ]]; then
   echo "ERROR: Languages not provided!"
-  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
   exit 1
 fi
 
 get_lb_ip() {
-    kubectl --namespace="${namespace}" get service hello-http-staging \
-      -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+  ip_var='{.status.loadBalancer.ingress[0].ip}'
+  if $local; then
+    ip_var='{.spec.clusterIP}'
+  fi
+  kubectl --namespace="${namespace}" get service hello-http-staging \
+    -o jsonpath=$ip_var
 }
 
 # Ensure there is an ip address for hello-http-staging:8080
@@ -150,6 +168,7 @@ while [[ -n "${1:-}" ]]; do
     sleep 25
     check_msg "$i"
   done
+  delete
 done
 
 # Replace the trap with a success message.

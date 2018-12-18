@@ -13,7 +13,7 @@ load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 k8s_deploy(
     name = "staging",
     images = {
-        "hello-http-image": ":server",
+        "hello-http-image:latest": ":server",
     },
     template = "//examples/hellohttp:deployment.yaml",
 )
