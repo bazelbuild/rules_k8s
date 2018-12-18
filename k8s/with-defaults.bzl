@@ -116,13 +116,13 @@ def {name}(**kwargs):
 
 k8s_defaults = repository_rule(
     attrs = {
-        "kind": attr.string(mandatory = False),
         "cluster": attr.string(mandatory = False),
         "context": attr.string(mandatory = False),
-        "user": attr.string(mandatory = False),
-        "namespace": attr.string(mandatory = False),
         "image_chroot": attr.string(mandatory = False),
+        "kind": attr.string(mandatory = False),
+        "namespace": attr.string(mandatory = False),
         "resolver": attr.string(mandatory = False),
+        "user": attr.string(mandatory = False),
     },
     implementation = _impl,
 )

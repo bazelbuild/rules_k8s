@@ -41,15 +41,14 @@ def _run_all_impl(ctx):
 
 _run_all = rule(
     attrs = {
+        "delimiter": attr.string(default = ""),
         "objects": attr.label_list(
             cfg = "target",
         ),
         "_template": attr.label(
             default = Label("//k8s:resolve-all.sh.tpl"),
-            single_file = True,
-            allow_files = True,
+            allow_single_file = True,
         ),
-        "delimiter": attr.string(default = ""),
     },
     executable = True,
     implementation = _run_all_impl,
