@@ -30,11 +30,13 @@ load(":defaults.bzl",
 
 def _impl(repository_ctx):
     substitutions = None
-    label = None
     if repository_ctx.attr.build_srcs:
         kubectl_target = "@io_kubernetes//cmd/kubectl:kubectl"
         substitutions = {"%{KUBECTL_TARGET}": "%s" % kubectl_target}
         template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.target.tpl")
+    elif repository_ctx.attr.kubectl_path != None:
+         substitutions = {"%{KUBECTL_TARGET}": "%s" % repository_ctx.attr.kubectl_path}
+         template = Label("@io_bazel_rules_k8s//toolchains/kubectl:BUILD.target.tpl")
     else:
         kubectl_tool_path = repository_ctx.which("kubectl") or ""
         substitutions = {"%{KUBECTL_TOOL}": "%s" % kubectl_tool_path}
@@ -44,12 +46,18 @@ def _impl(repository_ctx):
         "BUILD",
         template,
         substitutions,
-        False,
+        False
     )
 
 _kubectl_configure = repository_rule(
     implementation = _impl,
     attrs = {
+        "kubectl_path": attr.label(
+            allow_single_file=True,
+            mandatory=False,
+            doc = "Optional. Path to a prebuilt custom kubectl binary file or" +
+                  " label. Can't be used together with attribute 'build_srcs'.",
+        ),
         "build_srcs": attr.bool(
             doc = "Optional. Set to true to build kubectl from sources.",
             default = False,
@@ -96,11 +104,14 @@ def kubectl_configure(name, **kwargs):
       Required Args
         name: A unique name for this rule.
       Default Args:
-        build_srcs: Optional. Set to true to build kubectl from sources. Default: False
-        k8s_commit: Otional. Commit / release tag at which to build kubectl
+        build_srcs: Optional. Set to true to build kubectl from sources. Default: False.
+                    Can't be specified if kubectl_path is specified.
+        k8s_commit: Optional. Commit / release tag at which to build kubectl
           from. Default is defined as k8s_tag in :defaults.bzl.
         k8s_sha256: Optional. sha256 of commit at which to build kubectl from.
           Default is defined as k8s_sha256 in :defaults.bzl.
+        kubectl_path: Optional. Use the kubectl binary at the given path or label.
+        This can't be used with 'build_srcs'.
       Note: Not all versions/commits of kubernetes project can be used to compile
       kubectl from an external repo. Notably, we have only tested with v1.13.0-beta.1
       or above. Note this rule has a hardcoded pointer to io_kubernetes_build repo
@@ -108,6 +119,9 @@ def kubectl_configure(name, **kwargs):
       related to @io_kubernetes_build repo, please send a PR to update these values.
     """
     build_srcs = False
+    if "build_srcs" in kwargs and "kubectl_path" in kwargs:
+        fail("Attributes 'build_srcs' and 'kubectl_path' can't be specified at"+
+             " the same time")
     if "build_srcs" in kwargs and kwargs["build_srcs"]:
         build_srcs = True
         _ensure_all_provided("kubectl_configure",
@@ -143,4 +157,7 @@ def kubectl_configure(name, **kwargs):
                 k8s_repo_tools_commit
             )],
         )
-    _kubectl_configure(name = name, build_srcs = build_srcs)
+    if "kubectl_path" in kwargs:
+        _kubectl_configure(name = name, kubectl_path=kwargs["kubectl_path"])
+    else:
+        _kubectl_configure(name = name, build_srcs = build_srcs)
