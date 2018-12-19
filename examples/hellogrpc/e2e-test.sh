@@ -42,6 +42,7 @@ function EXPECT_CONTAINS() {
 }
 
 if [[ -z "${1:-}" ]]; then
+  echo "ERROR: None of execution type, kubernetes namspace and languages is provided!"
   echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
   exit 1
 fi
@@ -50,12 +51,14 @@ local=false
 if [[ "$1" == "local" ]]; then
   local=true
 elif [[ "$1" != "remote" ]]; then
+  echo "ERROR: Execution type must be either 'remote' or 'local'!"
   echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
   exit 1
 fi
 shift
 
 if [[ -z "${1:-}" ]]; then
+  echo "ERROR: None of kubernetes namspace and languages is provided!"
   echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
   exit 1
 fi
@@ -68,6 +71,8 @@ if [[ -z "${1:-}" ]]; then
 fi
 
 get_lb_ip() {
+  # Determine the location of variable to retrieve the service IP address
+  # based on execution type
   ip_var='{.status.loadBalancer.ingress[0].ip}'
   if $local; then
     ip_var='{.spec.clusterIP}'

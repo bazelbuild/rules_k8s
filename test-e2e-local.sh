@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This file runs all rules_k8s e2e tests locally.
+# It confirms that the platform running this script is Linux and verifies that
+# all the required tools are installed. Then it builds and tests all the Bazel
+# targets in the rules_k8s project, creates the Kubernetes namespace for the
+# tests and runs all tests.
+
 set -o errexit
 set -o nounset
 set -o xtrace

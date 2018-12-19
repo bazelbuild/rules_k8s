@@ -109,7 +109,7 @@ set -o xtrace
 ./examples/hellohttp/e2e-test.sh remote $E2E_NAMESPACE java go py nodejs
 # Third, TODO Controller.
 # chrislovecnm - disabled till this is less flakey
-# ./examples/todocontroller/e2e-test.sh $E2E_NAMESPACE py
+# ./examples/todocontroller/e2e-test.sh remote $E2E_NAMESPACE py
 
 # Delete everything as we are now done
 delete
