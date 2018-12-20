@@ -19,7 +19,7 @@ KubectlInfo = provider(
     doc = "Information about how to invoke the kubectl tool.",
     fields = {
         "tool_path": "Path to the kubectl executable",
-        "tool_target": "Target to build kubectl executable",
+        "tool_target": "A kubectl executable target built from source or downloaded.",
     },
 )
 
@@ -42,7 +42,7 @@ kubectl_toolchain = rule(
             mandatory = False,
         ),
         "tool_target": attr.label(
-            doc = "Target to build kubectl from source.",
+            doc = "Target to build kubectl from source or a downloaded kubectl binary.",
             mandatory = False,
         ),
     },
