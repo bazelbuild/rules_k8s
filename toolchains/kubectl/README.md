@@ -102,14 +102,41 @@ add to your `WORKSPACE` file the following lines (Note: The call to
 `kubectl_configure` must be before the  call to `k8s_repositories`):
 
 ```python
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "io_bazel_rules_docker",
+    commit = "{HEAD}",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+)
+
+load(
+  "@io_bazel_rules_docker//container:container.bzl",
+  container_repositories = "repositories",
+)
+
+container_repositories()
+
+# This requires rules_docker to be fully instantiated before
+# it is pulled in.
+git_repository(
+    name = "io_bazel_rules_k8s",
+    commit = "{HEAD}",
+    remote = "https://github.com/bazelbuild/rules_k8s.git",
+)
+
 load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+# Download the v1.10.0 kubectl binary for the Linux x86 64 bit platform.
 http_file(
     name="k8s_binary",
     downloaded_file_path = "kubectl",
+    sha256="49f7e5791d7cd91009c728eb4dc1dbf9ee1ae6a881be6b970e631116065384c3",
     executable=True,
     urls=["https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl"],
 )
+# Configure the kubectl toolchain to use the downloaded prebuilt v1.10.0
+# kubectl binary.
 kubectl_configure(name="k8s_config", kubectl_path="@k8s_binary//file")
 k8s_repositories()
 ```
