@@ -125,7 +125,7 @@ git_repository(
     remote = "https://github.com/bazelbuild/rules_k8s.git",
 )
 
-load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
+load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 # Download the v1.10.0 kubectl binary for the Linux x86 64 bit platform.
 http_file(
