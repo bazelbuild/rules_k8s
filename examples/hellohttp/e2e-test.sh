@@ -20,7 +20,7 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
-source ./util.sh
+source ./examples/util.sh
 
 validate_args $@
 shift 2
