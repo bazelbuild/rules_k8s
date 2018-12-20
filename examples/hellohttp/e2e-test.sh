@@ -20,6 +20,11 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+source ./util.sh
+
+validate_args $@
+shift 2
+
 function fail() {
   echo "FAILURE: $1"
   exit 1
@@ -41,46 +46,6 @@ function EXPECT_CONTAINS() {
   CONTAINS "${complete}" "${substring}" || fail "$message"
 }
 
-if [[ -z "${1:-}" ]]; then
-  echo "ERROR: None of execution type, kubernetes namspace and languages is provided!"
-  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
-  exit 1
-fi
-
-local=false
-if [[ "$1" == "local" ]]; then
-  local=true
-elif [[ "$1" != "remote" ]]; then
-  echo "ERROR: Execution type must be either 'remote' or 'local'!"
-  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
-  exit 1
-fi
-shift
-
-if [[ -z "${1:-}" ]]; then
-  echo "ERROR: None of kubernetes namspace and languages is provided!"
-  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
-  exit 1
-fi
-namespace="$1"
-shift
-if [[ -z "${1:-}" ]]; then
-  echo "ERROR: Languages not provided!"
-  echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
-  exit 1
-fi
-
-get_lb_ip() {
-  # Determine the location of variable to retrieve the service IP address
-  # based on execution type
-  ip_var='{.status.loadBalancer.ingress[0].ip}'
-  if $local; then
-    ip_var='{.spec.clusterIP}'
-  fi
-  kubectl --namespace="${namespace}" get service hello-http-staging \
-    -o jsonpath=$ip_var
-}
-
 # Ensure there is an ip address for hello-http-staging:8080
 apply-lb() {
   echo Applying service...
@@ -88,7 +53,7 @@ apply-lb() {
 }
 
 check_msg() {
-   while [[ -z $(get_lb_ip) ]]; do
+   while [[ -z $(get_lb_ip $local hello-http-staging) ]]; do
      echo "service has not yet received an IP address, sleeping for 5s..."
      sleep 10
    done
@@ -96,7 +61,7 @@ check_msg() {
    # alive
    echo "Got IP Adress! Sleeping 30s more for service to come alive..."
    sleep 30
-   OUTPUT=$(curl http://$(get_lb_ip):8080)
+   OUTPUT=$(curl http://$(get_lb_ip $local hello-http-staging):8080)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }

@@ -52,17 +52,6 @@ if [[ -z "${1:-}" ]]; then
 fi
 LANGUAGE="$1"
 
-function get_lb_ip() {
-  # Determine the location of variable to retrieve the service IP address
-  # based on execution type
-  ip_var='{.status.loadBalancer.ingress[0].ip}'
-  if $local; then
-    ip_var='{.spec.clusterIP}'
-  fi
-  kubectl --namespace="${namespace}" get service hello-grpc-staging \
-    -o jsonpath=$ip_var
-}
-
 function create() {
   echo Creating $LANGUAGE...
   bazel build examples/todocontroller/${LANGUAGE}:staging.create
