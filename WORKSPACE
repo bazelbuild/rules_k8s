@@ -75,7 +75,7 @@ _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
 _CONTEXT = _CLUSTER
 
-_NAMESPACE = "{E2E_NAMESPACE}"
+_NAMESPACE = "build-${BUILD_ID:-0}"
 
 k8s_defaults(
     name = "k8s_object",

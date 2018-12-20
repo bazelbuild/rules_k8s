@@ -48,7 +48,7 @@ bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
 
 # Create namespace for this job
-E2E_NAMESPACE="rules-k8s-e2e-test"
+E2E_NAMESPACE="build-${BUILD_ID:-0}"
 
 kubectl get "namespaces/${E2E_NAMESPACE}" &> /dev/null || kubectl create namespace "${E2E_NAMESPACE}"
 
