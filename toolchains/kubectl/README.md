@@ -6,7 +6,9 @@ rule. At the moment, the tool's configuration does one of the following:
 
 1. Detect the path to the `kubectl` tool (default).
 2. Build the `kubectl` tool from source.
+3. Download a `kubectl` prebuilt binary not on the system path.
 
+### Use a kubectl built from source
 If you want to build the `kubectl` tool from source you will
 need to add to your `WORKSPACE` file the following lines (Note:
 The call to `kubectl_configure` must be before the call to
@@ -90,6 +92,56 @@ version of the kubernetes repository tools infrastructure the new kubernetes
 source repository is compatible with. Look at the `http_archive` invocation in
 https://github.com/kubernetes/kubernetes/blob/{k8s_commit}/build/root/WORKSPACE
 for the `@io_kubernetes_build` to get the commit pin, sha256 and prefix values.*
+
+### Download a custom kubectl binary
+
+If you want to download a standard binary released by the kubernetes project,
+get the URL and SHA256 for the binary for your platform from [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-using-curl).
+For example, if you want to use kubectl v1.10.0 on a x86 64 bit Linux platform,
+add to your `WORKSPACE` file the following lines (Note: The call to
+`kubectl_configure` must be before the  call to `k8s_repositories`):
+
+```python
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "io_bazel_rules_docker",
+    commit = "{HEAD}",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+)
+
+load(
+  "@io_bazel_rules_docker//container:container.bzl",
+  container_repositories = "repositories",
+)
+
+container_repositories()
+
+# This requires rules_docker to be fully instantiated before
+# it is pulled in.
+git_repository(
+    name = "io_bazel_rules_k8s",
+    commit = "{HEAD}",
+    remote = "https://github.com/bazelbuild/rules_k8s.git",
+)
+
+load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+# Download the v1.10.0 kubectl binary for the Linux x86 64 bit platform.
+http_file(
+    name="k8s_binary",
+    downloaded_file_path = "kubectl",
+    sha256="49f7e5791d7cd91009c728eb4dc1dbf9ee1ae6a881be6b970e631116065384c3",
+    executable=True,
+    urls=["https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl"],
+)
+# Configure the kubectl toolchain to use the downloaded prebuilt v1.10.0
+# kubectl binary.
+kubectl_configure(name="k8s_config", kubectl_path="@k8s_binary//file")
+k8s_repositories()
+```
+
+
 
 ## Using the kubectl toolchain
 
