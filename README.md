@@ -662,6 +662,11 @@ A repository rule that allows users to alias `k8s_object` with default values.
 </table>
 
 
+## Testing
+
+To test rules_k8s, you can run the provided e2e tests locally on Linux by
+following these [instructions](examples/#running-rules_k8s-e2e-tests-locally).
+
 ## Support
 
 Users find on stackoverflow, slack and Google Group mailing list.
