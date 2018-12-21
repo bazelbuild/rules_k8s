@@ -104,12 +104,12 @@ set -o xtrace
 
 # Run end-to-end integration testing.
 # First, GRPC.
-./examples/hellogrpc/e2e-test.sh $E2E_NAMESPACE cc java go py
+./examples/hellogrpc/e2e-test.sh remote $E2E_NAMESPACE cc java go py
 # Second, HTTP.
-./examples/hellohttp/e2e-test.sh $E2E_NAMESPACE java go py nodejs
+./examples/hellohttp/e2e-test.sh remote $E2E_NAMESPACE java go py nodejs
 # Third, TODO Controller.
 # chrislovecnm - disabled till this is less flakey
-# ./examples/todocontroller/e2e-test.sh $E2E_NAMESPACE py
+# ./examples/todocontroller/e2e-test.sh remote $E2E_NAMESPACE py
 
 # Delete everything as we are now done
 delete

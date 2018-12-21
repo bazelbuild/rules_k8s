@@ -19,22 +19,38 @@ set -o xtrace
 # limitations under the License.
 
 if [[ -z "${1:-}" ]]; then
-  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  echo "ERROR: None of execution type, kubernetes namspace and languages is provided!"
+  echo "Usage: $(basename $0) remote <kubernetes namespace> <language ...>"
+  exit 1
+fi
+
+local=false
+if [[ "$1" == "local" ]]; then
+  # TODO (alex1545): try making this test run locally (with minikube and local
+  # registry) once this test works with GKE and GCR.
+  echo "ERROR: This test is not currently supported to run locally."
+  echo "Usage: $(basename $0) remote <kubernetes namespace> <language ...>"
+  exit 1
+elif [[ "$1" != "remote" ]]; then
+  echo "ERROR: Execution type must be 'remote'!"
+  echo "Usage: $(basename $0) remote <kubernetes namespace> <language ...>"
+  exit 1
+fi
+shift
+
+if [[ -z "${1:-}" ]]; then
+  echo "ERROR: None of kubernetes namspace and languages is provided!"
+  echo "Usage: $(basename $0) remote <kubernetes namespace> <language ...>"
   exit 1
 fi
 namespace="$1"
 shift
 if [[ -z "${1:-}" ]]; then
   echo "ERROR: Languages not provided!"
-  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
+  echo "Usage: $(basename $0) remote <kubernetes namespace> <language ...>"
   exit 1
 fi
 LANGUAGE="$1"
-
-function get_lb_ip() {
-  kubectl --namespace="${namespace}" get service hello-grpc-staging \
-    -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-}
 
 function create() {
   echo Creating $LANGUAGE...

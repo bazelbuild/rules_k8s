@@ -33,7 +33,7 @@ k8s_deploy(
         "--v=2",
     ],
     images = {
-        "hello-http-image": ":server",
+        "hello-http-image:latest": ":server",
     },
     template = "//examples/hellohttp:deployment.json",
 )
