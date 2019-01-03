@@ -13,6 +13,8 @@
 # limitations under the License.
 package(default_visibility = ["//visibility:private"])
 
+licenses(["notice"])  # Apache 2.0
+
 load(":kubectl_toolchain.bzl", "kubectl_toolchain")
 
 # kubectl toolchain type

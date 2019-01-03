@@ -12,9 +12,6 @@ platforms:
     - "..."
   macos:
     build_targets:
-    - "--"
-    - "..."
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud_push"
+    - "//examples/hellohttp:deployment_test"
     test_targets:
-    - "..."
+    - "//examples/hellohttp:deployment_test"

@@ -16,18 +16,28 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
+# Get a recent version of protobuf (one that's compatible with Bazel >= 0.20.0).
+# Protobuf is a transitive dep of this repo, but we need
+# to overload it with a version >= 3.6.1.1 before any other repos load it.
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "983975ab66113cbaabea4b8ec9f3a73406d89ed74db9ae75c74888e685f956f8",
+    strip_prefix = "protobuf-66dc42d891a4fc8e9190c524fd67961688a37bbe",
+    url = "https://github.com/google/protobuf/archive/66dc42d891a4fc8e9190c524fd67961688a37bbe.tar.gz",
+)
+
 http_archive(
     name = "base_images_docker",
-    sha256 = "9540d8b1de4a0e294d5a5729c3c3f3720f4f5cdd966590e12b4dd98d5b7c10c7",
-    strip_prefix = "base-images-docker-55a4d060547899fdcd0ec662697e9212cac92996",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/55a4d060547899fdcd0ec662697e9212cac92996.tar.gz"],
+    sha256 = "713f0a7475c724cf5be9edc62f9c8f8e5ef3472772a374d68cf4e979f1f9f7fb",
+    strip_prefix = "base-images-docker-5c152fa8129ce2efced84392d6384b05d761319b",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/5c152fa8129ce2efced84392d6384b05d761319b.tar.gz"],
 )
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "5235045774d2f40f37331636378f21fe11f69906c0386a790c5987a09211c3c4",
-    strip_prefix = "rules_docker-8010a50ef03d1e13f1bebabfc625478da075fa60",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/8010a50ef03d1e13f1bebabfc625478da075fa60.tar.gz"],
+    sha256 = "a699b5c38ec001a9a266d9513a020b0256fbcc4f61caad154f80b48f2a975497",
+    strip_prefix = "rules_docker-e944b2fcb41d93cc8fdbbcddfa17adc240dfd5ea",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/e944b2fcb41d93cc8fdbbcddfa17adc240dfd5ea.tar.gz"],
 )
 
 load(
@@ -45,7 +55,6 @@ container_pull(
     repository = "google/bazel",
 )
 
-
 # Gcloud installer
 http_file(
     name = "gcloud_archive",
@@ -59,8 +68,7 @@ http_file(
 docker_repositories()
 
 load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
-
-k8s_repositories(build_kubectl_srcs = False)
+k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
@@ -120,9 +128,9 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.1.tar.gz"],
-    sha256 = "ced2749527318abeddd9d91f5e1555ed86e2b6bfd08677b750396e0ec5462bec",
-    strip_prefix = "rules_go-0.16.1",
+    sha256 = "efa592f3f71a7e2f1cea98e431e2ccc8dba98375ae144f115fd4789f092869de",
+    strip_prefix = "rules_go-0.16.5",
+    urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.5.tar.gz"],
 )
 
 load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")
@@ -137,9 +145,9 @@ go_register_toolchains()
 
 http_archive(
     name = "build_stack_rules_proto",
-    urls = ["https://github.com/stackb/rules_proto/archive/32204c6ec15aea9c015774223252be09d4156234.tar.gz"],
-    sha256 = "49ed4e86938d6d8c080382e958158a01b3b7a7adc65b91f80a804e542cd43649",
-    strip_prefix = "rules_proto-32204c6ec15aea9c015774223252be09d4156234",
+    sha256 = "1d966be7d7dd2b22a3f684fafc6d138ad461edaa8a3133011e3a71dd1292a10d",
+    strip_prefix = "rules_proto-8087f91f3d1080ce84c6d5a716ddc4993d325b69",
+    urls = ["https://github.com/stackb/rules_proto/archive/8087f91f3d1080ce84c6d5a716ddc4993d325b69.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -196,7 +204,7 @@ _go_image_repos()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "3e167dcfb17356c68588715ed324c5e9b76f391d",
+    commit = "c08d1e6325d8bb5f6227dd284d1859182a5936c1", # 2018-12-17
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -209,8 +217,8 @@ load(
 pip_repositories()
 
 pip_import(
-	name = "protobuf_py_deps",
-	requirements = "@build_stack_rules_proto//python/requirements:protobuf.txt",
+    name = "protobuf_py_deps",
+    requirements = "@build_stack_rules_proto//python/requirements:protobuf.txt",
 )
 
 load("@protobuf_py_deps//:requirements.bzl", protobuf_pip_install = "pip_install")
@@ -218,8 +226,8 @@ load("@protobuf_py_deps//:requirements.bzl", protobuf_pip_install = "pip_install
 protobuf_pip_install()
 
 pip_import(
-   name = "grpc_py_deps",
-   requirements = "@build_stack_rules_proto//python:requirements.txt",
+    name = "grpc_py_deps",
+    requirements = "@build_stack_rules_proto//python:requirements.txt",
 )
 
 load("@grpc_py_deps//:requirements.bzl", grpc_pip_install = "pip_install")
@@ -260,7 +268,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "09ec18db5b9ad3129810f5f0ccc86363a8bfb6be",
+    commit = "f39f5fd8c9d8ae6273cd6d8610016a561d4d1c95",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 
@@ -282,9 +290,9 @@ _controller_pip_install()
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "779edee08986ab40dbf8b1ad0260f3cc8050f1e96ccd2a88dc499848bbdb787f",
-    strip_prefix = "rules_nodejs-0.11.1",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.11.1.zip"],
+    sha256 = "b996a3ce55c49ae359468dae040b30025fdc0917f67b08c36929ecb1ea02907e",
+    strip_prefix = "rules_nodejs-0.16.3",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.16.3.zip"],
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")

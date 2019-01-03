@@ -20,6 +20,11 @@ set -o nounset
 set -o pipefail
 set -o xtrace
 
+source ./examples/util.sh
+
+validate_args $@
+shift 2
+
 function fail() {
   echo "FAILURE: $1"
   exit 1
@@ -41,23 +46,6 @@ function EXPECT_CONTAINS() {
   CONTAINS "${complete}" "${substring}" || fail "$message"
 }
 
-if [[ -z "${1:-}" ]]; then
-  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
-  exit 1
-fi
-namespace="$1"
-shift
-if [[ -z "${1:-}" ]]; then
-  echo "ERROR: Languages not provided!"
-  echo "Usage: $(basename $0) <kubernetes namespace> <language ...>"
-  exit 1
-fi
-
-get_lb_ip() {
-  kubectl --namespace="${namespace}" get service hello-grpc-staging \
-    -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-}
-
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
   echo Applying service...
@@ -74,7 +62,7 @@ create() {
 check_msg() {
   bazel build examples/hellogrpc/${LANGUAGE}/client
 
-  while [[ -z $(get_lb_ip) ]]; do
+  while [[ -z $(get_lb_ip $local hello-grpc-staging) ]]; do
     echo "service has not yet received an IP address, sleeping for 5s..."
     sleep 10
   done
@@ -84,7 +72,7 @@ check_msg() {
   echo "Got IP Adress! Sleeping 30s more for service to come alive..."
   sleep 30
 
-  OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip))
+  OUTPUT=$(./bazel-bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip $local hello-grpc-staging))
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
   echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
