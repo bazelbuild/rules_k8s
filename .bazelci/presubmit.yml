@@ -3,13 +3,19 @@ platforms:
   ubuntu1404:
     build_targets:
     - "..."
-    - "-//images/gcloud-bazel/..."
+    - "-//images//gcloud-bazel:gcloud_push"
+    - "-//images/gcloud-bazel:gcloud_installer"
+    - "-//images/gcloud-bazel:gcloud_install"
+    - "-//images/gcloud-bazel:gcloud-layer"
     test_targets:
     - "..."
   ubuntu1604:
     build_targets:
     - "..."
-    - "-//images/gcloud-bazel/..."
+    - "-//images//gcloud-bazel:gcloud_push"
+    - "-//images/gcloud-bazel:gcloud_installer"
+    - "-//images/gcloud-bazel:gcloud_install"
+    - "-//images/gcloud-bazel:gcloud-layer"
     test_targets:
     - "..."
   macos:
