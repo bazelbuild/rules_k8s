@@ -2,6 +2,7 @@
 platforms:
   ubuntu1404:
     build_targets:
+    - "--"
     - "..."
     - "-//images//gcloud-bazel:gcloud_push"
     - "-//images/gcloud-bazel:gcloud_installer"
@@ -11,6 +12,7 @@ platforms:
     - "..."
   ubuntu1604:
     build_targets:
+    - "--"
     - "..."
     - "-//images//gcloud-bazel:gcloud_push"
     - "-//images/gcloud-bazel:gcloud_installer"
