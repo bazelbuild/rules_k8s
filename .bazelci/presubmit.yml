@@ -3,11 +3,13 @@ platforms:
   ubuntu1404:
     build_targets:
     - "..."
+    - "-//images/gcloud-bazel/..."
     test_targets:
     - "..."
   ubuntu1604:
     build_targets:
     - "..."
+    - "-//images/gcloud-bazel/..."
     test_targets:
     - "..."
   macos:
