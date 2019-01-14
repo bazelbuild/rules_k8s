@@ -145,9 +145,9 @@ go_register_toolchains()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "1d966be7d7dd2b22a3f684fafc6d138ad461edaa8a3133011e3a71dd1292a10d",
-    strip_prefix = "rules_proto-8087f91f3d1080ce84c6d5a716ddc4993d325b69",
-    urls = ["https://github.com/stackb/rules_proto/archive/8087f91f3d1080ce84c6d5a716ddc4993d325b69.tar.gz"],
+    sha256 = "523bda43ee63bffe369d401575ef72bea2b301a352c49e54c13afdcc253c6382",
+    strip_prefix = "rules_proto-76e30bc0ad6c2f4150f40e593db83eedeb069f1e",
+    urls = ["https://github.com/stackb/rules_proto/archive/76e30bc0ad6c2f4150f40e593db83eedeb069f1e.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
