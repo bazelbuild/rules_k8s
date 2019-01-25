@@ -31,7 +31,7 @@ pulled in is defined [here](defaults.bzl). To use e.g., kubernetes release
 v1.13.1, call `kubectl_configure` as follows:
 
 ```python
-kubectl_configure(mame="k8s_config", build_srcs=True,
+kubectl_configure(name="k8s_config", build_srcs=True,
     k8s_commit = "v1.13.1",
     # Run wget https://github.com/kubernetes/kubernetes/archive/v1.13.1.tar.gz
     # to download v1.13.1.tar.gz and run sha256sum on the downloaded archive
@@ -47,7 +47,7 @@ To use e.g., kubernetes repository infrastructure tools at commit
 `b4bc4f1552c7fc1d4654753ca9b0e5e13883429f`, call `kubectl_configure` as follows:
 
 ```python
-kubectl_configure(mame="k8s_config", build_srcs=True,
+kubectl_configure(name="k8s_config", build_srcs=True,
     k8s_repo_tools_commit = "b4bc4f1552c7fc1d4654753ca9b0e5e13883429f",
     # Run wget https://github.com/kubernetes/kubernetes/archive/b4bc4f1552c7fc1d4654753ca9b0e5e13883429f.tar.gz
     # to download b4bc4f1552c7fc1d4654753ca9b0e5e13883429f.tar.gz and run
@@ -64,7 +64,7 @@ at commit `b4bc4f1552c7fc1d4654753ca9b0e5e13883429f`, call `kubectl_configure`
 as follows:
 
 ```python
-kubectl_configure(mame="k8s_config", build_srcs=True,
+kubectl_configure(name="k8s_config", build_srcs=True,
     k8s_commit = "v1.13.1",
     k8s_sha256 = "677d2a5021c3826a9122de5a9c8827fed4f28352c6abacb336a1a5a007e434b7",
     k8s_prefix = "kubernetes-1.13.1",
