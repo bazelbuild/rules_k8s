@@ -42,12 +42,10 @@ k8s_objects(
     ],
 )
 
-load("@k8s_object//:defaults.bzl", "k8s_object")
-
 k8s_todo(
     name = "joined",
-    template = ":joined.yaml",
     testonly = 1,
+    template = ":joined.yaml",
 )
 
 alias(

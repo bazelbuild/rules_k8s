@@ -21,4 +21,3 @@ genrule(
     cmd = "cp $(SRCS) $@",
     output_to_bindir = True,
 )
-

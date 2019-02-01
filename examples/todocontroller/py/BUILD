@@ -33,9 +33,9 @@ k8s_deploy(
     images = {
         "us.gcr.io/not-my-project/todo-controller:staging": ":controller",
     },
+    tags = ["propogate"],
     template = "//examples/todocontroller:deployment.yaml",
     visibility = ["//examples/todocontroller:__pkg__"],
-    tags = ["propogate"],
 )
 
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")

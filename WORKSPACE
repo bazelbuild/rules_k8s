@@ -68,6 +68,7 @@ http_file(
 docker_repositories()
 
 load("//k8s:k8s.bzl", "k8s_repositories", "k8s_defaults")
+
 k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
@@ -204,7 +205,7 @@ _go_image_repos()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "c08d1e6325d8bb5f6227dd284d1859182a5936c1", # 2018-12-17
+    commit = "c08d1e6325d8bb5f6227dd284d1859182a5936c1",  # 2018-12-17
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 

@@ -31,9 +31,9 @@ load("@subpar//:subpar.bzl", "par_binary")
 py_library(
     name = "resolver_lib",
     srcs = [
-        "//:__init__.py",
         "__init__.py",
         "resolver.py",
+        "//:__init__.py",
     ],
     deps = [
         "@containerregistry",
