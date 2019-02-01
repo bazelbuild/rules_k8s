@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+load("@io_bazel_rules_docker//java:image.bzl", "war_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
-
-load("@io_bazel_rules_docker//java:image.bzl", "war_image")
 
 war_image(
     name = "server",
@@ -24,8 +26,6 @@ war_image(
         "@javax_servlet_api//jar",
     ],
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

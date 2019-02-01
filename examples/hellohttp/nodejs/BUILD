@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+load("@io_bazel_rules_docker//nodejs:image.bzl", "nodejs_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
-
-load("@io_bazel_rules_docker//nodejs:image.bzl", "nodejs_image")
 
 nodejs_image(
     name = "server",
@@ -23,8 +25,6 @@ nodejs_image(
     entry_point = "io_bazel_rules_k8s/examples/hellohttp/nodejs/server.js",
     node_modules = "@examples_hellohttp_npm//:node_modules",
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

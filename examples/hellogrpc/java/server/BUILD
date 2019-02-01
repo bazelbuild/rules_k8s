@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+load("@io_bazel_rules_docker//java:image.bzl", "java_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
-
-load("@io_bazel_rules_docker//java:image.bzl", "java_image")
 
 java_image(
     name = "server",
@@ -26,8 +28,6 @@ java_image(
         "@build_stack_rules_proto//java:grpc_netty",
     ],
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

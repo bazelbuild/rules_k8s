@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-licenses(["notice"])  # Apache 2.0
-
 load("@examples_todocontroller_pip//:requirements.bzl", "requirement")
 load("@io_bazel_rules_docker//python:image.bzl", "py_image")
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
+licenses(["notice"])  # Apache 2.0
 
 py_image(
     name = "controller",
@@ -26,19 +28,15 @@ py_image(
     ],
 )
 
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
-
 k8s_deploy(
     name = "controller-deployment",
     images = {
         "us.gcr.io/not-my-project/todo-controller:staging": ":controller",
     },
+    tags = ["propogate"],
     template = "//examples/todocontroller:deployment.yaml",
     visibility = ["//examples/todocontroller:__pkg__"],
-    tags = ["propogate"],
 )
-
-load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
 
 k8s_objects(
     name = "staging",

@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-package(default_visibility = ["//visibility:public"])
-
-licenses(["notice"])  # Apache 2.0
 
 load("@examples_hellohttp_pip//:requirements.bzl", "all_requirements")
 load("@io_bazel_rules_docker//python:image.bzl", "py_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])  # Apache 2.0
 
 py_image(
     name = "server",
@@ -24,8 +26,6 @@ py_image(
     main = "server.py",
     deps = all_requirements,
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

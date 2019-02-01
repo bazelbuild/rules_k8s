@@ -11,9 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
+package(default_visibility = ["//visibility:public"])
 
 go_image(
     name = "server",
@@ -24,8 +26,6 @@ go_image(
         "@org_golang_google_grpc//:go_default_library",
     ],
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",
