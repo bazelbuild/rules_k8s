@@ -1,3 +1,6 @@
+load("@io_bazel_rules_docker//cc:image.bzl", "cc_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +18,11 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//cc:image.bzl", "cc_image")
-
 cc_image(
     name = "server",
     srcs = ["main.cc"],
     deps = ["//examples/hellogrpc/proto:simple_cc_grpc"],
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

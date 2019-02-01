@@ -1,10 +1,13 @@
+load("@build_stack_rules_proto//cpp:cpp_grpc_library.bzl", "cpp_grpc_library")
+load("@build_stack_rules_proto//go:go_grpc_library.bzl", "go_grpc_library")
+load("@build_stack_rules_proto//java:java_grpc_library.bzl", "java_grpc_library")
+load("@build_stack_rules_proto//python:python_grpc_library.bzl", "python_grpc_library")
+
 proto_library(
     name = "simple_proto",
     srcs = ["simple.proto"],
     visibility = ["//visibility:public"],
 )
-
-load("@build_stack_rules_proto//cpp:cpp_grpc_library.bzl", "cpp_grpc_library")
 
 cpp_grpc_library(
     name = "simple_cc_grpc",
@@ -12,15 +15,11 @@ cpp_grpc_library(
     deps = [":simple_proto"],
 )
 
-load("@build_stack_rules_proto//java:java_grpc_library.bzl", "java_grpc_library")
-
 java_grpc_library(
     name = "simple_java_grpc",
     visibility = ["//examples/hellogrpc/java:__subpackages__"],
     deps = [":simple_proto"],
 )
-
-load("@build_stack_rules_proto//go:go_grpc_library.bzl", "go_grpc_library")
 
 go_grpc_library(
     name = "simple_go_grpc",
@@ -28,8 +27,6 @@ go_grpc_library(
     visibility = ["//examples/hellogrpc/go:__subpackages__"],
     deps = [":simple_proto"],
 )
-
-load("@build_stack_rules_proto//python:python_grpc_library.bzl", "python_grpc_library")
 
 python_grpc_library(
     name = "simple_python_grpc",

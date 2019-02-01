@@ -53,16 +53,16 @@ def _impl(repository_ctx):
 _kubectl_configure = repository_rule(
     implementation = _impl,
     attrs = {
+        "build_srcs": attr.bool(
+            doc = "Optional. Set to true to build kubectl from sources.",
+            default = False,
+            mandatory = False,
+        ),
         "kubectl_path": attr.label(
             allow_single_file = True,
             mandatory = False,
             doc = "Optional. Path to a prebuilt custom kubectl binary file or" +
                   " label. Can't be used together with attribute 'build_srcs'.",
-        ),
-        "build_srcs": attr.bool(
-            doc = "Optional. Set to true to build kubectl from sources.",
-            default = False,
-            mandatory = False,
         ),
     },
 )

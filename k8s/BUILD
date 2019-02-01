@@ -1,3 +1,5 @@
+load("@subpar//:subpar.bzl", "par_binary")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +27,6 @@ exports_files([
     "delete.sh.tpl",
     "describe.sh.tpl",
 ])
-
-load("@subpar//:subpar.bzl", "par_binary")
 
 py_library(
     name = "resolver_lib",

@@ -1,3 +1,7 @@
+load("@examples_hellohttp_pip//:requirements.bzl", "all_requirements")
+load("@io_bazel_rules_docker//python:image.bzl", "py_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +19,12 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@examples_hellohttp_pip//:requirements.bzl", "all_requirements")
-load("@io_bazel_rules_docker//python:image.bzl", "py_image")
-
 py_image(
     name = "server",
     srcs = ["server.py"],
     main = "server.py",
     deps = all_requirements,
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

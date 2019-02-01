@@ -1,3 +1,7 @@
+load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
+load("@k8s_crd//:defaults.bzl", "k8s_crd")
+load("@k8s_todo//:defaults.bzl", "k8s_todo")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +21,15 @@ licenses(["notice"])  # Apache 2.0
 
 exports_files(["deployment.yaml"])
 
-load("@k8s_crd//:defaults.bzl", "k8s_crd")
-
 k8s_crd(
     name = "todo-crd",
     template = ":todo.yaml",
 )
 
-load("@k8s_todo//:defaults.bzl", "k8s_todo")
-
 k8s_todo(
     name = "example-todo",
     template = ":example.yaml",
 )
-
-load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
 
 k8s_objects(
     name = "everything",

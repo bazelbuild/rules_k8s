@@ -1,3 +1,6 @@
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +16,6 @@
 # limitations under the License.
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_docker//go:image.bzl", "go_image")
-
 go_image(
     name = "server",
     srcs = ["main.go"],
@@ -24,8 +25,6 @@ go_image(
         "@org_golang_google_grpc//:go_default_library",
     ],
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

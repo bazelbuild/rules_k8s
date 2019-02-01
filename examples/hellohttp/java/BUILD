@@ -1,3 +1,6 @@
+load("@io_bazel_rules_docker//java:image.bzl", "war_image")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +18,6 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//java:image.bzl", "war_image")
-
 war_image(
     name = "server",
     srcs = ["Servlet.java"],
@@ -24,8 +25,6 @@ war_image(
         "@javax_servlet_api//jar",
     ],
 )
-
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 k8s_deploy(
     name = "staging",

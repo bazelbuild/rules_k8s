@@ -1,3 +1,6 @@
+load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
+load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +18,6 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
-
 k8s_deploy(
     name = "staging",
     template = "deployment.yaml",
@@ -26,8 +27,6 @@ k8s_deploy(
     name = "staging-service",
     template = "service.yaml",
 )
-
-load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
 
 jsonnet_to_json(
     name = "deployment",

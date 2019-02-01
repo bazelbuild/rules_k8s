@@ -1,3 +1,5 @@
+load(":kubectl_toolchain.bzl", "kubectl_toolchain")
+
 # Copyright 2018 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +16,6 @@
 package(default_visibility = ["//visibility:private"])
 
 licenses(["notice"])  # Apache 2.0
-
-load(":kubectl_toolchain.bzl", "kubectl_toolchain")
 
 # kubectl toolchain type
 toolchain_type(name = "toolchain_type")
