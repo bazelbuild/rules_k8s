@@ -699,3 +699,7 @@ There is also a `#bazel` channel on [Freenode IRC], although we have found the s
 [existing questions]: https://stackoverflow.com/search?q=rules_k8s
 [kubernetes community]: https://kubernetes.io/community/
 [slack.k8s.io]: http://slack.k8s.io/
+
+## Adopters
+Here's a (non-exhaustive) list of companies that use `rules_k8s` in production. Don't see yours? [You can add it in a PR!](https://github.com/bazelbuild/rules_k8s/edit/master/README.md)
+  * [Etsy](https://www.etsy.com)
