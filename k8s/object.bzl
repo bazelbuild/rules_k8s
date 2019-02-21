@@ -181,6 +181,12 @@ def _common_impl(ctx):
     if namespace_arg:
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
+    if ctx.file.kubeconfig:
+        kubeconfig_arg = _runfiles(ctx, ctx.file.kubeconfig)
+        files += [ctx.file.kubeconfig]
+    else:
+        kubeconfig_arg = ""
+
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
     if kubectl_tool_info.tool_path == "" and not kubectl_tool_info.tool_target:
         # If tool_path is empty and tool_target is None then there is no local
@@ -200,6 +206,7 @@ def _common_impl(ctx):
             "%{cluster}": cluster_arg,
             "%{context}": context_arg,
             "%{kind}": ctx.attr.kind,
+            "%{kubeconfig}": kubeconfig_arg,
             "%{kubectl_tool}": kubectl_tool,
             "%{namespace_arg}": namespace_arg,
             "%{user}": user_arg,
@@ -235,6 +242,9 @@ _common_attrs = {
     "image_chroot": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
+    "kubeconfig": attr.label(
+        allow_single_file = True,
+    ),
     "namespace": attr.string(),
     "resolver": attr.label(
         default = Label("//k8s:resolver"),
@@ -455,6 +465,7 @@ def k8s_object(name, **kwargs):
         cluster: the name of the cluster.
         user: the user which has access to the cluster.
         namespace: the namespace within the cluster.
+        kubeconfig: the kubeconfig file to use with kubectl.
         kind: the object kind.
         template: the yaml template to instantiate.
         images: a dictionary from fully-qualified tag to label.
@@ -482,6 +493,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -493,6 +505,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -504,6 +517,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -515,6 +529,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -527,6 +542,7 @@ def k8s_object(name, **kwargs):
                 kind = kwargs.get("kind"),
                 cluster = kwargs.get("cluster"),
                 context = kwargs.get("context"),
+                kubeconfig = kwargs.get("kubeconfig"),
                 user = kwargs.get("user"),
                 namespace = kwargs.get("namespace"),
                 args = kwargs.get("args"),
