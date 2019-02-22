@@ -35,8 +35,8 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_docker",
-    strip_prefix = "rules_docker-10ac85c3a91a38c6a0c178844c75b27092330ee9",
     sha256 = "ed9b4cd5d1c37e5b9243e4eaf31a8e155fd49f2a73955dc07512b5b476e63ea6",
+    strip_prefix = "rules_docker-10ac85c3a91a38c6a0c178844c75b27092330ee9",
     urls = ["https://github.com/bazelbuild/rules_docker/archive/10ac85c3a91a38c6a0c178844c75b27092330ee9.tar.gz"],
 )
 
@@ -44,6 +44,7 @@ load(
     "@io_bazel_rules_docker//repositories:repositories.bzl",
     container_repositories = "repositories",
 )
+
 container_repositories()
 
 load(
@@ -66,7 +67,6 @@ http_file(
         "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
     ],
 )
-
 
 load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
@@ -147,8 +147,8 @@ go_register_toolchains()
 
 http_archive(
     name = "build_stack_rules_proto",
-    strip_prefix = "rules_proto-f5d6eea6a4528bef3c1d3a44d486b51a214d61c2",
     sha256 = "128c4486b1707db917411c6e448849dd76ea3b8ba704f9e0627d9b01f2ee45fe",
+    strip_prefix = "rules_proto-f5d6eea6a4528bef3c1d3a44d486b51a214d61c2",
     urls = ["https://github.com/stackb/rules_proto/archive/f5d6eea6a4528bef3c1d3a44d486b51a214d61c2.tar.gz"],
 )
 
