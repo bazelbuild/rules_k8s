@@ -28,22 +28,25 @@ http_archive(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "713f0a7475c724cf5be9edc62f9c8f8e5ef3472772a374d68cf4e979f1f9f7fb",
-    strip_prefix = "base-images-docker-5c152fa8129ce2efced84392d6384b05d761319b",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/5c152fa8129ce2efced84392d6384b05d761319b.tar.gz"],
+    sha256 = "6f57bff25c50cb72627d753f8dbbd128c52a1af74ac0d7debe99a6c9d98e2e9f",
+    strip_prefix = "base-images-docker-b0cb21d231f567864ac751f6606d51a72ba90a5e",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/b0cb21d231f567864ac751f6606d51a72ba90a5e.tar.gz"],
 )
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "a699b5c38ec001a9a266d9513a020b0256fbcc4f61caad154f80b48f2a975497",
-    strip_prefix = "rules_docker-e944b2fcb41d93cc8fdbbcddfa17adc240dfd5ea",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/e944b2fcb41d93cc8fdbbcddfa17adc240dfd5ea.tar.gz"],
+    sha256 = "ed9b4cd5d1c37e5b9243e4eaf31a8e155fd49f2a73955dc07512b5b476e63ea6",
+    strip_prefix = "rules_docker-10ac85c3a91a38c6a0c178844c75b27092330ee9",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/10ac85c3a91a38c6a0c178844c75b27092330ee9.tar.gz"],
 )
 
 load(
-    "@io_bazel_rules_docker//docker:docker.bzl",
-    "docker_repositories",
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
 )
+
+container_repositories()
+
 load(
     "@io_bazel_rules_docker//container:container.bzl",
     "container_pull",
@@ -64,8 +67,6 @@ http_file(
         "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
     ],
 )
-
-docker_repositories()
 
 load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
@@ -146,9 +147,9 @@ go_register_toolchains()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "074dbfbeef97dfb2145cdda0bab6d1d51f459e90e0e835284a59b3880bbebd6e",
-    strip_prefix = "rules_proto-137014a36f389cfcb4987a567b7bd23a7a259cf9",
-    urls = ["https://github.com/stackb/rules_proto/archive/137014a36f389cfcb4987a567b7bd23a7a259cf9.tar.gz"],
+    sha256 = "128c4486b1707db917411c6e448849dd76ea3b8ba704f9e0627d9b01f2ee45fe",
+    strip_prefix = "rules_proto-f5d6eea6a4528bef3c1d3a44d486b51a214d61c2",
+    urls = ["https://github.com/stackb/rules_proto/archive/f5d6eea6a4528bef3c1d3a44d486b51a214d61c2.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")

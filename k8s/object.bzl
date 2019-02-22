@@ -129,7 +129,8 @@ def _resolve(ctx, string, output):
             "--format=%s" % string,
             "--output=%s" % output.path,
         ] + stamp_args,
-        inputs = [ctx.executable._stamper] + stamps,
+        inputs = stamps,
+        tools = [ctx.executable._stamper],
         outputs = [output],
         mnemonic = "Stamp",
     )
