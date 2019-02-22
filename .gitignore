@@ -32,6 +32,9 @@
 *~
 *.swp
 
+# Visual Studio Code settings
+.vscode/*
+
 # Bazel directories
 bazel-*
 bazel-bin
