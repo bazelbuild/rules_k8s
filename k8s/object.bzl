@@ -31,15 +31,14 @@ def _runfiles(ctx, f):
     return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
 
 def _deduplicate(iterable):
-    """
-    Performs a deduplication (similar to `list(set(...))`,
-    but `set` is not available in Skylark).
+    """Performs a deduplication (similar to `list(set(...))`)
+
+    This is necessary because `set` is not available in Skylark.
     """
     return {k: None for k in iterable}.keys()
 
 def _add_dicts(*dicts):
-    """
-    Creates a new dict with a union of the elements of the arguments
+    """Creates a new dict with a union of the elements of the arguments
     """
     result = {}
     for d in dicts:
@@ -430,14 +429,16 @@ def _implicit_args_as_dict(**kwargs):
 
 def k8s_object(name, **kwargs):
     """Interact with a K8s object.
+
     Args:
       name: name of the rule.
-      cluster: the name of the cluster.
-      user: the user which has access to the cluster.
-      namespace: the namespace within the cluster.
-      kind: the object kind.
-      template: the yaml template to instantiate.
-      images: a dictionary from fully-qualified tag to label.
+      **kwargs: Other arguments accepted by k8s_object build rule.
+        cluster: the name of the cluster.
+        user: the user which has access to the cluster.
+        namespace: the namespace within the cluster.
+        kind: the object kind.
+        template: the yaml template to instantiate.
+        images: a dictionary from fully-qualified tag to label.
     """
     for reserved in ["image_targets", "image_target_strings", "resolved", "reversed"]:
         if reserved in kwargs:

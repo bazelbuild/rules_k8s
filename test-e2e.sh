@@ -81,6 +81,18 @@ kubectl version
 # Don't build/test the prow image as it requires Docker
 EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
 
+# Install buildifier 0.22.0 and run lint checks
+wget -q https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier
+chmod +x ./buildifier
+
+# Check for issues with the format of our bazel config files.
+# All warnings from https://github.com/bazelbuild/buildtools/blob/master/WARNINGS.md
+# are enabled except:
+# rule-impl-return, uninitialized, return-value
+# TODO (suvanjan): reenable once issues are fixed and move to buildkite.
+./buildifier --mode=check --warnings=attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,confusing-name,constant-glob,ctx-actions,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,function-docstring,git-repository,http-archive,integer-division,load,load-on-top,module-docstring,name-conventions,native-build,native-package,no-effect,out-of-order-load,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unreachable,unsorted-dict-items,unused-variable $(find . -name BUILD -o -name WORKSPACE -o -name "*.bzl" -type f)
+./buildifier --lint=warn --warnings=attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,confusing-name,constant-glob,ctx-actions,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,function-docstring,git-repository,http-archive,integer-division,load,load-on-top,module-docstring,name-conventions,native-build,native-package,no-effect,out-of-order-load,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unreachable,unsorted-dict-items,unused-variable $(find . -name BUILD -o -name WORKSPACE -o -name "*.bzl" -type f)
+
 # Check that all of our tools and samples build
 bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
