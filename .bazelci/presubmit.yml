@@ -1,4 +1,6 @@
 ---
+# TODO (suvanjan): Re-enable once lint warnings have been fixed.
+# buildifier: true
 platforms:
   ubuntu1404:
     build_targets:

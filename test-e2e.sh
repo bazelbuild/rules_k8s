@@ -89,7 +89,7 @@ chmod +x ./buildifier
 # All warnings from https://github.com/bazelbuild/buildtools/blob/master/WARNINGS.md
 # are enabled except:
 # rule-impl-return, uninitialized, return-value
-# TODO (suvanjan): reenable once issues are fixed
+# TODO (suvanjan): reenable once issues are fixed and move to buildkite.
 ./buildifier --mode=check --warnings=attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,confusing-name,constant-glob,ctx-actions,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,function-docstring,git-repository,http-archive,integer-division,load,load-on-top,module-docstring,name-conventions,native-build,native-package,no-effect,out-of-order-load,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unreachable,unsorted-dict-items,unused-variable $(find . -name BUILD -o -name WORKSPACE -o -name "*.bzl" -type f)
 ./buildifier --lint=warn --warnings=attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,confusing-name,constant-glob,ctx-actions,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,function-docstring,git-repository,http-archive,integer-division,load,load-on-top,module-docstring,name-conventions,native-build,native-package,no-effect,out-of-order-load,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unreachable,unsorted-dict-items,unused-variable $(find . -name BUILD -o -name WORKSPACE -o -name "*.bzl" -type f)
 
