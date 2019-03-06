@@ -68,7 +68,8 @@ _kubectl_configure = repository_rule(
 )
 
 def _ensure_all_provided(func_name, attrs, kwargs):
-    """
+    """Ensures all the required arguments in the given function were specified.
+
     For function func_name, ensure either all attributes in 'attrs' were
     specified in kwargs or none were specified.
     """
@@ -94,28 +95,30 @@ def _ensure_all_provided(func_name, attrs, kwargs):
         ))
 
 def kubectl_configure(name, **kwargs):
-    """
-    Creates an external repository with a kubectl_toolchain target
-    properly configured.
+    """Creates an external repository with a configured kubectl_toolchain target.
+
+    Note: Not all versions/commits of kubernetes project can be used to compile
+    kubectl from an external repo. Notably, we have only tested with v1.13.0-beta.1
+    or above. Note this rule has a hardcoded pointer to io_kubernetes_build repo
+    if your commit (above v1.13.0-beta.1) does not work due to problems,
+    related to @io_kubernetes_build repo, please send a PR to update these values.
 
     Args:
+        name: Name of the build target.
         **kwargs:
-      Required Args
-        name: A unique name for this rule.
-      Default Args:
-        build_srcs: Optional. Set to true to build kubectl from sources. Default: False.
-                    Can't be specified if kubectl_path is specified.
-        k8s_commit: Optional. Commit / release tag at which to build kubectl
-          from. Default is defined as k8s_tag in :defaults.bzl.
-        k8s_sha256: Optional. sha256 of commit at which to build kubectl from.
-          Default is defined as k8s_sha256 in :defaults.bzl.
-        kubectl_path: Optional. Use the kubectl binary at the given path or label.
-        This can't be used with 'build_srcs'.
-      Note: Not all versions/commits of kubernetes project can be used to compile
-      kubectl from an external repo. Notably, we have only tested with v1.13.0-beta.1
-      or above. Note this rule has a hardcoded pointer to io_kubernetes_build repo
-      if your commit (above v1.13.0-beta.1) does not work due to problems,
-      related to @io_kubernetes_build repo, please send a PR to update these values.
+            Required Args
+                name: A unique name for this rule.
+            Default Args:
+                build_srcs: Optional. Set to true to build kubectl from sources.
+                            Default: False. Can't be specified if kubectl_path
+                            is specified.
+                k8s_commit: Optional. Commit / release tag at which to build
+                            kubectl from. Default is defined as k8s_tag in
+                            :defaults.bzl.
+                k8s_sha256: Optional. sha256 of commit at which to build kubectl
+                from. Default is defined as k8s_sha256 in :defaults.bzl.
+                kubectl_path: Optional. Use the kubectl binary at the given path
+                or label. This can't be used with 'build_srcs'.
     """
     build_srcs = False
     if "build_srcs" in kwargs and "kubectl_path" in kwargs:

@@ -60,6 +60,7 @@ def k8s_objects(name, objects, **kwargs):
     Args:
       name: name of the rule.
       objects: list of k8s_object rules.
+      **kwargs: Pass through other arguments accepted by k8s_object.
     """
 
     # TODO(mattmoor): We may have to normalize the labels that come
