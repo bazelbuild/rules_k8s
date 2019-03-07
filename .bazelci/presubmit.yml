@@ -1,6 +1,10 @@
 ---
-# TODO (suvanjan): Re-enable once lint warnings have been fixed.
-# buildifier: true
+buildifier: 0.22.0
+# Check for issues with the format of our bazel config files.
+# All warnings from https://github.com/bazelbuild/buildtools/blob/master/WARNINGS.md
+# are enabled except:
+# rule-impl-return, uninitialized, return-value, rule-impl-return
+warnings: -rule-impl-return,-uninitialized,-return-value,-rule-impl-return
 platforms:
   ubuntu1404:
     build_targets:
