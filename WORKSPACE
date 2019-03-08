@@ -167,6 +167,13 @@ load("@build_stack_rules_proto//cpp:deps.bzl", "cpp_grpc_library")
 
 cpp_grpc_library()
 
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = "9aec0faff93877e3f46afb7a653e1ea8a8037ec9abf1559d7205cb12d9d538e8",
+    strip_prefix = "grpc-2779322af7418d9873492310c88e2de961e1663c",
+    urls = ["https://github.com/grpc/grpc/archive/2779322af7418d9873492310c88e2de961e1663c.tar.gz"],
+)
+
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
