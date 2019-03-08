@@ -212,7 +212,7 @@ _go_image_repos()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "c08d1e6325d8bb5f6227dd284d1859182a5936c1",  # 2018-12-17
+    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2018-12-17
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
