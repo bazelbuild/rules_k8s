@@ -29,10 +29,9 @@ git_repository(
 )
 
 load(
-  "@io_bazel_rules_docker//container:container.bzl",
-  container_repositories = "repositories",
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
 )
-
 container_repositories()
 
 # This requires rules_docker to be fully instantiated before
