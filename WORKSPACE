@@ -28,9 +28,9 @@ http_archive(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "6f57bff25c50cb72627d753f8dbbd128c52a1af74ac0d7debe99a6c9d98e2e9f",
-    strip_prefix = "base-images-docker-b0cb21d231f567864ac751f6606d51a72ba90a5e",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/b0cb21d231f567864ac751f6606d51a72ba90a5e.tar.gz"],
+    sha256 = "7ee1984d8abdb75aa689a468a96eb7130515e1f3f039426d23af62fcc22049e8",
+    strip_prefix = "base-images-docker-6201ac7214a03b15f2cee98400c2cdda564116ba",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/6201ac7214a03b15f2cee98400c2cdda564116ba.tar.gz"],
 )
 
 http_archive(
@@ -212,7 +212,7 @@ _go_image_repos()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "c08d1e6325d8bb5f6227dd284d1859182a5936c1",  # 2018-12-17
+    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2018-12-17
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
