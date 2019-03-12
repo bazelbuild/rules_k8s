@@ -26,6 +26,15 @@ http_archive(
     url = "https://github.com/google/protobuf/archive/66dc42d891a4fc8e9190c524fd67961688a37bbe.tar.gz",
 )
 
+# Mention subpar directly to ensure we get a version dated after 2019-03-07,
+# which included fixes for incompatible change flags added in Bazel 0.23. This
+# can be removed once other dependencies are updated.
+git_repository(
+    name = "subpar",
+    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
+    remote = "https://github.com/google/subpar.git",
+)
+
 http_archive(
     name = "base_images_docker",
     sha256 = "7ee1984d8abdb75aa689a468a96eb7130515e1f3f039426d23af62fcc22049e8",
@@ -144,6 +153,23 @@ go_register_toolchains()
 # Imports for examples/
 # ================================================================
 
+# rules_python is a transitive dep of build_stack_rules_proto, so place it
+# first if we're going to explicitly mention it at all
+
+git_repository(
+    name = "io_bazel_rules_python",
+    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2019-03-07
+    remote = "https://github.com/bazelbuild/rules_python.git",
+)
+
+load(
+    "@io_bazel_rules_python//python:pip.bzl",
+    "pip_import",
+    "pip_repositories",
+)
+
+pip_repositories()
+
 http_archive(
     name = "build_stack_rules_proto",
     sha256 = "128c4486b1707db917411c6e448849dd76ea3b8ba704f9e0627d9b01f2ee45fe",
@@ -209,20 +235,6 @@ load(
 )
 
 _go_image_repos()
-
-git_repository(
-    name = "io_bazel_rules_python",
-    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2018-12-17
-    remote = "https://github.com/bazelbuild/rules_python.git",
-)
-
-load(
-    "@io_bazel_rules_python//python:pip.bzl",
-    "pip_import",
-    "pip_repositories",
-)
-
-pip_repositories()
 
 pip_import(
     name = "protobuf_py_deps",
