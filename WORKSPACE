@@ -28,9 +28,9 @@ http_archive(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "6f57bff25c50cb72627d753f8dbbd128c52a1af74ac0d7debe99a6c9d98e2e9f",
-    strip_prefix = "base-images-docker-b0cb21d231f567864ac751f6606d51a72ba90a5e",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/b0cb21d231f567864ac751f6606d51a72ba90a5e.tar.gz"],
+    sha256 = "7ee1984d8abdb75aa689a468a96eb7130515e1f3f039426d23af62fcc22049e8",
+    strip_prefix = "base-images-docker-6201ac7214a03b15f2cee98400c2cdda564116ba",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/6201ac7214a03b15f2cee98400c2cdda564116ba.tar.gz"],
 )
 
 http_archive(
@@ -130,8 +130,8 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "6776d68ebb897625dead17ae510eac3d5f6342367327875210df44dbe2aeeb19",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.17.1/rules_go-0.17.1.tar.gz",
+    sha256 = "301c8b39b0808c49f98895faa6aa8c92cbd605ab5ad4b6a3a652da33a1a2ba2e",
+    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.0/rules_go-0.18.0.tar.gz",
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
@@ -169,9 +169,9 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "9aec0faff93877e3f46afb7a653e1ea8a8037ec9abf1559d7205cb12d9d538e8",
-    strip_prefix = "grpc-2779322af7418d9873492310c88e2de961e1663c",
-    urls = ["https://github.com/grpc/grpc/archive/2779322af7418d9873492310c88e2de961e1663c.tar.gz"],
+    sha256 = "880a6337fdb59a4192adfc040b1ff47219d30999d1f5a560e73663857c7d22cd",
+    strip_prefix = "grpc-dcb3b039714e4bcf4d826d99cac56c25eb1de565",
+    urls = ["https://github.com/grpc/grpc/archive/dcb3b039714e4bcf4d826d99cac56c25eb1de565.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -212,7 +212,7 @@ _go_image_repos()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "c08d1e6325d8bb5f6227dd284d1859182a5936c1",  # 2018-12-17
+    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2018-12-17
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
