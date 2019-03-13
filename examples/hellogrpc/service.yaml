@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     app: hello-grpc-staging
+    extratag: %{SUBSTITUTED_ARGUMENT}
   name: hello-grpc-staging
 spec:
   ports:

@@ -97,6 +97,15 @@ def _impl(ctx):
         all_inputs += [image_chroot_file]
 
     ctx.actions.expand_template(
+        template = ctx.file.template,
+        substitutions = {
+            key: ctx.expand_make_variables(key, value, {})
+            for (key, value) in ctx.attr.substitutions.items()
+        },
+        output = ctx.outputs.substituted,
+    )
+
+    ctx.actions.expand_template(
         template = ctx.file._template,
         substitutions = {
             "%{image_chroot}": image_chroot_arg,
@@ -106,14 +115,14 @@ def _impl(ctx):
             ]),
             "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
             "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
-            "%{yaml}": _runfiles(ctx, ctx.file.template),
+            "%{yaml}": _runfiles(ctx, ctx.outputs.substituted),
         },
         output = ctx.outputs.executable,
     )
 
     return struct(runfiles = ctx.runfiles(files = [
         ctx.executable.resolver,
-        ctx.file.template,
+        ctx.outputs.substituted,
     ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
 
 def _resolve(ctx, string, output):
@@ -295,6 +304,7 @@ _k8s_object = rule(
             # Implicit dependencies.
             "image_targets": attr.label_list(allow_files = True),
             "images": attr.string_dict(),
+            "substitutions": attr.string_dict(),
             "template": attr.label(
                 allow_single_file = [
                     ".yaml",
@@ -311,6 +321,9 @@ _k8s_object = rule(
         _layer_tools,
     ),
     executable = True,
+    outputs = {
+        "substituted": "%{name}.substituted.yaml",
+    },
     implementation = _impl,
 )
 
@@ -330,8 +343,8 @@ _k8s_object_apply = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_create = rule(
@@ -350,8 +363,8 @@ _k8s_object_create = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_replace = rule(
@@ -370,8 +383,8 @@ _k8s_object_replace = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_describe = rule(
@@ -392,8 +405,8 @@ _k8s_object_describe = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_delete = rule(
@@ -412,12 +425,18 @@ _k8s_object_delete = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 # See "attrs" parameter at https://docs.bazel.build/versions/master/skylark/lib/globals.html#parameters-26
-_implicit_attrs = ["visibility", "deprecation", "tags", "testonly", "features"]
+_implicit_attrs = [
+    "visibility",
+    "deprecation",
+    "tags",
+    "testonly",
+    "features",
+]
 
 def _implicit_args_as_dict(**kwargs):
     implicit_args = {}
