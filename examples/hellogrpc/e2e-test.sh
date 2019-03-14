@@ -46,6 +46,22 @@ function EXPECT_CONTAINS() {
   CONTAINS "${complete}" "${substring}" || fail "$message"
 }
 
+function CONTAINS_PATTERN() {
+  local complete="${1}"
+  local substring="${2}"
+
+  echo "${complete}" | grep -Esq -- "${substring}"
+}
+
+function EXPECT_CONTAINS_PATTERN() {
+  local complete="${1}"
+  local substring="${2}"
+  local message="${3:-Expected '${substring}' not found in '${complete}'}"
+
+  echo Checking "$1" contains pattern "$2"
+  CONTAINS_PATTERN "${complete}" "${substring}" || fail "$message"
+}
+
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
   echo Applying service...
@@ -97,6 +113,12 @@ delete() {
   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
 }
 
+check_kubeconfig_args() {
+  bazel build examples/hellogrpc:staging-deployment-with-kubeconfig.apply
+  OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.apply)"
+  EXPECT_CONTAINS_PATTERN "${OUTPUT}" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
+}
+
 # e2e test that checks that args are added to the kubectl apply command
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
@@ -107,6 +129,8 @@ check_kubectl_args() {
     # template
     EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply -- --v=1)" "apply --v=2 --v=1"
 }
+
+check_kubeconfig_args
 
 check_kubectl_args
 

@@ -488,6 +488,15 @@ A rule for interacting with Kubernetes objects.
       </td>
     </tr>
     <tr>
+      <td><code>kubeconfig</code></td>
+      <td>
+        <p><code>kubeconfig file, optional</code></p>
+        <p>The kubeconfig file to pass to the `kubectl` tool via the
+          `--kubeconfig` option. Can be useful if the `kubeconfig` is generated
+          by another target.</p>
+      </td>
+    </tr>
+    <tr>
       <td><code>substitutions</code></td>
       <td>
         <p><code>string_dict, optional</code></p>
