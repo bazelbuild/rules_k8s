@@ -28,4 +28,5 @@ RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 # TODO(mattmoor): Should we create namespaces that do not exist?
 
 PYTHON_RUNFILES=${RUNFILES} %{resolve_script} | \
-  exe %{kubectl_tool} --cluster="%{cluster}" --context="%{context}" --user="%{user}" %{namespace_arg} create $@ -f -
+  exe %{kubectl_tool} --kubeconfig="%{kubeconfig}" --cluster="%{cluster}" \
+  --context="%{context}" --user="%{user}" %{namespace_arg} create $@ -f -

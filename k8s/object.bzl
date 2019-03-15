@@ -97,6 +97,15 @@ def _impl(ctx):
         all_inputs += [image_chroot_file]
 
     ctx.actions.expand_template(
+        template = ctx.file.template,
+        substitutions = {
+            key: ctx.expand_make_variables(key, value, {})
+            for (key, value) in ctx.attr.substitutions.items()
+        },
+        output = ctx.outputs.substituted,
+    )
+
+    ctx.actions.expand_template(
         template = ctx.file._template,
         substitutions = {
             "%{image_chroot}": image_chroot_arg,
@@ -106,14 +115,14 @@ def _impl(ctx):
             ]),
             "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
             "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
-            "%{yaml}": _runfiles(ctx, ctx.file.template),
+            "%{yaml}": _runfiles(ctx, ctx.outputs.substituted),
         },
         output = ctx.outputs.executable,
     )
 
     return struct(runfiles = ctx.runfiles(files = [
         ctx.executable.resolver,
-        ctx.file.template,
+        ctx.outputs.substituted,
     ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
 
 def _resolve(ctx, string, output):
@@ -172,6 +181,12 @@ def _common_impl(ctx):
     if namespace_arg:
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
+    if ctx.file.kubeconfig:
+        kubeconfig_arg = _runfiles(ctx, ctx.file.kubeconfig)
+        files += [ctx.file.kubeconfig]
+    else:
+        kubeconfig_arg = ""
+
     kubectl_tool_info = ctx.toolchains["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"].kubectlinfo
     if kubectl_tool_info.tool_path == "" and not kubectl_tool_info.tool_target:
         # If tool_path is empty and tool_target is None then there is no local
@@ -191,6 +206,7 @@ def _common_impl(ctx):
             "%{cluster}": cluster_arg,
             "%{context}": context_arg,
             "%{kind}": ctx.attr.kind,
+            "%{kubeconfig}": kubeconfig_arg,
             "%{kubectl_tool}": kubectl_tool,
             "%{namespace_arg}": namespace_arg,
             "%{user}": user_arg,
@@ -226,6 +242,9 @@ _common_attrs = {
     "image_chroot": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
+    "kubeconfig": attr.label(
+        allow_single_file = True,
+    ),
     "namespace": attr.string(),
     "resolver": attr.label(
         default = Label("//k8s:resolver"),
@@ -295,6 +314,7 @@ _k8s_object = rule(
             # Implicit dependencies.
             "image_targets": attr.label_list(allow_files = True),
             "images": attr.string_dict(),
+            "substitutions": attr.string_dict(),
             "template": attr.label(
                 allow_single_file = [
                     ".yaml",
@@ -311,6 +331,9 @@ _k8s_object = rule(
         _layer_tools,
     ),
     executable = True,
+    outputs = {
+        "substituted": "%{name}.substituted.yaml",
+    },
     implementation = _impl,
 )
 
@@ -330,8 +353,8 @@ _k8s_object_apply = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_create = rule(
@@ -350,8 +373,8 @@ _k8s_object_create = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_replace = rule(
@@ -370,8 +393,8 @@ _k8s_object_replace = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_describe = rule(
@@ -392,8 +415,8 @@ _k8s_object_describe = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 _k8s_object_delete = rule(
@@ -412,12 +435,18 @@ _k8s_object_delete = rule(
         _common_attrs,
     ),
     executable = True,
-    implementation = _common_impl,
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
 )
 
 # See "attrs" parameter at https://docs.bazel.build/versions/master/skylark/lib/globals.html#parameters-26
-_implicit_attrs = ["visibility", "deprecation", "tags", "testonly", "features"]
+_implicit_attrs = [
+    "visibility",
+    "deprecation",
+    "tags",
+    "testonly",
+    "features",
+]
 
 def _implicit_args_as_dict(**kwargs):
     implicit_args = {}
@@ -436,6 +465,7 @@ def k8s_object(name, **kwargs):
         cluster: the name of the cluster.
         user: the user which has access to the cluster.
         namespace: the namespace within the cluster.
+        kubeconfig: the kubeconfig file to use with kubectl.
         kind: the object kind.
         template: the yaml template to instantiate.
         images: a dictionary from fully-qualified tag to label.
@@ -463,6 +493,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -474,6 +505,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -485,6 +517,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -496,6 +529,7 @@ def k8s_object(name, **kwargs):
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
             user = kwargs.get("user"),
             namespace = kwargs.get("namespace"),
             args = kwargs.get("args"),
@@ -508,6 +542,7 @@ def k8s_object(name, **kwargs):
                 kind = kwargs.get("kind"),
                 cluster = kwargs.get("cluster"),
                 context = kwargs.get("context"),
+                kubeconfig = kwargs.get("kubeconfig"),
                 user = kwargs.get("user"),
                 namespace = kwargs.get("namespace"),
                 args = kwargs.get("args"),
