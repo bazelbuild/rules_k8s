@@ -69,7 +69,7 @@ check_msg() {
       echo "Get output succeeded!"
       break
     fi
-    i =$[$i+1]
+    i=$[$i+1]
    done
 
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
