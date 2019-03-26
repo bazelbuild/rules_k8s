@@ -60,7 +60,7 @@ check_msg() {
    # Wait some more for after IP address allocation for the service to come
    # alive
    echo "Got IP Adress! Sleeping 30s more for service to come alive..."
-   sleep 30
+   sleep 60
    OUTPUT=$(curl http://$(get_lb_ip $local hello-http-staging):8080)
    echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
    echo "${OUTPUT}" | grep "DEMO$1[ ]"
