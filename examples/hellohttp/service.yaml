@@ -3,6 +3,8 @@ kind: Service
 metadata:
   labels:
     app: hello-http-staging
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
   name: hello-http-staging
 spec:
   ports:
