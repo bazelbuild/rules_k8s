@@ -540,7 +540,7 @@ A rule for interacting with Kubernetes objects.
     <tr>
       <td><code>images</code></td>
       <td>
-        <p><code>string to label dictionary; required</code></p>
+        <p><code>string to label dictionary</code></p>
         <p>When this target is <code>bazel run</code> the images
           referenced by label will be published to the tag key.</p>
        <p>The published digests of these images will be substituted

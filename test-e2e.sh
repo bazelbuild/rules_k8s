@@ -110,7 +110,7 @@ set -o xtrace
 # First, GRPC.
 ./examples/hellogrpc/e2e-test.sh remote $E2E_NAMESPACE cc java go py
 # Second, HTTP.
-./examples/hellohttp/e2e-test.sh remote $E2E_NAMESPACE java go py nodejs
+./examples/hellohttp/e2e-test.sh remote $E2E_NAMESPACE py java go nodejs
 # Third, TODO Controller.
 # chrislovecnm - disabled till this is less flakey
 # ./examples/todocontroller/e2e-test.sh remote $E2E_NAMESPACE py
