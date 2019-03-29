@@ -120,10 +120,14 @@ def _impl(ctx):
         output = ctx.outputs.executable,
     )
 
-    return struct(runfiles = ctx.runfiles(files = [
-        ctx.executable.resolver,
-        ctx.outputs.substituted,
-    ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles(files = [
+                ctx.executable.resolver,
+                ctx.outputs.substituted,
+            ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs)
+        ),
+    ]
 
 def _resolve(ctx, string, output):
     stamps = [ctx.info_file, ctx.version_file]
@@ -232,7 +236,11 @@ def _common_impl(ctx):
             output = ctx.outputs.executable,
         )
 
-    return struct(runfiles = ctx.runfiles(files = files))
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles(files = files),
+        ),
+    ]
 
 _common_attrs = {
     # We allow cluster to be omitted, and we just
@@ -274,10 +282,14 @@ def _reverse(ctx):
         output = ctx.outputs.executable,
     )
 
-    return struct(runfiles = ctx.runfiles(files = [
-        ctx.executable.reverser,
-        ctx.file.template,
-    ] + list(ctx.attr.reverser.default_runfiles.files)))
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles(files = [
+                ctx.executable.reverser,
+                ctx.file.template,
+            ] + list(ctx.attr.reverser.default_runfiles.files))
+        ),
+    ]
 
 _reversed = rule(
     attrs = _add_dicts(
