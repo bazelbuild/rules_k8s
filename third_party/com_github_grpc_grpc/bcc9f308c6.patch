@@ -1,0 +1,25 @@
+From bcc9f308c6a069fbba4e07cd9110f3517473f171 Mon Sep 17 00:00:00 2001
+From: Nicolas Lopez <ngiraldo@google.com>
+Date: Mon, 1 Apr 2019 13:00:21 -0400
+Subject: [PATCH] fix incompatible_depset_is_not_iterable
+
+---
+ bazel/generate_cc.bzl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bazel/generate_cc.bzl b/bazel/generate_cc.bzl
+index 8f30c84f6b..46bf0ef733 100644
+--- a/bazel/generate_cc.bzl
++++ b/bazel/generate_cc.bzl
+@@ -7,7 +7,7 @@ directly.
+ def generate_cc_impl(ctx):
+   """Implementation of the generate_cc rule."""
+   protos = [f for src in ctx.attr.srcs for f in src.proto.direct_sources]
+-  includes = [f for src in ctx.attr.srcs for f in src.proto.transitive_imports]
++  includes = [f for src in ctx.attr.srcs for f in src.proto.transitive_imports.to_list()]
+   outs = []
+   # label_len is length of the path from WORKSPACE root to the location of this build file
+   label_len = 0
+-- 
+2.21.0.392.gf8f6787159e-goog
+

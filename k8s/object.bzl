@@ -222,12 +222,12 @@ def _common_impl(ctx):
         if hasattr(ctx.executable, "resolved"):
             substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
             files += [ctx.executable.resolved]
-            files += list(ctx.attr.resolved[DefaultInfo].default_runfiles.files)
+            files += list(ctx.attr.resolved[DefaultInfo].default_runfiles.files.to_list())
 
         if hasattr(ctx.executable, "reversed"):
             substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
             files += [ctx.executable.reversed]
-            files += list(ctx.attr.reversed[DefaultInfo].default_runfiles.files)
+            files += list(ctx.attr.reversed[DefaultInfo].default_runfiles.files.to_list())
 
         if hasattr(ctx.files, "unresolved"):
             substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
