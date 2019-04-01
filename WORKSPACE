@@ -16,14 +16,11 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
-# Get a recent version of protobuf (one that's compatible with Bazel >= 0.20.0).
-# Protobuf is a transitive dep of this repo, but we need
-# to overload it with a version >= 3.6.1.1 before any other repos load it.
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "983975ab66113cbaabea4b8ec9f3a73406d89ed74db9ae75c74888e685f956f8",
-    strip_prefix = "protobuf-66dc42d891a4fc8e9190c524fd67961688a37bbe",
-    url = "https://github.com/google/protobuf/archive/66dc42d891a4fc8e9190c524fd67961688a37bbe.tar.gz",
+    sha256 = "f1748989842b46fa208b2a6e4e2785133cfcc3e4d43c17fecb023733f0f5443f",
+    strip_prefix = "protobuf-3.7.1",
+    url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
 )
 
 # Mention subpar directly to ensure we get a version dated after 2019-03-07,
@@ -330,4 +327,15 @@ _nodejs_image_repos()
 npm_install(
     name = "examples_hellohttp_npm",
     package_json = "//examples/hellohttp/nodejs:package.json",
+)
+
+# error_prone_annotations required by protobuf 3.7.1
+maven_jar(
+    name = "error_prone_annotations_maven",
+    artifact = "com.google.errorprone:error_prone_annotations:2.3.2",
+)
+
+bind(
+    name = "error_prone_annotations",
+    actual = "@error_prone_annotations_maven//jar",
 )
