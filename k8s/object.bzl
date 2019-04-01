@@ -120,10 +120,17 @@ def _impl(ctx):
         output = ctx.outputs.executable,
     )
 
-    return struct(runfiles = ctx.runfiles(files = [
-        ctx.executable.resolver,
-        ctx.outputs.substituted,
-    ] + list(ctx.attr.resolver.default_runfiles.files) + all_inputs))
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles(
+                files = [
+                    ctx.executable.resolver,
+                    ctx.outputs.substituted,
+                ] + all_inputs,
+                transitive_files = ctx.attr.resolver[DefaultInfo].default_runfiles.files,
+            ),
+        ),
+    ]
 
 def _resolve(ctx, string, output):
     stamps = [ctx.info_file, ctx.version_file]
@@ -215,12 +222,12 @@ def _common_impl(ctx):
         if hasattr(ctx.executable, "resolved"):
             substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
             files += [ctx.executable.resolved]
-            files += list(ctx.attr.resolved.default_runfiles.files)
+            files += list(ctx.attr.resolved[DefaultInfo].default_runfiles.files)
 
         if hasattr(ctx.executable, "reversed"):
             substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
             files += [ctx.executable.reversed]
-            files += list(ctx.attr.reversed.default_runfiles.files)
+            files += list(ctx.attr.reversed[DefaultInfo].default_runfiles.files)
 
         if hasattr(ctx.files, "unresolved"):
             substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
@@ -232,7 +239,11 @@ def _common_impl(ctx):
             output = ctx.outputs.executable,
         )
 
-    return struct(runfiles = ctx.runfiles(files = files))
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles(files = files),
+        ),
+    ]
 
 _common_attrs = {
     # We allow cluster to be omitted, and we just
@@ -274,10 +285,17 @@ def _reverse(ctx):
         output = ctx.outputs.executable,
     )
 
-    return struct(runfiles = ctx.runfiles(files = [
-        ctx.executable.reverser,
-        ctx.file.template,
-    ] + list(ctx.attr.reverser.default_runfiles.files)))
+    return [
+        DefaultInfo(
+            runfiles = ctx.runfiles(
+                files = [
+                    ctx.executable.reverser,
+                    ctx.file.template,
+                ],
+                transitive_files = ctx.attr.reverser[DefaultInfo].default_runfiles.files,
+            ),
+        ),
+    ]
 
 _reversed = rule(
     attrs = _add_dicts(
