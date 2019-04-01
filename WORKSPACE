@@ -198,7 +198,7 @@ http_archive(
     patch_args = ["-p1"],
     # TODO(nlopezgi): Remove patch one issue is fixed upstream.
     patches = [
-       "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
+        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
     ],
     sha256 = "0ecd85858ba3a020a920b15dae3ce3743b038017c63e0d917ff7c43caa332e31",
     strip_prefix = "grpc-d23af02826ce4225d1483fe97207b2e2b8fa0342",
