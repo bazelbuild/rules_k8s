@@ -35,7 +35,7 @@ def _run_all_impl(ctx):
 
     runfiles = [obj.files_to_run.executable for obj in ctx.attr.objects]
     for obj in ctx.attr.objects:
-        runfiles += list(obj.default_runfiles.files)
+        runfiles += list(obj.default_runfiles.files.to_list())
 
     return struct(runfiles = ctx.runfiles(files = runfiles))
 
