@@ -196,6 +196,7 @@ cpp_grpc_library()
 http_archive(
     name = "com_github_grpc_grpc",
     patch_args = ["-p1"],
+    # TODO(nlopezgi): Remove patch one issue is fixed upstream.
     patches = [
        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
     ],
