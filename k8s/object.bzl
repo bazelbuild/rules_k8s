@@ -126,8 +126,8 @@ def _impl(ctx):
                 files = [
                     ctx.executable.resolver,
                     ctx.outputs.substituted,
-                ],
-                transitive_files = list(ctx.attr.resolver[DefaultInfo].default_runfiles.files) + all_inputs,
+                ] + all_inputs,
+                transitive_files = ctx.attr.resolver[DefaultInfo].default_runfiles.files,
             ),
         ),
     ]
@@ -292,7 +292,7 @@ def _reverse(ctx):
                     ctx.executable.reverser,
                     ctx.file.template,
                 ],
-                transitive_files = list(ctx.attr.reverser[DefaultInfo].default_runfiles.files),
+                transitive_files = ctx.attr.reverser[DefaultInfo].default_runfiles.files,
             ),
         ),
     ]
