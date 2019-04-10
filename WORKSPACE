@@ -155,7 +155,7 @@ go_register_toolchains()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2019-03-07
+    commit = "fa6ab781188972aa2710310b29a9bccaae7fd7fe",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -169,9 +169,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "128c4486b1707db917411c6e448849dd76ea3b8ba704f9e0627d9b01f2ee45fe",
-    strip_prefix = "rules_proto-f5d6eea6a4528bef3c1d3a44d486b51a214d61c2",
-    urls = ["https://github.com/stackb/rules_proto/archive/f5d6eea6a4528bef3c1d3a44d486b51a214d61c2.tar.gz"],
+    sha256 = "9c9fc051189dd87bd643cf69e82e3b08de03114fc03155de784ba60bd0cef4b6",
+    strip_prefix = "rules_proto-609362dd9b08110b7a95bfa26b5e3aac3cd06905",
+    urls = ["https://github.com/stackb/rules_proto/archive/609362dd9b08110b7a95bfa26b5e3aac3cd06905.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
