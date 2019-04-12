@@ -16,6 +16,10 @@ platforms:
     - "-//images/gcloud-bazel:gcloud_installer"
     - "-//images/gcloud-bazel:gcloud_install"
     - "-//images/gcloud-bazel:gcloud-layer"
+    # Ubuntu 14.04 binutils is incompatible with Go 0.18.2.
+    # See buildkite CI failure in https://github.com/bazelbuild/rules_k8s/pull/309
+    - "-//examples/hellogrpc/go/..."
+    - "-//examples/hellohttp/go/..."
     test_targets:
     - "..."
   ubuntu1604:
