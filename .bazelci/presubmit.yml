@@ -22,14 +22,13 @@ platforms:
     - "-//examples/hellohttp/go/..."
     # Version of GCC in Ubuntu 14.04 is incompatible with the latest version of
     # rules_jsonnet
-    - "-@io_bazel_rules_jsonnet"
-    - "-@jsonnet"
-    - "-//examples:container_lib"
-    - "-//examples:deploy_lib"
-    - "-//examples/hellogrpc:deployment"
-    - "-//examples/hellohttp:deployment"
-    - "-//examples/hellogrpc/java/..."
-    - "-//examples/hellohttp/java/..."
+    - "-//examples/..."
+    # - "-//examples:container_lib"
+    # - "-//examples:deploy_lib"
+    # - "-//examples/hellogrpc:deployment"
+    # - "-//examples/hellohttp:deployment"
+    # - "-//examples/hellogrpc/java/..."
+    # - "-//examples/hellohttp/java/..."
     test_targets:
     - "..."
     # Version of GCC in Ubuntu 14.04 is incompatible with the latest version of
