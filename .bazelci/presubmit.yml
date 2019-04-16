@@ -20,8 +20,23 @@ platforms:
     # See buildkite CI failure in https://github.com/bazelbuild/rules_k8s/pull/309
     - "-//examples/hellogrpc/go/..."
     - "-//examples/hellohttp/go/..."
+    # Version of GCC in Ubuntu 14.04 is incompatible with the latest version of
+    # rules_jsonnet
+    - "-//examples:container_lib"
+    - "-//examples:deploy_lib"
+    - "-//examples/hellogrpc:deployment"
+    - "-//examples/hellohttp:deployment"
+    - "-//examples/hellogrpc/java/..."
+    - "-//examples/hellohttp/java/..."
+    - "-//examples/hellogrpc:deployment_test"
+    - "-//examples/hellohttp:deployment_test"
     test_targets:
+    - "--"
     - "..."
+    # Version of GCC in Ubuntu 14.04 is incompatible with the latest version of
+    # rules_jsonnet
+    - "-//examples/hellogrpc:deployment_test"
+    - "-//examples/hellohttp:deployment_test"
   ubuntu1604:
     build_targets:
     - "--"
