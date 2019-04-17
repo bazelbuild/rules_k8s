@@ -136,8 +136,8 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "31f959ecf3687f6e0bb9d01e1e7a7153367ecd82816c9c0ae149cd0e5a92bf8c",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.2/rules_go-0.18.2.tar.gz",
+    sha256 = "86ae934bd4c43b99893fc64be9d9fc684b81461581df7ea8fc291c816f5ee8c5",
+    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.3/rules_go-0.18.3.tar.gz",
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
@@ -155,7 +155,7 @@ go_register_toolchains()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "fa6ab781188972aa2710310b29a9bccaae7fd7fe",  # 2019-03-07
+    commit = "f7a96a4756aeda1cd0ece89f9813fc2c393c20a8",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -169,9 +169,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "9c9fc051189dd87bd643cf69e82e3b08de03114fc03155de784ba60bd0cef4b6",
-    strip_prefix = "rules_proto-609362dd9b08110b7a95bfa26b5e3aac3cd06905",
-    urls = ["https://github.com/stackb/rules_proto/archive/609362dd9b08110b7a95bfa26b5e3aac3cd06905.tar.gz"],
+    sha256 = "71e42321cda1e9b0dad6a1a76570708ecb771e697281d43a7ec4b8b4a0e5c4b0",
+    strip_prefix = "rules_proto-ab75a398df8aeb77045662757bb00cec28734c31",
+    urls = ["https://github.com/stackb/rules_proto/archive/ab75a398df8aeb77045662757bb00cec28734c31.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -290,7 +290,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "f39f5fd8c9d8ae6273cd6d8610016a561d4d1c95",
+    commit = "fd484046f9c4a32f4d696f05578907162d5a631f",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 
