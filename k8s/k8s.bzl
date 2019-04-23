@@ -52,9 +52,9 @@ py_library(
         # here to keep all the http_archive calls in one function for simplicity.
         http_archive(
             name = "io_bazel_rules_go",
-            urls = ["https://github.com/bazelbuild/rules_go/archive/0.16.1.tar.gz"],
-            sha256 = "ced2749527318abeddd9d91f5e1555ed86e2b6bfd08677b750396e0ec5462bec",
-            strip_prefix = "rules_go-0.16.1",
+            urls = ["https://github.com/bazelbuild/rules_go/archive/0.18.3.tar.gz"],
+            sha256 = "86ae934bd4c43b99893fc64be9d9fc684b81461581df7ea8fc291c816f5ee8c5",
+            strip_prefix = "rules_go-0.18.3",
         )
     if "k8s_config" not in excludes:
         # WORKSPACE target to configure the kubectl tool

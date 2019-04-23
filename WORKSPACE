@@ -16,21 +16,27 @@ workspace(name = "io_bazel_rules_k8s")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
-# Get a recent version of protobuf (one that's compatible with Bazel >= 0.20.0).
-# Protobuf is a transitive dep of this repo, but we need
-# to overload it with a version >= 3.6.1.1 before any other repos load it.
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "983975ab66113cbaabea4b8ec9f3a73406d89ed74db9ae75c74888e685f956f8",
-    strip_prefix = "protobuf-66dc42d891a4fc8e9190c524fd67961688a37bbe",
-    url = "https://github.com/google/protobuf/archive/66dc42d891a4fc8e9190c524fd67961688a37bbe.tar.gz",
+    sha256 = "f1748989842b46fa208b2a6e4e2785133cfcc3e4d43c17fecb023733f0f5443f",
+    strip_prefix = "protobuf-3.7.1",
+    url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
+)
+
+# Mention subpar directly to ensure we get a version dated after 2019-03-07,
+# which included fixes for incompatible change flags added in Bazel 0.23. This
+# can be removed once other dependencies are updated.
+git_repository(
+    name = "subpar",
+    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
+    remote = "https://github.com/google/subpar.git",
 )
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "7ee1984d8abdb75aa689a468a96eb7130515e1f3f039426d23af62fcc22049e8",
-    strip_prefix = "base-images-docker-6201ac7214a03b15f2cee98400c2cdda564116ba",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/6201ac7214a03b15f2cee98400c2cdda564116ba.tar.gz"],
+    sha256 = "974e5209ea42a852504729e2f9c3e7fa87f1978e65dd13a36fb035f1155dcbc6",
+    strip_prefix = "base-images-docker-7eb0e369aa8559cadc2230d5768003c22da6cc0c",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/7eb0e369aa8559cadc2230d5768003c22da6cc0c.tar.gz"],
 )
 
 http_archive(
@@ -130,8 +136,8 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "301c8b39b0808c49f98895faa6aa8c92cbd605ab5ad4b6a3a652da33a1a2ba2e",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.0/rules_go-0.18.0.tar.gz",
+    sha256 = "86ae934bd4c43b99893fc64be9d9fc684b81461581df7ea8fc291c816f5ee8c5",
+    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.3/rules_go-0.18.3.tar.gz",
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
@@ -144,11 +150,28 @@ go_register_toolchains()
 # Imports for examples/
 # ================================================================
 
+# rules_python is a transitive dep of build_stack_rules_proto, so place it
+# first if we're going to explicitly mention it at all
+
+git_repository(
+    name = "io_bazel_rules_python",
+    commit = "f7a96a4756aeda1cd0ece89f9813fc2c393c20a8",  # 2019-03-07
+    remote = "https://github.com/bazelbuild/rules_python.git",
+)
+
+load(
+    "@io_bazel_rules_python//python:pip.bzl",
+    "pip_import",
+    "pip_repositories",
+)
+
+pip_repositories()
+
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "128c4486b1707db917411c6e448849dd76ea3b8ba704f9e0627d9b01f2ee45fe",
-    strip_prefix = "rules_proto-f5d6eea6a4528bef3c1d3a44d486b51a214d61c2",
-    urls = ["https://github.com/stackb/rules_proto/archive/f5d6eea6a4528bef3c1d3a44d486b51a214d61c2.tar.gz"],
+    sha256 = "0d88313ba32c0042c2633c3cbdd187afb0c3c9468b978f6eb4919ac6e535f029",
+    strip_prefix = "rules_proto-8afa882b3dff5fec93b22519d34d0099083a7ce2",
+    urls = ["https://github.com/stackb/rules_proto/archive/8afa882b3dff5fec93b22519d34d0099083a7ce2.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -169,9 +192,14 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "721ccf319fbcb8f9f7e386dca9bf60448bc38507888d84cfd735ad128092494f",
-    strip_prefix = "grpc-c5311260fd923079637f5d43bd410ba6de740443",
-    urls = ["https://github.com/grpc/grpc/archive/c5311260fd923079637f5d43bd410ba6de740443.tar.gz"],
+    patch_args = ["-p1"],
+    # TODO(nlopezgi): Remove patch once issue is fixed upstream.
+    patches = [
+        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
+    ],
+    sha256 = "0ecd85858ba3a020a920b15dae3ce3743b038017c63e0d917ff7c43caa332e31",
+    strip_prefix = "grpc-d23af02826ce4225d1483fe97207b2e2b8fa0342",
+    urls = ["https://github.com/grpc/grpc/archive/d23af02826ce4225d1483fe97207b2e2b8fa0342.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -209,20 +237,6 @@ load(
 )
 
 _go_image_repos()
-
-git_repository(
-    name = "io_bazel_rules_python",
-    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",  # 2018-12-17
-    remote = "https://github.com/bazelbuild/rules_python.git",
-)
-
-load(
-    "@io_bazel_rules_python//python:pip.bzl",
-    "pip_import",
-    "pip_repositories",
-)
-
-pip_repositories()
 
 pip_import(
     name = "protobuf_py_deps",
@@ -276,7 +290,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "f39f5fd8c9d8ae6273cd6d8610016a561d4d1c95",
+    commit = "fd484046f9c4a32f4d696f05578907162d5a631f",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 
@@ -318,4 +332,15 @@ _nodejs_image_repos()
 npm_install(
     name = "examples_hellohttp_npm",
     package_json = "//examples/hellohttp/nodejs:package.json",
+)
+
+# error_prone_annotations required by protobuf 3.7.1
+maven_jar(
+    name = "error_prone_annotations_maven",
+    artifact = "com.google.errorprone:error_prone_annotations:2.3.2",
+)
+
+bind(
+    name = "error_prone_annotations",
+    actual = "@error_prone_annotations_maven//jar",
 )
