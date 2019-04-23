@@ -41,9 +41,9 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "ed9b4cd5d1c37e5b9243e4eaf31a8e155fd49f2a73955dc07512b5b476e63ea6",
-    strip_prefix = "rules_docker-10ac85c3a91a38c6a0c178844c75b27092330ee9",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/10ac85c3a91a38c6a0c178844c75b27092330ee9.tar.gz"],
+    sha256 = "5dcd5820604c5b7e7c5f7db6e2b0cd1cf59eb0a30a0076fe3a4b86198365479a",
+    strip_prefix = "rules_docker-21c19afed2bfbbee7e266bcbef98d70df33670d9",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/21c19afed2bfbbee7e266bcbef98d70df33670d9.tar.gz"],
 )
 
 load(
@@ -169,9 +169,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "71e42321cda1e9b0dad6a1a76570708ecb771e697281d43a7ec4b8b4a0e5c4b0",
-    strip_prefix = "rules_proto-ab75a398df8aeb77045662757bb00cec28734c31",
-    urls = ["https://github.com/stackb/rules_proto/archive/ab75a398df8aeb77045662757bb00cec28734c31.tar.gz"],
+    sha256 = "0d88313ba32c0042c2633c3cbdd187afb0c3c9468b978f6eb4919ac6e535f029",
+    strip_prefix = "rules_proto-8afa882b3dff5fec93b22519d34d0099083a7ce2",
+    urls = ["https://github.com/stackb/rules_proto/archive/8afa882b3dff5fec93b22519d34d0099083a7ce2.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
