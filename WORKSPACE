@@ -200,7 +200,8 @@ http_archive(
     sha256 = "ba0b3cec6a2048164249f7800f722f8eba4b832e5224ed5d1b4bf0c8e6b15740",
     strip_prefix = "grpc-709cceb65fd5f8a420696efed632dfe340fa5033",
     urls = ["https://github.com/grpc/grpc/archive/709cceb65fd5f8a420696efed632dfe340fa5033.tar.gz"],
-): Remove patch once issue is fixed upstream.
+),
+    # TODO(nlopezgi): Remove patch once issue is fixed upstream.
     patches = [
         "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
     ],
