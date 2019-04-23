@@ -8,35 +8,6 @@ buildifier:
   # TODO (suvanjan): Re-enable once issues are fixed.
   warnings: "attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,confusing-name,constant-glob,ctx-actions,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,function-docstring,git-repository,http-archive,integer-division,load,load-on-top,module-docstring,name-conventions,native-build,native-package,no-effect,out-of-order-load,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unreachable,unsorted-dict-items,unused-variable"
 platforms:
-  ubuntu1404:
-    build_targets:
-    - "--"
-    - "..."
-    - "-//images/gcloud-bazel:gcloud_push"
-    - "-//images/gcloud-bazel:gcloud_installer"
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud-layer"
-    # Ubuntu 14.04 binutils is incompatible with Go 0.18.2.
-    # See buildkite CI failure in https://github.com/bazelbuild/rules_k8s/pull/309
-    - "-//examples/hellogrpc/go/..."
-    - "-//examples/hellohttp/go/..."
-    # Version of GCC in Ubuntu 14.04 is incompatible with the latest version of
-    # rules_jsonnet
-    - "-//examples:container_lib"
-    - "-//examples:deploy_lib"
-    - "-//examples/hellogrpc:deployment"
-    - "-//examples/hellohttp:deployment"
-    - "-//examples/hellogrpc/java/..."
-    - "-//examples/hellohttp/java/..."
-    - "-//examples/hellogrpc:deployment_test"
-    - "-//examples/hellohttp:deployment_test"
-    test_targets:
-    - "--"
-    - "..."
-    # Version of GCC in Ubuntu 14.04 is incompatible with the latest version of
-    # rules_jsonnet
-    - "-//examples/hellogrpc:deployment_test"
-    - "-//examples/hellohttp:deployment_test"
   ubuntu1604:
     build_targets:
     - "--"
