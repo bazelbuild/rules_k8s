@@ -197,9 +197,9 @@ http_archive(
     patches = [
         "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
     ],
-    sha256 = "ba0b3cec6a2048164249f7800f722f8eba4b832e5224ed5d1b4bf0c8e6b15740",
-    strip_prefix = "grpc-709cceb65fd5f8a420696efed632dfe340fa5033",
-    urls = ["https://github.com/grpc/grpc/archive/709cceb65fd5f8a420696efed632dfe340fa5033.tar.gz"],
+    sha256 = "c0ae4f3f6f946f7e0093eaf68c3fc103f3b720c886f4fcba6589b964b1454a53",
+    strip_prefix = "grpc-77eb7306d89892a9c11353fa90e658564df305a6",
+    urls = ["https://github.com/grpc/grpc/archive/77eb7306d89892a9c11353fa90e658564df305a6.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
