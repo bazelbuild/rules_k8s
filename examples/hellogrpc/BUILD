@@ -100,6 +100,7 @@ py_test(
         ":deployment.json",
         ":deployment.yaml",
     ],
+    python_version = "PY2",
     deps = [
         "@yaml",
     ],
