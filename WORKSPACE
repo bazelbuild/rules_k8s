@@ -28,7 +28,7 @@ http_archive(
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
-    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
+    commit = "5b0f501356b86f16da5aac25bc2069e25e74b67d",  # 2019-03-07
     remote = "https://github.com/google/subpar.git",
 )
 
