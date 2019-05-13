@@ -87,6 +87,13 @@ def _impl(repository_ctx):
             repository_ctx.attr.kind,
         )]
 
+    if repository_ctx.attr.kubeconfig:
+        overrides += [_override(
+            repository_ctx.attr.name,
+            "kubeconfig",
+            repository_ctx.attr.kubeconfig,
+        )]
+
     if repository_ctx.attr.image_chroot:
         overrides += [_override(
             repository_ctx.attr.name,
@@ -120,6 +127,7 @@ k8s_defaults = repository_rule(
         "context": attr.string(mandatory = False),
         "image_chroot": attr.string(mandatory = False),
         "kind": attr.string(mandatory = False),
+        "kubeconfig": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
         "resolver": attr.string(mandatory = False),
         "user": attr.string(mandatory = False),
