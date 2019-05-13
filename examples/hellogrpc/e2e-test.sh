@@ -88,7 +88,7 @@ check_msg() {
   echo "Got IP Adress! Sleeping 30s more for service to come alive..."
   sleep 30
 
-  OUTPUT=$(bazel run examples/hellogrpc/${LANGUAGE}/client/client -- $(get_lb_ip $local hello-grpc-staging))
+  OUTPUT=$(./bazel-out/k8-py2-fastbuild/bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip $local hello-grpc-staging))
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
   echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
