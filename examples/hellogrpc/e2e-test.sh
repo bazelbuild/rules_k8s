@@ -88,7 +88,12 @@ check_msg() {
   echo "Got IP Adress! Sleeping 30s more for service to come alive..."
   sleep 30
 
-  OUTPUT=$(./bazel-out/k8-py2-fastbuild/bin/examples/hellogrpc/${LANGUAGE}/client/client $(get_lb_ip $local hello-grpc-staging))
+  # Make Bazel generate a temporary script that runs the client executable.
+  tmp_exec=hellogrpc_${LANGUAGE}_client
+  # This will only generate the temp executable. It won't actually run it.
+  bazel run //examples/hellogrpc/${LANGUAGE}/client --script_path=${tmp_exec}
+  OUTPUT=$(./${tmp_exec} $(get_lb_ip $local hello-grpc-staging))
+  rm ${tmp_exec}
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
   echo "${OUTPUT}" | grep "DEMO$1[ ]"
 }
