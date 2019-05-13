@@ -114,9 +114,11 @@ delete() {
 }
 
 check_kubeconfig_args() {
-  bazel build examples/hellogrpc:staging-deployment-with-kubeconfig.apply
-  OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.apply)"
-  EXPECT_CONTAINS_PATTERN "${OUTPUT}" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
+  for cmd in apply delete; do
+    bazel build examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
+    OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.${cmd})"
+    EXPECT_CONTAINS_PATTERN "${OUTPUT}" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
+  done
 }
 
 # e2e test that checks that args are added to the kubectl apply command
