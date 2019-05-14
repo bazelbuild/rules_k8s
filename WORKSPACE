@@ -34,9 +34,9 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "a422f79c616a15ceec1214eb7826865aeb247f01adbda52f58a4c08ce08a3ec3",
-    strip_prefix = "base-images-docker-e49a605c9330e2666a6f47c060ab0da8a032bc4f",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/e49a605c9330e2666a6f47c060ab0da8a032bc4f.tar.gz"],
+    sha256 = "3a5ded3fc5ddb8ab77df5be634b8397639e0c884e0b7fc3f0a78be01740e96eb",
+    strip_prefix = "base-images-docker-ecdd90a8da2c5b07af5e087d0d7b442e5311c5f0",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/ecdd90a8da2c5b07af5e087d0d7b442e5311c5f0.tar.gz"],
 )
 
 http_archive(
@@ -169,9 +169,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "0d88313ba32c0042c2633c3cbdd187afb0c3c9468b978f6eb4919ac6e535f029",
-    strip_prefix = "rules_proto-8afa882b3dff5fec93b22519d34d0099083a7ce2",
-    urls = ["https://github.com/stackb/rules_proto/archive/8afa882b3dff5fec93b22519d34d0099083a7ce2.tar.gz"],
+    sha256 = "d0287b40af0815c1003446cbf62899c3aa61df8a48eb4f798d74ddfc3dd1bc0a",
+    strip_prefix = "rules_proto-ea94d1bfff73d274b116e00e7897179f114958c1",
+    urls = ["https://github.com/stackb/rules_proto/archive/ea94d1bfff73d274b116e00e7897179f114958c1.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -197,9 +197,9 @@ http_archive(
     patches = [
         "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
     ],
-    sha256 = "ba0b3cec6a2048164249f7800f722f8eba4b832e5224ed5d1b4bf0c8e6b15740",
-    strip_prefix = "grpc-709cceb65fd5f8a420696efed632dfe340fa5033",
-    urls = ["https://github.com/grpc/grpc/archive/709cceb65fd5f8a420696efed632dfe340fa5033.tar.gz"],
+    sha256 = "c0ae4f3f6f946f7e0093eaf68c3fc103f3b720c886f4fcba6589b964b1454a53",
+    strip_prefix = "grpc-77eb7306d89892a9c11353fa90e658564df305a6",
+    urls = ["https://github.com/grpc/grpc/archive/77eb7306d89892a9c11353fa90e658564df305a6.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
