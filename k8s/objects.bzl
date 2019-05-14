@@ -18,28 +18,58 @@ load(
     _get_runfile_path = "runfile",
 )
 
+RunAllInfo = provider()
+
 def _runfiles(ctx, f):
     return "PYTHON_RUNFILES=${RUNFILES} ${RUNFILES}/%s $@" % _get_runfile_path(ctx, f)
 
+def _run_all_aspect_impl(target, ctx):
+    files_to_run = []
+    runfiles = ctx.runfiles()
+    if ctx.rule.kind.startswith("_k8s_object_"):
+        files_to_run = [target.files_to_run.executable]
+        runfiles = target.default_runfiles
+    transitive_files_to_run = []
+    if hasattr(ctx.rule.attr, "objects"):
+        for obj in ctx.rule.attr.objects:
+            if RunAllInfo in obj:
+                transitive_files_to_run.append(obj[RunAllInfo].files_to_run)
+                runfiles = runfiles.merge(obj[RunAllInfo].runfiles)
+    return [
+        RunAllInfo(
+            files_to_run = depset(files_to_run, transitive = transitive_files_to_run),
+            runfiles = runfiles,
+        ),
+    ]
+
+_run_all_aspect = aspect(
+    implementation = _run_all_aspect_impl,
+    attr_aspects = ["objects"],
+)
+
 def _run_all_impl(ctx):
+    runfiles = ctx.runfiles()
+    transitive_files_to_run = []
+    for obj in ctx.attr.objects:
+        if RunAllInfo in obj:
+            transitive_files_to_run.append(obj[RunAllInfo].files_to_run)
+            runfiles = runfiles.merge(obj[RunAllInfo].runfiles)
+    files_to_run = depset([], transitive = transitive_files_to_run)
+
     ctx.actions.expand_template(
         template = ctx.file._template,
         substitutions = {
             "%{resolve_statements}": ("\n" + ctx.attr.delimiter).join([
-                _runfiles(ctx, exe.files_to_run.executable)
-                for exe in ctx.attr.objects
+                _runfiles(ctx, f)
+                for f in files_to_run.to_list()
             ]),
         },
         output = ctx.outputs.executable,
     )
 
-    runfiles = [obj.files_to_run.executable for obj in ctx.attr.objects]
-    for obj in ctx.attr.objects:
-        runfiles += list(obj.default_runfiles.files.to_list())
-
     return [
         DefaultInfo(
-            runfiles = ctx.runfiles(files = runfiles),
+            runfiles = runfiles,
         ),
     ]
 
@@ -48,6 +78,7 @@ _run_all = rule(
         "delimiter": attr.string(default = ""),
         "objects": attr.label_list(
             cfg = "target",
+            aspects = [_run_all_aspect],
         ),
         "_template": attr.label(
             default = Label("//k8s:resolve-all.sh.tpl"),
