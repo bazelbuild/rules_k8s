@@ -23,12 +23,12 @@ http_archive(
     url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
 )
 
-# Mention subpar directly to ensure we get a version dated after 2019-03-07,
-# which included fixes for incompatible change flags added in Bazel 0.23. This
+# Mention subpar directly to ensure we get a version dated after 2019-05-13,
+# which included fixes for incompatible change flags added in Bazel 0.25. This
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
-    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
+    commit = "9c7b3e73b2c1f2befb3a789194bb46982ea336c8",  # 2019-05-13
     remote = "https://github.com/google/subpar.git",
 )
 
@@ -41,9 +41,9 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "5dcd5820604c5b7e7c5f7db6e2b0cd1cf59eb0a30a0076fe3a4b86198365479a",
-    strip_prefix = "rules_docker-21c19afed2bfbbee7e266bcbef98d70df33670d9",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/21c19afed2bfbbee7e266bcbef98d70df33670d9.tar.gz"],
+    sha256 = "7355a42f93f4aecee147a734d1be9b91427d7fbf12292806cbdb22a3805011b9",
+    strip_prefix = "rules_docker-ea702043f0e59921a2a4dafaed8ac60c68011bbc",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/ea702043f0e59921a2a4dafaed8ac60c68011bbc.tar.gz"],
 )
 
 load(
