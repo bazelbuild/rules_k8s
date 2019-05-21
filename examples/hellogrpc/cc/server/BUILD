@@ -28,7 +28,7 @@ cc_image(
 k8s_deploy(
     name = "staging",
     images = {
-        "us.gcr.io/not-my-project/hello-grpc:staging": ":server",
+        "us.gcr.io/not-my-project/hello-grpc:$(TAG)": ":server",
     },
     template = "//examples/hellogrpc:deployment.yaml",
 )

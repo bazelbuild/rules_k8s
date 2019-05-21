@@ -45,6 +45,18 @@ def _add_dicts(*dicts):
         result.update(d)
     return result
 
+def _make_resolve(ctx, val):
+    make_start_index = val.find("$(") + 2
+    make_end_index = val.find(")")
+    if make_start_index >= 0 and make_end_index >= 0 and make_end_index > make_start_index:
+        var_key = val[make_start_index:make_end_index]
+        if var_key not in ctx.var:
+            fail("{val} not found in configuration variables. Maybe you forgot to set --define {val}=<value>?".format(val = var_key))
+        else:
+            return ctx.var[var_key]
+    else:
+        return val
+
 def _impl(ctx):
     """Core implementation of k8s_object."""
 
@@ -63,10 +75,11 @@ def _impl(ctx):
         # As part of this walk, we also collect all of the image's input files
         # to include as runfiles, so they are accessible to be pushed.
         for tag in ctx.attr.images:
+            real_tag = _make_resolve(ctx, tag)
             target = ctx.attr.images[tag]
             image = _get_layers(ctx, ctx.label.name, image_target_dict[target])
 
-            image_spec = {"name": tag}
+            image_spec = {"name": real_tag}
             if image.get("legacy"):
                 image_spec["tarball"] = _runfiles(ctx, image["legacy"])
                 all_inputs += [image["legacy"]]
