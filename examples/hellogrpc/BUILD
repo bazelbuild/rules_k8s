@@ -63,15 +63,24 @@ spec:
     file = ":staging-service.substituted.yaml",
 )
 
+config_setting(
+    name = "is_prod",
+    define_values = {"environment": "staging"},
+    visibility = ["//visibility:public"],
+)
+
 k8s_objects(
     name = "staging",
     args = [
         "--v=2",
     ],
-    objects = [
-        ":staging-deployment",
-        ":staging-service",
-    ],
+    objects = {
+        ":is_prod": [],
+        "//conditions:default": [
+            ":staging-deployment",
+            ":staging-service",
+        ],
+    },
 )
 
 jsonnet_to_json(

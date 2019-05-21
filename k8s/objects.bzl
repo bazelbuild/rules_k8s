@@ -58,20 +58,31 @@ _run_all = rule(
     implementation = _run_all_impl,
 )
 
+def _reverse(l, reverse=False):
+    if reverse:
+        return reversed(l)
+    else:
+        return l
+
+def _cmd_select(cmd, objects, reverse=False):
+    if type(objects) == "dict":
+        return select({k: [x + cmd for x in _reverse(v, reverse)] for k, v in objects.items()})
+    else:
+        return [x + cmd for x in _reverse(objects, reverse)]
+
 def k8s_objects(name, objects, **kwargs):
     """Interact with a collection of K8s objects.
 
     Args:
       name: name of the rule.
-      objects: list of k8s_object rules.
+      objects: list or dict of k8s_object rules. A dict will be converted into a select statement.
       **kwargs: Pass through other arguments accepted by k8s_object.
     """
 
     # TODO(mattmoor): We may have to normalize the labels that come
     # in through objects.
-
-    _run_all(name = name, objects = objects, delimiter = "echo ---\n", **kwargs)
-    _run_all(name = name + ".create", objects = [x + ".create" for x in objects], **kwargs)
-    _run_all(name = name + ".delete", objects = [x + ".delete" for x in reversed(objects)], **kwargs)
-    _run_all(name = name + ".replace", objects = [x + ".replace" for x in objects], **kwargs)
-    _run_all(name = name + ".apply", objects = [x + ".apply" for x in objects], **kwargs)
+    _run_all(name = name, objects = _cmd_select("", objects), delimiter = "echo ---\n", **kwargs)
+    _run_all(name = name + ".create", objects = _cmd_select(".create", objects), **kwargs)
+    _run_all(name = name + ".delete", objects = _cmd_select(".delete", objects, True), **kwargs)
+    _run_all(name = name + ".replace", objects = _cmd_select(".replace", objects), **kwargs)
+    _run_all(name = name + ".apply", objects = _cmd_select(".apply", objects), **kwargs)
