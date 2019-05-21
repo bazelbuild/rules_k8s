@@ -41,9 +41,9 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "5dcd5820604c5b7e7c5f7db6e2b0cd1cf59eb0a30a0076fe3a4b86198365479a",
-    strip_prefix = "rules_docker-21c19afed2bfbbee7e266bcbef98d70df33670d9",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/21c19afed2bfbbee7e266bcbef98d70df33670d9.tar.gz"],
+    sha256 = "2a71e2ddc445c81bd5413fbf8d3b27d2d01daf2d6602a2b6254bc49da8bfa431",
+    strip_prefix = "rules_docker-3bea22a4e1454508e8aae45ca70c79f8ed00fc1d",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/3bea22a4e1454508e8aae45ca70c79f8ed00fc1d.tar.gz"],
 )
 
 load(
@@ -136,8 +136,11 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "86ae934bd4c43b99893fc64be9d9fc684b81461581df7ea8fc291c816f5ee8c5",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.3/rules_go-0.18.3.tar.gz",
+    sha256 = "a82a352bffae6bee4e95f68a8d80a70e87f42c4741e6a448bec11998fcc82329",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz",
+    ],
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
