@@ -58,6 +58,7 @@ par_binary(
     name = "resolver",
     srcs = ["resolver.py"],
     main = "resolver.py",
+    python_version = "PY2",
     visibility = ["//visibility:public"],
     deps = [
         "@containerregistry",
@@ -69,6 +70,7 @@ par_binary(
     name = "stamper",
     srcs = ["stamper.py"],
     main = "stamper.py",
+    python_version = "PY2",
     visibility = ["//visibility:public"],
 )
 
@@ -76,6 +78,7 @@ par_binary(
     name = "reverser",
     srcs = ["reverser.py"],
     main = "reverser.py",
+    python_version = "PY2",
     visibility = ["//visibility:public"],
     deps = [
         "@yaml",
