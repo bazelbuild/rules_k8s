@@ -15,7 +15,7 @@ The call to `kubectl_configure` must be before the call to
 `k8s_repositories`):
 
 ```python
-load("//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
+load("@io_bazel_rules_k8s//toolchains/kubectl:kubectl_configure.bzl", "kubectl_configure")
 
 kubectl_configure(name="k8s_config", build_srcs=True)
 k8s_repositories()
