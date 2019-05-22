@@ -34,16 +34,16 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "3a5ded3fc5ddb8ab77df5be634b8397639e0c884e0b7fc3f0a78be01740e96eb",
-    strip_prefix = "base-images-docker-ecdd90a8da2c5b07af5e087d0d7b442e5311c5f0",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/ecdd90a8da2c5b07af5e087d0d7b442e5311c5f0.tar.gz"],
+    sha256 = "d78d3a6851e329bc086af343b3d8bc3eed8d06b02605b504d0cc20da41d07acd",
+    strip_prefix = "base-images-docker-8c490f943bbdedde8e68f852fb3bd1d84b26a2f5",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/8c490f943bbdedde8e68f852fb3bd1d84b26a2f5.tar.gz"],
 )
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "1a035f4e9c21e48668e09b327f89bd8197feb42b82d2b6904913c655f27a845a",
-    strip_prefix = "rules_docker-bb6d6606a6be348115af3552662799fd6d851a88",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/bb6d6606a6be348115af3552662799fd6d851a88.tar.gz"],
+    sha256 = "2a71e2ddc445c81bd5413fbf8d3b27d2d01daf2d6602a2b6254bc49da8bfa431",
+    strip_prefix = "rules_docker-3bea22a4e1454508e8aae45ca70c79f8ed00fc1d",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/3bea22a4e1454508e8aae45ca70c79f8ed00fc1d.tar.gz"],
 )
 
 load(
@@ -172,9 +172,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "d0287b40af0815c1003446cbf62899c3aa61df8a48eb4f798d74ddfc3dd1bc0a",
-    strip_prefix = "rules_proto-ea94d1bfff73d274b116e00e7897179f114958c1",
-    urls = ["https://github.com/stackb/rules_proto/archive/ea94d1bfff73d274b116e00e7897179f114958c1.tar.gz"],
+    sha256 = "22679ab1588d9074dddee3f4f796c020e9be41b7b223e06d48bd68dbde713aee",
+    strip_prefix = "rules_proto-bdf16170163f014d92f7bae3a95bb9105b116aef",
+    urls = ["https://github.com/stackb/rules_proto/archive/bdf16170163f014d92f7bae3a95bb9105b116aef.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -293,7 +293,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "ad2b4204157ddcf7919e8bd210f607f8a801aa7f",
+    commit = "45f7cbde4bf88042154385fea3d559d81be4f252",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 
