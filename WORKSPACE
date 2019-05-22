@@ -28,8 +28,8 @@ http_archive(
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
-    tag = "2.0.0",
     remote = "https://github.com/google/subpar.git",
+    tag = "2.0.0",
 )
 
 http_archive(
