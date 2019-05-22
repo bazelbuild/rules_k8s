@@ -611,7 +611,7 @@ A rule for interacting with multiple Kubernetes objects.
 	<p>When <code>bazel run</code> this target resolves each of the object
 	   targets which includes publishing their associated images, and will
 	   print a <code>---</code> delimited yaml.</p>
-        <p> If a dict is provided it will be converted to a [select](https://docs.bazel.build/versions/master/be/functions.html) statement.</p>
+        <p> If a dict is provided it will be converted to a <a href="https://docs.bazel.build/versions/master/be/functions.html">select</a> statement.</p>
       </td>
     </tr>
   </tbody>
