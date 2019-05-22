@@ -58,13 +58,13 @@ _run_all = rule(
     implementation = _run_all_impl,
 )
 
-def _reverse(lis, reverse=False):
+def _reverse(lis, reverse = False):
     if reverse:
         return reversed(lis)
     else:
         return lis
 
-def _cmd_objects(cmd, objects, reverse=False):
+def _cmd_objects(cmd, objects, reverse = False):
     if type(objects) == "dict":
         return select({k: [x + cmd for x in _reverse(v, reverse)] for k, v in objects.items()})
     else:
