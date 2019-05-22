@@ -195,11 +195,6 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    patch_args = ["-p1"],
-    # TODO(nlopezgi): Remove patch once issue is fixed upstream.
-    patches = [
-        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
-    ],
     sha256 = "a1fae46e4718888ae2a976f09542d7bff879003a3bd28f4f684a9c74c43bccda",
     strip_prefix = "grpc-a30c1d097123bd2b3327383c5bb63ec176598815",
     urls = ["https://github.com/grpc/grpc/archive/a30c1d097123bd2b3327383c5bb63ec176598815.tar.gz"],
