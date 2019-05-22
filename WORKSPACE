@@ -200,6 +200,13 @@ http_archive(
     patches = [
         "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
     ],
+    sha256 = "a1fae46e4718888ae2a976f09542d7bff879003a3bd28f4f684a9c74c43bccda",
+    strip_prefix = "grpc-a30c1d097123bd2b3327383c5bb63ec176598815",
+    urls = ["https://github.com/grpc/grpc/archive/a30c1d097123bd2b3327383c5bb63ec176598815.tar.gz"],
+): Remove patch once issue is fixed upstream.
+    patches = [
+        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
+    ],
     sha256 = "c0ae4f3f6f946f7e0093eaf68c3fc103f3b720c886f4fcba6589b964b1454a53",
     strip_prefix = "grpc-77eb7306d89892a9c11353fa90e658564df305a6",
     urls = ["https://github.com/grpc/grpc/archive/77eb7306d89892a9c11353fa90e658564df305a6.tar.gz"],
