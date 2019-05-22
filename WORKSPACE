@@ -23,13 +23,13 @@ http_archive(
     url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
 )
 
-# Mention subpar directly to ensure we get a version dated after 2019-03-07,
-# which included fixes for incompatible change flags added in Bazel 0.23. This
+# Mention subpar directly to ensure we get version 2.0.0,
+# which included fixes for incompatible change flags added in Bazel 0.25. This
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
-    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
     remote = "https://github.com/google/subpar.git",
+    tag = "2.0.0",
 )
 
 http_archive(
