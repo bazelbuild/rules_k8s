@@ -46,10 +46,10 @@ def _add_dicts(*dicts):
     return result
 
 def _make_resolve(ctx, val):
-    make_start_index = val.find("$(") + 2
+    make_start_index = val.find("$(")
     make_end_index = val.find(")")
     if make_start_index >= 0 and make_end_index >= 0 and make_end_index > make_start_index:
-        var_key = val[make_start_index:make_end_index]
+        var_key = val[make_start_index + 2:make_end_index]
         if var_key not in ctx.var:
             fail("{val} not found in configuration variables. Maybe you forgot to set --define {val}=<value>?".format(val = var_key))
         else:
