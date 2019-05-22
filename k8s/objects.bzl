@@ -58,13 +58,13 @@ _run_all = rule(
     implementation = _run_all_impl,
 )
 
-def _reverse(l, reverse=False):
+def _reverse(lis, reverse=False):
     if reverse:
-        return reversed(l)
+        return reversed(lis)
     else:
-        return l
+        return lis
 
-def _cmd_select(cmd, objects, reverse=False):
+def _cmd_objects(cmd, objects, reverse=False):
     if type(objects) == "dict":
         return select({k: [x + cmd for x in _reverse(v, reverse)] for k, v in objects.items()})
     else:
@@ -81,8 +81,8 @@ def k8s_objects(name, objects, **kwargs):
 
     # TODO(mattmoor): We may have to normalize the labels that come
     # in through objects.
-    _run_all(name = name, objects = _cmd_select("", objects), delimiter = "echo ---\n", **kwargs)
-    _run_all(name = name + ".create", objects = _cmd_select(".create", objects), **kwargs)
-    _run_all(name = name + ".delete", objects = _cmd_select(".delete", objects, True), **kwargs)
-    _run_all(name = name + ".replace", objects = _cmd_select(".replace", objects), **kwargs)
-    _run_all(name = name + ".apply", objects = _cmd_select(".apply", objects), **kwargs)
+    _run_all(name = name, objects = _cmd_objects("", objects), delimiter = "echo ---\n", **kwargs)
+    _run_all(name = name + ".create", objects = _cmd_objects(".create", objects), **kwargs)
+    _run_all(name = name + ".delete", objects = _cmd_objects(".delete", objects, True), **kwargs)
+    _run_all(name = name + ".replace", objects = _cmd_objects(".replace", objects), **kwargs)
+    _run_all(name = name + ".apply", objects = _cmd_objects(".apply", objects), **kwargs)
