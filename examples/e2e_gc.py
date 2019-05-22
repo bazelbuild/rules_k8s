@@ -14,8 +14,8 @@ _log = None
 
 def list_namespaces():
     """
-    Returns a list of strings of namespace names that were created the e2e tests
-    in rules_k8s and are older than an hour.
+    Returns a list of strings of namespace names that were created by the e2e
+    tests in rules_k8s and are older than an hour.
     """
     result = []
     ofp = open("namespaces.json", "w")
