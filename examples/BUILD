@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_library")
+load("@subpar//:subpar.bzl", "par_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,4 +27,11 @@ jsonnet_library(
 jsonnet_library(
     name = "container_lib",
     srcs = ["container.libsonnet"],
+)
+
+par_binary(
+    name = "e2e_gc",
+    srcs = ["e2e_gc.py"],
+    main = "e2e_gc.py",
+    python_version = "PY2",
 )
