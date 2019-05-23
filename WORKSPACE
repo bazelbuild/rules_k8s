@@ -23,27 +23,27 @@ http_archive(
     url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
 )
 
-# Mention subpar directly to ensure we get a version dated after 2019-03-07,
-# which included fixes for incompatible change flags added in Bazel 0.23. This
+# Mention subpar directly to ensure we get version 2.0.0,
+# which included fixes for incompatible change flags added in Bazel 0.25. This
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
-    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
     remote = "https://github.com/google/subpar.git",
+    tag = "2.0.0",
 )
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "3a5ded3fc5ddb8ab77df5be634b8397639e0c884e0b7fc3f0a78be01740e96eb",
-    strip_prefix = "base-images-docker-ecdd90a8da2c5b07af5e087d0d7b442e5311c5f0",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/ecdd90a8da2c5b07af5e087d0d7b442e5311c5f0.tar.gz"],
+    sha256 = "d78d3a6851e329bc086af343b3d8bc3eed8d06b02605b504d0cc20da41d07acd",
+    strip_prefix = "base-images-docker-8c490f943bbdedde8e68f852fb3bd1d84b26a2f5",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/8c490f943bbdedde8e68f852fb3bd1d84b26a2f5.tar.gz"],
 )
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "e2674bb36d5c39e3dfd28c18fb6f0568083c98209f0c5a0ee8eaf35ab4766f1d",
-    strip_prefix = "rules_docker-251f6a68b439744094faff800cd029798edf9faa",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/251f6a68b439744094faff800cd029798edf9faa.tar.gz"],
+    sha256 = "2a71e2ddc445c81bd5413fbf8d3b27d2d01daf2d6602a2b6254bc49da8bfa431",
+    strip_prefix = "rules_docker-3bea22a4e1454508e8aae45ca70c79f8ed00fc1d",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/3bea22a4e1454508e8aae45ca70c79f8ed00fc1d.tar.gz"],
 )
 
 load(
@@ -136,8 +136,11 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "86ae934bd4c43b99893fc64be9d9fc684b81461581df7ea8fc291c816f5ee8c5",
-    url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.3/rules_go-0.18.3.tar.gz",
+    sha256 = "a82a352bffae6bee4e95f68a8d80a70e87f42c4741e6a448bec11998fcc82329",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz",
+    ],
 )
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
@@ -155,7 +158,7 @@ go_register_toolchains()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "f7a96a4756aeda1cd0ece89f9813fc2c393c20a8",  # 2019-03-07
+    commit = "6b6aedda3aab264dc1e27470655e0ae0cfb2b5bc",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -169,9 +172,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "d0287b40af0815c1003446cbf62899c3aa61df8a48eb4f798d74ddfc3dd1bc0a",
-    strip_prefix = "rules_proto-ea94d1bfff73d274b116e00e7897179f114958c1",
-    urls = ["https://github.com/stackb/rules_proto/archive/ea94d1bfff73d274b116e00e7897179f114958c1.tar.gz"],
+    sha256 = "22679ab1588d9074dddee3f4f796c020e9be41b7b223e06d48bd68dbde713aee",
+    strip_prefix = "rules_proto-bdf16170163f014d92f7bae3a95bb9105b116aef",
+    urls = ["https://github.com/stackb/rules_proto/archive/bdf16170163f014d92f7bae3a95bb9105b116aef.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -192,14 +195,9 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    patch_args = ["-p1"],
-    # TODO(nlopezgi): Remove patch once issue is fixed upstream.
-    patches = [
-        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
-    ],
-    sha256 = "c0ae4f3f6f946f7e0093eaf68c3fc103f3b720c886f4fcba6589b964b1454a53",
-    strip_prefix = "grpc-77eb7306d89892a9c11353fa90e658564df305a6",
-    urls = ["https://github.com/grpc/grpc/archive/77eb7306d89892a9c11353fa90e658564df305a6.tar.gz"],
+    sha256 = "a1fae46e4718888ae2a976f09542d7bff879003a3bd28f4f684a9c74c43bccda",
+    strip_prefix = "grpc-a30c1d097123bd2b3327383c5bb63ec176598815",
+    urls = ["https://github.com/grpc/grpc/archive/a30c1d097123bd2b3327383c5bb63ec176598815.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -290,7 +288,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "ad2b4204157ddcf7919e8bd210f607f8a801aa7f",
+    commit = "45f7cbde4bf88042154385fea3d559d81be4f252",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 

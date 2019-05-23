@@ -16,3 +16,14 @@ build --define=TAG=staging
 build --workspace_status_command="bash print-workspace-status.sh"
 run --workspace_status_command="bash print-workspace-status.sh"
 test --test_output=errors --workspace_status_command="bash print-workspace-status.sh"
+
+# Flags to explicitly use python toolchains to select appropriate py_runtime
+# Also, force host binaries to use py2.
+# Note these flags will only work with Bazel 0.25.0 or above.
+build --incompatible_use_python_toolchains
+build --host_force_python=PY2
+test --incompatible_use_python_toolchains
+test --host_force_python=PY2
+run --incompatible_use_python_toolchains
+run --host_force_python=PY2
+

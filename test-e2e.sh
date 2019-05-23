@@ -89,6 +89,9 @@ chmod +x ./buildifier
 bazel build -- //... $EXCLUDED_TARGETS
 bazel test  -- //... $EXCLUDED_TARGETS
 
+# Run the garbage collection script to delete old namespaces.
+bazel run -- //examples:e2e_gc
+
 # Create a unique namespace for this job using the repo name and the build id
 E2E_NAMESPACE="build-${BUILD_ID:-0}"
 
