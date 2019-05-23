@@ -23,13 +23,13 @@ http_archive(
     url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
 )
 
-# Mention subpar directly to ensure we get a version dated after 2019-03-07,
-# which included fixes for incompatible change flags added in Bazel 0.23. This
+# Mention subpar directly to ensure we get version 2.0.0,
+# which included fixes for incompatible change flags added in Bazel 0.25. This
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
-    commit = "0356bef3fbbabec5f0e196ecfacdeb6db62d48c0",  # 2019-03-07
     remote = "https://github.com/google/subpar.git",
+    tag = "2.0.0",
 )
 
 http_archive(
@@ -158,7 +158,7 @@ go_register_toolchains()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "f7a96a4756aeda1cd0ece89f9813fc2c393c20a8",  # 2019-03-07
+    commit = "6b6aedda3aab264dc1e27470655e0ae0cfb2b5bc",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -195,14 +195,9 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    patch_args = ["-p1"],
-    # TODO(nlopezgi): Remove patch once issue is fixed upstream.
-    patches = [
-        "//third_party/com_github_grpc_grpc:bcc9f308c6.patch",
-    ],
-    sha256 = "c0ae4f3f6f946f7e0093eaf68c3fc103f3b720c886f4fcba6589b964b1454a53",
-    strip_prefix = "grpc-77eb7306d89892a9c11353fa90e658564df305a6",
-    urls = ["https://github.com/grpc/grpc/archive/77eb7306d89892a9c11353fa90e658564df305a6.tar.gz"],
+    sha256 = "a1fae46e4718888ae2a976f09542d7bff879003a3bd28f4f684a9c74c43bccda",
+    strip_prefix = "grpc-a30c1d097123bd2b3327383c5bb63ec176598815",
+    urls = ["https://github.com/grpc/grpc/archive/a30c1d097123bd2b3327383c5bb63ec176598815.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
