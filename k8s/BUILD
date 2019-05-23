@@ -48,6 +48,7 @@ py_test(
     data = [
         "//examples/hellogrpc/cc/server:server.tar",
     ],
+    python_version = "PY2",
     deps = [
         ":resolver_lib",
         "@mock",
