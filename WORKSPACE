@@ -172,9 +172,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "22679ab1588d9074dddee3f4f796c020e9be41b7b223e06d48bd68dbde713aee",
-    strip_prefix = "rules_proto-bdf16170163f014d92f7bae3a95bb9105b116aef",
-    urls = ["https://github.com/stackb/rules_proto/archive/bdf16170163f014d92f7bae3a95bb9105b116aef.tar.gz"],
+    sha256 = "8a9cf001e3ba5c97d45ed8eb09985f15355df4bbe2dc6dd4844cccfe71f17d3e",
+    strip_prefix = "rules_proto-9e68c7eb1e36bd08e9afebc094883ebc4debdb09",
+    urls = ["https://github.com/stackb/rules_proto/archive/9e68c7eb1e36bd08e9afebc094883ebc4debdb09.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
