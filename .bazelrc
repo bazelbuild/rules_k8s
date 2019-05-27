@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+build --define=TAG=staging
 build --workspace_status_command="bash print-workspace-status.sh"
 run --workspace_status_command="bash print-workspace-status.sh"
 test --test_output=errors --workspace_status_command="bash print-workspace-status.sh"
