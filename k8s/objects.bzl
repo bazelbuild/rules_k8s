@@ -59,12 +59,25 @@ _run_all = rule(
 )
 
 def _reverse(lis, reverse = False):
+    """Returns a reversed list if if reverse is true
+
+    Args:
+      lis: The list to be potentially reversed
+      reverse: If True the provided list will be reversed
+    """
     if reverse:
         return reversed(lis)
     else:
         return lis
 
 def _cmd_objects(cmd, objects, reverse = False):
+    """Returns either a list or a select statement of objects for the provided cmd
+
+    Args:
+      cmd: name of the command that will be appended to each object
+      objects: The objects that will get the cmd appended
+      reverse: If the order of the objects should be reversed or not
+    """
     if type(objects) == "dict":
         return select({k: [x + cmd for x in _reverse(v, reverse)] for k, v in objects.items()})
     else:
