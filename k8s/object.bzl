@@ -63,7 +63,7 @@ def _impl(ctx):
         # As part of this walk, we also collect all of the image's input files
         # to include as runfiles, so they are accessible to be pushed.
         for tag in ctx.attr.images:
-            resolved_tag = ctx.expand_make_variables("something", tag, {})
+            resolved_tag = ctx.expand_make_variables("tag", tag, {})
             target = ctx.attr.images[tag]
             image = _get_layers(ctx, ctx.label.name, image_target_dict[target])
 
