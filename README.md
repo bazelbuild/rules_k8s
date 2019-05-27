@@ -545,6 +545,7 @@ A rule for interacting with Kubernetes objects.
           referenced by label will be published to the tag key.</p>
        <p>The published digests of these images will be substituted
           directly, so as to avoid a race in the resolution process</p>
+       <p>Subject to "Make" variable substitution</p>
       </td>
     </tr>
     <tr>
