@@ -288,7 +288,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "45f7cbde4bf88042154385fea3d559d81be4f252",
+    commit = "4012fc54776a2ac21badb71434cc7e75aec24733",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 
