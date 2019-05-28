@@ -58,20 +58,44 @@ _run_all = rule(
     implementation = _run_all_impl,
 )
 
+def _reverse(lis, reverse = False):
+    """Returns a reversed list if if reverse is true
+
+    Args:
+      lis: The list to be potentially reversed
+      reverse: If True the provided list will be reversed
+    """
+    if reverse:
+        return reversed(lis)
+    else:
+        return lis
+
+def _cmd_objects(cmd, objects, reverse = False):
+    """Returns either a list or a select statement of objects for the provided cmd
+
+    Args:
+      cmd: name of the command that will be appended to each object
+      objects: The objects that will get the cmd appended
+      reverse: If the order of the objects should be reversed or not
+    """
+    if type(objects) == "dict":
+        return select({k: [x + cmd for x in _reverse(v, reverse)] for k, v in objects.items()})
+    else:
+        return [x + cmd for x in _reverse(objects, reverse)]
+
 def k8s_objects(name, objects, **kwargs):
     """Interact with a collection of K8s objects.
 
     Args:
       name: name of the rule.
-      objects: list of k8s_object rules.
+      objects: list or dict of k8s_object rules. A dict will be converted into a select statement.
       **kwargs: Pass through other arguments accepted by k8s_object.
     """
 
     # TODO(mattmoor): We may have to normalize the labels that come
     # in through objects.
-
-    _run_all(name = name, objects = objects, delimiter = "echo ---\n", **kwargs)
-    _run_all(name = name + ".create", objects = [x + ".create" for x in objects], **kwargs)
-    _run_all(name = name + ".delete", objects = [x + ".delete" for x in reversed(objects)], **kwargs)
-    _run_all(name = name + ".replace", objects = [x + ".replace" for x in objects], **kwargs)
-    _run_all(name = name + ".apply", objects = [x + ".apply" for x in objects], **kwargs)
+    _run_all(name = name, objects = _cmd_objects("", objects), delimiter = "echo ---\n", **kwargs)
+    _run_all(name = name + ".create", objects = _cmd_objects(".create", objects), **kwargs)
+    _run_all(name = name + ".delete", objects = _cmd_objects(".delete", objects, True), **kwargs)
+    _run_all(name = name + ".replace", objects = _cmd_objects(".replace", objects), **kwargs)
+    _run_all(name = name + ".apply", objects = _cmd_objects(".apply", objects), **kwargs)

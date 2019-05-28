@@ -607,11 +607,12 @@ A rule for interacting with multiple Kubernetes objects.
     <tr>
       <td><code>objects</code></td>
       <td>
-        <p><code>Label list; required</code></p>
+        <p><code>Label list or dict; required</code></p>
         <p>The list of objects on which actions are taken.</p>
 	<p>When <code>bazel run</code> this target resolves each of the object
 	   targets which includes publishing their associated images, and will
 	   print a <code>---</code> delimited yaml.</p>
+        <p> If a dict is provided it will be converted to a <a href="https://docs.bazel.build/versions/master/be/functions.html">select</a> statement.</p>
       </td>
     </tr>
   </tbody>
