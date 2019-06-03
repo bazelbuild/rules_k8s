@@ -41,9 +41,9 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "2a71e2ddc445c81bd5413fbf8d3b27d2d01daf2d6602a2b6254bc49da8bfa431",
-    strip_prefix = "rules_docker-3bea22a4e1454508e8aae45ca70c79f8ed00fc1d",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/3bea22a4e1454508e8aae45ca70c79f8ed00fc1d.tar.gz"],
+    sha256 = "1fc5947055ed78ff098f4a75aecc8dba6d69c31b034780559efea2324f6a92b6",
+    strip_prefix = "rules_docker-5d35fee42a513ac83dc23c32ba1f0b029fd75e0f",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/5d35fee42a513ac83dc23c32ba1f0b029fd75e0f.tar.gz"],
 )
 
 load(
