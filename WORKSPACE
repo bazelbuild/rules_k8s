@@ -23,6 +23,10 @@ http_archive(
     url = "https://github.com/google/protobuf/archive/v3.8.0.tar.gz",
 )
 
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
+
 # Mention subpar directly to ensure we get version 2.0.0,
 # which included fixes for incompatible change flags added in Bazel 0.25. This
 # can be removed once other dependencies are updated.
