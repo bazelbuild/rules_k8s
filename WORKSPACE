@@ -34,9 +34,9 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "a4d4c1a53ad0df5146da95df37d5d5b4f15c9f50f5613566ddf460d00f0605c0",
-    strip_prefix = "base-images-docker-31af4f6d8be1cfea468fd98f906f26666daf38fe",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/31af4f6d8be1cfea468fd98f906f26666daf38fe.tar.gz"],
+    sha256 = "d780e11965c5023a88f9c1c643e757c42decb54c1ccb57984da137d335457086",
+    strip_prefix = "base-images-docker-99d7af333d9d136c19a9a746dc9746f87e65c34c",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/99d7af333d9d136c19a9a746dc9746f87e65c34c.tar.gz"],
 )
 
 http_archive(
