@@ -34,9 +34,9 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "a4d4c1a53ad0df5146da95df37d5d5b4f15c9f50f5613566ddf460d00f0605c0",
-    strip_prefix = "base-images-docker-31af4f6d8be1cfea468fd98f906f26666daf38fe",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/31af4f6d8be1cfea468fd98f906f26666daf38fe.tar.gz"],
+    sha256 = "d780e11965c5023a88f9c1c643e757c42decb54c1ccb57984da137d335457086",
+    strip_prefix = "base-images-docker-99d7af333d9d136c19a9a746dc9746f87e65c34c",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/99d7af333d9d136c19a9a746dc9746f87e65c34c.tar.gz"],
 )
 
 http_archive(
@@ -172,9 +172,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "8a9cf001e3ba5c97d45ed8eb09985f15355df4bbe2dc6dd4844cccfe71f17d3e",
-    strip_prefix = "rules_proto-9e68c7eb1e36bd08e9afebc094883ebc4debdb09",
-    urls = ["https://github.com/stackb/rules_proto/archive/9e68c7eb1e36bd08e9afebc094883ebc4debdb09.tar.gz"],
+    sha256 = "ad2bd886ed2ca0f5891ee58415bf875839787ae44414e178f468685a8b5d0bb1",
+    strip_prefix = "rules_proto-2f4e4f62a3d7a43654d69533faa0652e1c4f5082",
+    urls = ["https://github.com/stackb/rules_proto/archive/2f4e4f62a3d7a43654d69533faa0652e1c4f5082.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
