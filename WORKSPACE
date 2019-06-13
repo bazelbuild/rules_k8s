@@ -38,16 +38,16 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "a4d4c1a53ad0df5146da95df37d5d5b4f15c9f50f5613566ddf460d00f0605c0",
-    strip_prefix = "base-images-docker-31af4f6d8be1cfea468fd98f906f26666daf38fe",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/31af4f6d8be1cfea468fd98f906f26666daf38fe.tar.gz"],
+    sha256 = "d780e11965c5023a88f9c1c643e757c42decb54c1ccb57984da137d335457086",
+    strip_prefix = "base-images-docker-99d7af333d9d136c19a9a746dc9746f87e65c34c",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/99d7af333d9d136c19a9a746dc9746f87e65c34c.tar.gz"],
 )
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "1fc5947055ed78ff098f4a75aecc8dba6d69c31b034780559efea2324f6a92b6",
-    strip_prefix = "rules_docker-5d35fee42a513ac83dc23c32ba1f0b029fd75e0f",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/5d35fee42a513ac83dc23c32ba1f0b029fd75e0f.tar.gz"],
+    sha256 = "f1412419c8f6559b3670c131a9a77c01b0503ab4e870e9a7b1b89a36372467d0",
+    strip_prefix = "rules_docker-cd7ddbe3d388723a7e18991bd8815ee014abc22a",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/cd7ddbe3d388723a7e18991bd8815ee014abc22a.tar.gz"],
 )
 
 load(
@@ -176,9 +176,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "8a9cf001e3ba5c97d45ed8eb09985f15355df4bbe2dc6dd4844cccfe71f17d3e",
-    strip_prefix = "rules_proto-9e68c7eb1e36bd08e9afebc094883ebc4debdb09",
-    urls = ["https://github.com/stackb/rules_proto/archive/9e68c7eb1e36bd08e9afebc094883ebc4debdb09.tar.gz"],
+    sha256 = "ad2bd886ed2ca0f5891ee58415bf875839787ae44414e178f468685a8b5d0bb1",
+    strip_prefix = "rules_proto-2f4e4f62a3d7a43654d69533faa0652e1c4f5082",
+    urls = ["https://github.com/stackb/rules_proto/archive/2f4e4f62a3d7a43654d69533faa0652e1c4f5082.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -199,10 +199,10 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "2865da2048bb3ea775505a9ae2a1b61430ed0186c9618083f0bd3b4a47687c52",
-    strip_prefix = "grpc-044a8e29df4c5c2716c7e8250c6b2585e1c425ff",
+    sha256 = "f3903747229ae7cc2541ffdf1676f2c5b3e70efd2eba224f505efbd1ea0d529a",
+    strip_prefix = "grpc-bc4279ed558e40722680a5b7297be8c311d4627c",
     # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/044a8e29df4c5c2716c7e8250c6b2585e1c425ff.tar.gz"],
+    urls = ["https://github.com/grpc/grpc/archive/bc4279ed558e40722680a5b7297be8c311d4627c.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -293,7 +293,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "4012fc54776a2ac21badb71434cc7e75aec24733",
+    commit = "6317ea9ea90a46252b24b6b6005e545b6229b3c5",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 

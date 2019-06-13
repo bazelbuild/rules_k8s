@@ -155,7 +155,7 @@ def kubectl_configure(name, **kwargs):
             ))],
         )
         http_archive(
-            name = "io_kubernetes_build",
+            name = "io_k8s_repo_infra",
             sha256 = k8s_repo_tools_sha,
             strip_prefix = k8s_repo_tools_prefix,
             urls = ["https://github.com/{}/{}/archive/{}.tar.gz".format(
@@ -164,6 +164,7 @@ def kubectl_configure(name, **kwargs):
                 k8s_repo_tools_commit,
             )],
         )
+
     if "kubectl_path" in kwargs:
         _kubectl_configure(name = name, kubectl_path = kwargs["kubectl_path"])
     else:
