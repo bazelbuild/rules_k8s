@@ -18,10 +18,14 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file"
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "f1748989842b46fa208b2a6e4e2785133cfcc3e4d43c17fecb023733f0f5443f",
-    strip_prefix = "protobuf-3.7.1",
-    url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
+    sha256 = "03d2e5ef101aee4c2f6ddcf145d2a04926b9c19e7086944df3842b1b8502b783",
+    strip_prefix = "protobuf-3.8.0",
+    url = "https://github.com/google/protobuf/archive/v3.8.0.tar.gz",
 )
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
 
 # Mention subpar directly to ensure we get version 2.0.0,
 # which included fixes for incompatible change flags added in Bazel 0.25. This
