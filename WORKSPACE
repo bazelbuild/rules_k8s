@@ -18,10 +18,14 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file"
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "f1748989842b46fa208b2a6e4e2785133cfcc3e4d43c17fecb023733f0f5443f",
-    strip_prefix = "protobuf-3.7.1",
-    url = "https://github.com/google/protobuf/archive/v3.7.1.tar.gz",
+    sha256 = "03d2e5ef101aee4c2f6ddcf145d2a04926b9c19e7086944df3842b1b8502b783",
+    strip_prefix = "protobuf-3.8.0",
+    url = "https://github.com/google/protobuf/archive/v3.8.0.tar.gz",
 )
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
 
 # Mention subpar directly to ensure we get version 2.0.0,
 # which included fixes for incompatible change flags added in Bazel 0.25. This
@@ -136,10 +140,10 @@ py_library(
 
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "a82a352bffae6bee4e95f68a8d80a70e87f42c4741e6a448bec11998fcc82329",
+    sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz",
-        "https://github.com/bazelbuild/rules_go/releases/download/0.18.5/rules_go-0.18.5.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
     ],
 )
 
@@ -195,10 +199,10 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "f3903747229ae7cc2541ffdf1676f2c5b3e70efd2eba224f505efbd1ea0d529a",
-    strip_prefix = "grpc-bc4279ed558e40722680a5b7297be8c311d4627c",
+    sha256 = "8b0aaf9587aebc99b411743af95029a5fa6c7f3fefdfd6c3d049aa7784974ce6",
+    strip_prefix = "grpc-e6d9b7b19edbfa9f67d16422fd9c748f55a8264a",
     # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/bc4279ed558e40722680a5b7297be8c311d4627c.tar.gz"],
+    urls = ["https://github.com/grpc/grpc/archive/e6d9b7b19edbfa9f67d16422fd9c748f55a8264a.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -289,7 +293,7 @@ _py_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
-    commit = "6317ea9ea90a46252b24b6b6005e545b6229b3c5",
+    commit = "67b2484dd0650248301ffabd304a9a9fd16b4966",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
 )
 
