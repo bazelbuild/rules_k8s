@@ -38,9 +38,9 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "d780e11965c5023a88f9c1c643e757c42decb54c1ccb57984da137d335457086",
-    strip_prefix = "base-images-docker-99d7af333d9d136c19a9a746dc9746f87e65c34c",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/99d7af333d9d136c19a9a746dc9746f87e65c34c.tar.gz"],
+    sha256 = "2c421ca558d043c4da34ddfbee0868c23f10022ee647106dad5f37849e3b0f2f",
+    strip_prefix = "base-images-docker-ed6a6f01d92d8ea3ffd01eac3bc9aa009e168c16",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/ed6a6f01d92d8ea3ffd01eac3bc9aa009e168c16.tar.gz"],
 )
 
 http_archive(
@@ -199,10 +199,10 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "f3903747229ae7cc2541ffdf1676f2c5b3e70efd2eba224f505efbd1ea0d529a",
-    strip_prefix = "grpc-bc4279ed558e40722680a5b7297be8c311d4627c",
+    sha256 = "8b0aaf9587aebc99b411743af95029a5fa6c7f3fefdfd6c3d049aa7784974ce6",
+    strip_prefix = "grpc-e6d9b7b19edbfa9f67d16422fd9c748f55a8264a",
     # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/bc4279ed558e40722680a5b7297be8c311d4627c.tar.gz"],
+    urls = ["https://github.com/grpc/grpc/archive/e6d9b7b19edbfa9f67d16422fd9c748f55a8264a.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
