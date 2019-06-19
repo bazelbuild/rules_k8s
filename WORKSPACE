@@ -199,10 +199,10 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "8b0aaf9587aebc99b411743af95029a5fa6c7f3fefdfd6c3d049aa7784974ce6",
-    strip_prefix = "grpc-e6d9b7b19edbfa9f67d16422fd9c748f55a8264a",
+    sha256 = "3bb80fb6421822810c3a59327b60660c87efb50499f213cef1ed354bc13c9ce1",
+    strip_prefix = "grpc-0de90d672a275ef2023cb077f7fe526ce93115a2",
     # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/e6d9b7b19edbfa9f67d16422fd9c748f55a8264a.tar.gz"],
+    urls = ["https://github.com/grpc/grpc/archive/0de90d672a275ef2023cb077f7fe526ce93115a2.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
