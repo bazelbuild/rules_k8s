@@ -176,9 +176,9 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "ad2bd886ed2ca0f5891ee58415bf875839787ae44414e178f468685a8b5d0bb1",
-    strip_prefix = "rules_proto-2f4e4f62a3d7a43654d69533faa0652e1c4f5082",
-    urls = ["https://github.com/stackb/rules_proto/archive/2f4e4f62a3d7a43654d69533faa0652e1c4f5082.tar.gz"],
+    sha256 = "7f7fc55f1cfe8b28f95f1feb8ea42f21310cbbf3c1ee5015dfc15c604f6593f1",
+    strip_prefix = "rules_proto-78d64b7317a332ee884ad7fcd0506d78f2a402cb",
+    urls = ["https://github.com/stackb/rules_proto/archive/78d64b7317a332ee884ad7fcd0506d78f2a402cb.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
@@ -199,10 +199,10 @@ cpp_grpc_library()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "3bb80fb6421822810c3a59327b60660c87efb50499f213cef1ed354bc13c9ce1",
-    strip_prefix = "grpc-0de90d672a275ef2023cb077f7fe526ce93115a2",
+    sha256 = "616497ee3d9e6cb95395c89a5adfca9718c5a1687842320efd1fbd04a9ad78a6",
+    strip_prefix = "grpc-3891e03ece195810a521ec379a512bdc2e4262cd",
     # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/0de90d672a275ef2023cb077f7fe526ce93115a2.tar.gz"],
+    urls = ["https://github.com/grpc/grpc/archive/3891e03ece195810a521ec379a512bdc2e4262cd.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
