@@ -47,6 +47,17 @@ load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
 k8s_repositories()
 ```
 
+NEW: Starting with Bazel 0.27.0, you also need to add to your .bazelrc
+file the following:
+
+```
+build --host_force_python=PY2
+test --host_force_python=PY2
+run --host_force_python=PY2
+```
+See https://github.com/bazelbuild/rules_docker/issues/842 for more
+details.
+
 ## Kubernetes Authentication
 
 As is somewhat standard for Bazel, the expectation is that the
