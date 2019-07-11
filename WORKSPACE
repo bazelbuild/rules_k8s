@@ -38,16 +38,16 @@ git_repository(
 
 http_archive(
     name = "base_images_docker",
-    sha256 = "070fe085903c59e30665d060f0635a821715f0d904ce38fdf33f655c5bcfdaa3",
-    strip_prefix = "base-images-docker-df620769f87537bf5b1db674164583b6f3655b8a",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/df620769f87537bf5b1db674164583b6f3655b8a.tar.gz"],
+    sha256 = "0ed911fde4427f7d3d9f2b32df13c2b4c43c855eaab52df6ab780e59a3e9270b",
+    strip_prefix = "base-images-docker-87df46c7f428f8b8d9be8fde2e653ae27bd9c7cd",
+    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/87df46c7f428f8b8d9be8fde2e653ae27bd9c7cd.tar.gz"],
 )
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "50e2ef4ba62575049445398c89c68696547140e0e57e5119b29c39ac21ee7f73",
-    strip_prefix = "rules_docker-3745c2033c1a85f71301109b7070c6433b80917c",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/3745c2033c1a85f71301109b7070c6433b80917c.tar.gz"],
+    sha256 = "c515d16e0e920041ae22d3d4449ec7898b776d4b6367d7d90b1c64c184b877d7",
+    strip_prefix = "rules_docker-63fd7c1babe2cd1a1e2390d4816bb3cc10bbfe6f",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/63fd7c1babe2cd1a1e2390d4816bb3cc10bbfe6f.tar.gz"],
 )
 
 load(
