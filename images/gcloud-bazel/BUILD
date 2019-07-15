@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@base_images_docker//util:run.bzl", "container_run_and_commit")
 load("@io_bazel_rules_docker//container:image.bzl", "container_image")
 load("@io_bazel_rules_docker//container:layer.bzl", "container_layer")
 load("@io_bazel_rules_docker//container:push.bzl", "container_push")
+load("@io_bazel_rules_docker//docker/util:run.bzl", "container_run_and_commit")
 
 # Includes the gcloud installation archive
 container_layer(
