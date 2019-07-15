@@ -162,7 +162,7 @@ go_register_toolchains()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "fdbb17a4118a1728d19e638a5291b4c4266ea5b8",  # 2019-03-07
+    commit = "3886b1a5ea6d301377d320b1a81feb0195561ac3",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
