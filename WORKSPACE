@@ -37,17 +37,37 @@ git_repository(
 )
 
 http_archive(
-    name = "base_images_docker",
-    sha256 = "0ed911fde4427f7d3d9f2b32df13c2b4c43c855eaab52df6ab780e59a3e9270b",
-    strip_prefix = "base-images-docker-87df46c7f428f8b8d9be8fde2e653ae27bd9c7cd",
-    urls = ["https://github.com/GoogleCloudPlatform/base-images-docker/archive/87df46c7f428f8b8d9be8fde2e653ae27bd9c7cd.tar.gz"],
+    name = "io_bazel_rules_go",
+    sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+    ],
 )
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains()
+
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = "ad83a8d8446b817a41d974ed2489ee77d3de83d4c27eeafe6299bc0906cd63dc",
+    strip_prefix = "grpc-d3316ad22e9122a2022ffe41f819dd670db05c49",
+    # Commit from 2019-05-30
+    urls = ["https://github.com/grpc/grpc/archive/d3316ad22e9122a2022ffe41f819dd670db05c49.tar.gz"],
+)
+
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "c515d16e0e920041ae22d3d4449ec7898b776d4b6367d7d90b1c64c184b877d7",
-    strip_prefix = "rules_docker-63fd7c1babe2cd1a1e2390d4816bb3cc10bbfe6f",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/63fd7c1babe2cd1a1e2390d4816bb3cc10bbfe6f.tar.gz"],
+    sha256 = "cf05ba2c4e48ef88bd04cd885b00442993afac9d484c0b304975aa3c5279daf3",
+    strip_prefix = "rules_docker-0830b13eb650489f9762d1878d764aeab9a29068",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/0830b13eb650489f9762d1878d764aeab9a29068.tar.gz"],
 )
 
 load(
@@ -138,21 +158,6 @@ py_library(
     url = "https://pypi.python.org/packages/source/m/mock/mock-1.0.1.tar.gz",
 )
 
-http_archive(
-    name = "io_bazel_rules_go",
-    sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
-        "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
-    ],
-)
-
-load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
-
-go_rules_dependencies()
-
-go_register_toolchains()
-
 # ================================================================
 # Imports for examples/
 # ================================================================
@@ -162,7 +167,7 @@ go_register_toolchains()
 
 git_repository(
     name = "io_bazel_rules_python",
-    commit = "fdbb17a4118a1728d19e638a5291b4c4266ea5b8",  # 2019-03-07
+    commit = "3886b1a5ea6d301377d320b1a81feb0195561ac3",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -196,18 +201,6 @@ java_grpc_library()
 load("@build_stack_rules_proto//cpp:deps.bzl", "cpp_grpc_library")
 
 cpp_grpc_library()
-
-http_archive(
-    name = "com_github_grpc_grpc",
-    sha256 = "ad83a8d8446b817a41d974ed2489ee77d3de83d4c27eeafe6299bc0906cd63dc",
-    strip_prefix = "grpc-d3316ad22e9122a2022ffe41f819dd670db05c49",
-    # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/d3316ad22e9122a2022ffe41f819dd670db05c49.tar.gz"],
-)
-
-load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-
-grpc_deps()
 
 load("@build_stack_rules_proto//go:deps.bzl", "go_grpc_library")
 
