@@ -24,18 +24,19 @@ def k8s_repositories():
 
     # Used by utilities for roundtripping yaml.
     http_archive(
-        name = "yaml",
+        name = "com_github_yaml_pyyaml",
         build_file_content = """
 py_library(
     name = "yaml",
-    srcs = glob(["*.py"]),
+    srcs = glob(["lib/yaml/*.py"]),
+    imports = [
+        "lib",
+    ],
     visibility = ["//visibility:public"],
 )""",
-        sha256 = "592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab",
-        urls = [("https://pypi.python.org/packages/4a/85/" +
-                 "db5a2df477072b2902b0eb892feb37d88ac635d36245a72a6a69b23b383a" +
-                 "/PyYAML-3.12.tar.gz")],
-        strip_prefix = "PyYAML-3.12/lib/yaml",
+        sha256 = "6b4314b1b2051ddb9d4fcd1634e1fa9c1bb4012954273c9ff3ef689f6ec6c93e",
+        strip_prefix = "pyyaml-3.12",
+        urls = ["https://github.com/yaml/pyyaml/archive/3.12.zip"],
     )
 
     # Register the default kubectl toolchain targets for supported platforms
