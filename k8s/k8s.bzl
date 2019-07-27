@@ -22,10 +22,13 @@ k8s_defaults = _k8s_defaults
 def k8s_repositories():
     """Download dependencies of k8s rules."""
 
-    # Used by utilities for roundtripping yaml.
-    http_archive(
-        name = "com_github_yaml_pyyaml",
-        build_file_content = """
+    excludes = native.existing_rules().keys()
+
+    if "com_github_yaml_pyyaml" not in excludes:
+        # Used by utilities for roundtripping yaml.
+        http_archive(
+            name = "com_github_yaml_pyyaml",
+            build_file_content = """
 py_library(
     name = "yaml",
     srcs = glob(["lib/yaml/*.py"]),
@@ -34,10 +37,10 @@ py_library(
     ],
     visibility = ["//visibility:public"],
 )""",
-        sha256 = "6b4314b1b2051ddb9d4fcd1634e1fa9c1bb4012954273c9ff3ef689f6ec6c93e",
-        strip_prefix = "pyyaml-3.12",
-        urls = ["https://github.com/yaml/pyyaml/archive/3.12.zip"],
-    )
+            sha256 = "6b4314b1b2051ddb9d4fcd1634e1fa9c1bb4012954273c9ff3ef689f6ec6c93e",
+            strip_prefix = "pyyaml-3.12",
+            urls = ["https://github.com/yaml/pyyaml/archive/3.12.zip"],
+        )
 
     # Register the default kubectl toolchain targets for supported platforms
     # note these work with the autoconfigured toolchain
@@ -47,7 +50,6 @@ py_library(
         "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
     )
 
-    excludes = native.existing_rules().keys()
     if "io_bazel_rules_go" not in excludes:
         # Only needed when building kubectl from source. It's always included
         # here to keep all the http_archive calls in one function for simplicity.
