@@ -166,13 +166,13 @@ py_library(
 # first if we're going to explicitly mention it at all
 
 git_repository(
-    name = "io_bazel_rules_python",
+    name = "rules_python",
     commit = "93d8b0af6d8ca1ee37816a829085d7092b04cc7b",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
 load(
-    "@io_bazel_rules_python//python:pip.bzl",
+    "@rules_python//python:pip.bzl",
     "pip_import",
     "pip_repositories",
 )
