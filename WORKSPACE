@@ -65,9 +65,9 @@ grpc_deps()
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "ba6fa21bea65d00b0b75fc49edc96e65b986d3e397470742ecf51ea6187c3bd5",
-    strip_prefix = "rules_docker-33927ce183ae05bbf720acc125eeee7ca47ae47f",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/33927ce183ae05bbf720acc125eeee7ca47ae47f.tar.gz"],
+    sha256 = "6706b3979498802672252e77a45674dae0a1036f246a7efe5d3adbe53dcbea31",
+    strip_prefix = "rules_docker-31c38b0f506d8aff07487c274ed045c0017f689f",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/31c38b0f506d8aff07487c274ed045c0017f689f.tar.gz"],
 )
 
 load(
@@ -166,13 +166,13 @@ py_library(
 # first if we're going to explicitly mention it at all
 
 git_repository(
-    name = "io_bazel_rules_python",
-    commit = "3886b1a5ea6d301377d320b1a81feb0195561ac3",  # 2019-03-07
+    name = "rules_python",
+    commit = "93d8b0af6d8ca1ee37816a829085d7092b04cc7b",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
 load(
-    "@io_bazel_rules_python//python:pip.bzl",
+    "@rules_python//python:pip.bzl",
     "pip_import",
     "pip_repositories",
 )
