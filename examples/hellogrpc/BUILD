@@ -111,6 +111,6 @@ py_test(
     ],
     python_version = "PY2",
     deps = [
-        "@yaml",
+        "@com_github_yaml_pyyaml//:yaml",
     ],
 )

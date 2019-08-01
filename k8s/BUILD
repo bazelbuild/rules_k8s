@@ -37,8 +37,8 @@ py_library(
         "//:__init__.py",
     ],
     deps = [
+        "@com_github_yaml_pyyaml//:yaml",
         "@containerregistry",
-        "@yaml",
     ],
 )
 
@@ -62,8 +62,8 @@ par_binary(
     python_version = "PY2",
     visibility = ["//visibility:public"],
     deps = [
+        "@com_github_yaml_pyyaml//:yaml",
         "@containerregistry",
-        "@yaml",
     ],
 )
 
@@ -82,6 +82,6 @@ par_binary(
     python_version = "PY2",
     visibility = ["//visibility:public"],
     deps = [
-        "@yaml",
+        "@com_github_yaml_pyyaml//:yaml",
     ],
 )

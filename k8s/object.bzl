@@ -461,6 +461,8 @@ _k8s_object_delete = rule(
 # See "attrs" parameter at https://docs.bazel.build/versions/master/skylark/lib/globals.html#parameters-26
 _implicit_attrs = [
     "visibility",
+    "restricted_to",
+    "compatible_with",
     "deprecation",
     "tags",
     "testonly",
