@@ -422,6 +422,18 @@ Users can "describe" their environment by running:
 bazel run :dev.describe
 ```
 
+### Diff
+
+Users can "diff" a configuration by running:
+```shell
+bazel run :dev.diff
+```
+
+`:dev.diff` maps to `kubectl diff`, which will diff the live against the would-be applied version.
+For more information see the `kubectl` documentation.
+
+This applies the **resolved** template, which includes republishing images.
+
 <a name="k8s_object"></a>
 ## k8s_object
 
