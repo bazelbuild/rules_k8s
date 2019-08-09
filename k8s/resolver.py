@@ -119,7 +119,7 @@ def StringToDigest(string, overrides, transport):
     return str(digest)
 
 
-def Publish(transport, image_chroot, no_push,
+def Publish(transport, image_chroot, no_push=False,
             name=None, tarball=None, config=None, digest=None, layer=None):
   if not name:
     raise Exception('Expected "name" kwarg')
@@ -182,7 +182,7 @@ def main():
     parts = spec.split(';')
     kwargs = dict([x.split('=', 2) for x in parts])
     try:
-      (tag, digest) = Publish(transport, args.image_chroot, args.no_push, **kwargs)
+      (tag, digest) = Publish(transport, args.image_chroot, no_push=args.no_push, **kwargs)
       overrides[tag] = digest
       unseen_strings.add(tag)
     except Exception as e:
