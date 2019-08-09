@@ -55,6 +55,10 @@ parser.add_argument(
         'when generating multiple SKUs of a k8s_object, only some of which use '
         'a particular image.'))
 
+parser.add_argument(
+  '--no_push', action='store_true',
+  help=('Don\'t push the images.'))
+
 _THREADS = 32
 
 
@@ -115,7 +119,7 @@ def StringToDigest(string, overrides, transport):
     return str(digest)
 
 
-def Publish(transport, image_chroot,
+def Publish(transport, image_chroot, no_push,
             name=None, tarball=None, config=None, digest=None, layer=None):
   if not name:
     raise Exception('Expected "name" kwarg')
@@ -154,14 +158,15 @@ def Publish(transport, image_chroot,
   # client logic.
   creds = docker_creds.DefaultKeychain.Resolve(name_to_publish)
 
-  with v2_2_session.Push(name_to_publish, creds, transport, threads=_THREADS) as session:
-    with v2_2_image.FromDisk(config, zip(digest or [], layer or []),
-                             legacy_base=tarball) as v2_2_img:
-      session.upload(v2_2_img)
+  with v2_2_image.FromDisk(config, zip(digest or [], layer or []),
+                            legacy_base=tarball) as v2_2_img:
+    if not no_push:
+      with v2_2_session.Push(name_to_publish, creds, transport, threads=_THREADS) as session:
+        session.upload(v2_2_img)
 
-      return (name_to_replace, docker_name.Digest('{repository}@{digest}'.format(
-          repository=name_to_publish.as_repository(),
-          digest=v2_2_img.digest())))
+    return (name_to_replace, docker_name.Digest('{repository}@{digest}'.format(
+        repository=name_to_publish.as_repository(),
+        digest=v2_2_img.digest())))
 
 
 def main():
@@ -177,7 +182,7 @@ def main():
     parts = spec.split(';')
     kwargs = dict([x.split('=', 2) for x in parts])
     try:
-      (tag, digest) = Publish(transport, args.image_chroot, **kwargs)
+      (tag, digest) = Publish(transport, args.image_chroot, args.no_push, **kwargs)
       overrides[tag] = digest
       unseen_strings.add(tag)
     except Exception as e:
