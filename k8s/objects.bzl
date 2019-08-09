@@ -100,3 +100,4 @@ def k8s_objects(name, objects, **kwargs):
     _run_all(name = name + ".delete", objects = _cmd_objects(".delete", objects, True), **kwargs)
     _run_all(name = name + ".replace", objects = _cmd_objects(".replace", objects), **kwargs)
     _run_all(name = name + ".apply", objects = _cmd_objects(".apply", objects), **kwargs)
+    _run_all(name = name + ".diff", objects = _cmd_objects(".diff", objects), **kwargs)
