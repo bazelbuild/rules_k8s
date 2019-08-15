@@ -22,14 +22,15 @@ Add the following to your `WORKSPACE` file to add the necessary external depende
 ```python
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Download the rules_docker repository at release v0.9.0. See
+# Download the latest release of the rules_docker repository. See
 # https://github.com/bazelbuild/rules_docker#setup for instructions to download
 # the latest available rules_docker release.
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "e513c0ac6534810eb7a14bf025a0f159726753f97f74ab7863c650d26e01d677",
-    strip_prefix = "rules_docker-0.9.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.9.0.tar.gz"],
+    # Fill in the rest below using the link above.
+    sha256 = ...
+    strip_prefix = ...
+    urls = ...
 )
 load(
     "@io_bazel_rules_docker//repositories:repositories.bzl",
