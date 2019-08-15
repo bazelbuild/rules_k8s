@@ -20,14 +20,18 @@ configurations / clusters.
 Add the following to your `WORKSPACE` file to add the necessary external dependencies:
 
 ```python
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-git_repository(
+# Download the latest release of the rules_docker repository. See
+# https://github.com/bazelbuild/rules_docker#setup for instructions to download
+# the latest available rules_docker release.
+http_archive(
     name = "io_bazel_rules_docker",
-    commit = "{HEAD}",
-    remote = "https://github.com/bazelbuild/rules_docker.git",
+    # Fill in the rest below using the link above.
+    sha256 = ...
+    strip_prefix = ...
+    urls = ...
 )
-
 load(
     "@io_bazel_rules_docker//repositories:repositories.bzl",
     container_repositories = "repositories",
@@ -36,10 +40,12 @@ container_repositories()
 
 # This requires rules_docker to be fully instantiated before
 # it is pulled in.
-git_repository(
+# Download the rules_k8s repository at release v0.1
+http_archive(
     name = "io_bazel_rules_k8s",
-    commit = "{HEAD}",
-    remote = "https://github.com/bazelbuild/rules_k8s.git",
+    sha256 = "91fef3e6054096a8947289ba0b6da3cba559ecb11c851d7bdfc9ca395b46d8d8",
+    strip_prefix = "rules_k8s-0.1",
+    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.1/rules_k8s-v0.1.tar.gz"],
 )
 
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
@@ -472,11 +478,11 @@ A rule for interacting with Kubernetes objects.
       <td><code>context</code></td>
       <td>
         <p><code>string, optional</code></p>
-        <p>The name of a kubeconfig context to use. Subject to "Make" variable 
+        <p>The name of a kubeconfig context to use. Subject to "Make" variable
           substitution.</p>
         <p><b>If this is omitted, the current context will be used.</b></p>
       </td>
-    </tr>    
+    </tr>
     <tr>
       <td><code>namespace</code></td>
       <td>
@@ -494,7 +500,7 @@ A rule for interacting with Kubernetes objects.
         <p><code>string, optional</code></p>
         <p>The user to authenticate to the cluster as configured with kubectl.
           Subject to "Make" variable substitution.</p>
-        <p><b>If this is omitted, kubectl will authenticate as the user from the 
+        <p><b>If this is omitted, kubectl will authenticate as the user from the
           current context.</b></p>
       </td>
     </tr>
