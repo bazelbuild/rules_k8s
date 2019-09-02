@@ -65,9 +65,9 @@ grpc_deps()
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "17b13c57817e61575d24460b83e11fe8b6468a953daf6e0020eaeb662de377d5",
-    strip_prefix = "rules_docker-c9705a2d3ed58d460b842ffc02d96f181bfe0ddd",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/c9705a2d3ed58d460b842ffc02d96f181bfe0ddd.tar.gz"],
+    sha256 = "5f3e6a154009384d497db0e3d8530fdaf456a74d9890c17a2bf721f2cac034df",
+    strip_prefix = "rules_docker-d96976904b7aac22ed2606c4eeae3d113f6d1706",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/d96976904b7aac22ed2606c4eeae3d113f6d1706.tar.gz"],
 )
 
 load(
@@ -167,7 +167,7 @@ py_library(
 
 git_repository(
     name = "rules_python",
-    commit = "4b84ad270387a7c439ebdccfd530e2339601ef27",  # 2019-03-07
+    commit = "9d68f24659e8ce8b736590ba1e4418af06ec2552",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
