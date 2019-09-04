@@ -65,9 +65,9 @@ grpc_deps()
 
 http_archive(
     name = "io_bazel_rules_docker",
-    sha256 = "5f3e6a154009384d497db0e3d8530fdaf456a74d9890c17a2bf721f2cac034df",
-    strip_prefix = "rules_docker-d96976904b7aac22ed2606c4eeae3d113f6d1706",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/d96976904b7aac22ed2606c4eeae3d113f6d1706.tar.gz"],
+    sha256 = "e944eccec26f4882eccd23d3fad5224184119512f2f292e5d1bb1c3f1c0b06bf",
+    strip_prefix = "rules_docker-165cd95365684f5fa1f29abc71cf1006e06c581a",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/165cd95365684f5fa1f29abc71cf1006e06c581a.tar.gz"],
 )
 
 load(
