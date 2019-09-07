@@ -53,10 +53,10 @@ go_register_toolchains()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "ad83a8d8446b817a41d974ed2489ee77d3de83d4c27eeafe6299bc0906cd63dc",
-    strip_prefix = "grpc-d3316ad22e9122a2022ffe41f819dd670db05c49",
+    sha256 = "b2668eabf83bed2875b0229d2c058a772220d25903245e7a97ee7fd54f866db5",
+    strip_prefix = "grpc-5a5dc3322cf9fcc52cdb1c081d9b8aa9bdeb1e00",
     # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/d3316ad22e9122a2022ffe41f819dd670db05c49.tar.gz"],
+    urls = ["https://github.com/grpc/grpc/archive/5a5dc3322cf9fcc52cdb1c081d9b8aa9bdeb1e00.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
