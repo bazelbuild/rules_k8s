@@ -30,6 +30,11 @@ platforms:
     - "..."
   macos:
     build_targets:
-    - "//examples/hellohttp:deployment_test"
+    - "--"
+    - "..."
+    - "-//images/gcloud-bazel:gcloud_push"
+    - "-//images/gcloud-bazel:gcloud_installer"
+    - "-//images/gcloud-bazel:gcloud_install"
+    - "-//images/gcloud-bazel:gcloud-layer"
     test_targets:
-    - "//examples/hellohttp:deployment_test"
+    - "..."
