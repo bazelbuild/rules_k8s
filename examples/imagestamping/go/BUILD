@@ -13,7 +13,6 @@
 # limitations under the License.
 
 load("@io_bazel_rules_docker//go:image.bzl", "go_image")
-load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 
 package(default_visibility = ["//visibility:public"])
 
