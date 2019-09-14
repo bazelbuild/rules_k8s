@@ -19,11 +19,11 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])  # Apache 2.0
 
 k8s_object(
-    name = "image-stamping",
+    name = "imagestamping-image",
     # Build images with the same container
     images = {
         "index.docker.io/parsec86/{REPOSITORY}:{STABLE_GIT_COMMIT}": "//examples/imagestamping/go:go-container",
     },
-    # K8s deployment template wtih a stamping variable to replace
+    # K8s deployment template with a stamping variable to replace
     template = ":deployment.yaml",
 )

@@ -77,6 +77,9 @@ def _generate_stamp_info(stamp_list):
 
   for stamp in stamp_list.splitlines():
     key, value = stamp.split(" ")
+    if key in stamp_info:
+      print ("WARNING: Duplicate value for workspace status key '%s': "
+              "using '%s'" % (key, value))
     stamp_info[key] = value
   
   return stamp_info
