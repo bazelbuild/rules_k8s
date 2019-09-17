@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -euo pipefail
 
-function guess_runfiles() {
-    pushd ${BASH_SOURCE[0]}.runfiles > /dev/null 2>&1
-    pwd
-    popd > /dev/null 2>&1
-}
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 
-RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
+package(default_visibility = ["//visibility:public"])
 
-%{resolver} %{resolver_args} %{stamp_args} --template %{yaml} --image_chroot=%{image_chroot} %{images}
+go_image(
+    name = "go-container",
+    srcs = ["main.go"],
+    importpath = "github.com/bazelbuild/not-my-project/examples/imagestamping/go",
+)

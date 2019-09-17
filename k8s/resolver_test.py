@@ -109,9 +109,10 @@ key1:
     name = docker_name.Tag('fake.gcr.io/foo/bar:baz')
 
     with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
-      (tag, digest) = resolver.Publish(
+      (tag, published_tag, digest) = resolver.Publish(
           _BAD_TRANSPORT, None, name=str(name), tarball=td)
       self.assertEqual(tag, str(name))
+      self.assertEqual(published_tag, str(name))
       with v2_2_image.FromTarball(td) as img:
         self.assertEqual(digest.digest, img.digest())
 
@@ -125,13 +126,35 @@ key1:
       expected_digest = img.digest()
 
     with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
-      (tag, digest) = resolver.Publish(
+      (tag, published_tag, digest) = resolver.Publish(
           _BAD_TRANSPORT, None, name=str(name), config=config_path,
           digest=','.join([h for (h, unused) in layer_data]),
           layer=','.join([layer for (unused, layer) in layer_data]))
       self.assertEqual(tag, str(name))
+      self.assertEqual(published_tag, str(name))
       self.assertEqual(digest.digest, expected_digest)
 
+  def test_publish_fast_stamping(self):
+    td = TestData(
+        'io_bazel_rules_k8s/examples/hellogrpc/cc/server/server.tar')
+    # name = docker_name.Tag('fake.gcr.io/foo/bar:{STABLE_GIT_COMMIT}')
+    name = "fake.gcr.io/foo/bar:{STABLE_GIT_COMMIT}"
+    stamp_info = { "STABLE_GIT_COMMIT": "9428a3b3" }
+    expected_tag = 'fake.gcr.io/foo/bar:9428a3b3'
+
+    with v2_2_image.FromTarball(td) as img:
+      (config_path, layer_data) = save.fast(img, self._tmpdir, threads=16)
+      expected_digest = img.digest()
+
+    print(expected_digest)
+    with mock.patch.object(v2_2_session, 'Push', return_value=NopPush()):
+      (tag, published_tag, digest) = resolver.Publish(
+          _BAD_TRANSPORT, None, stamp_info, name=name, config=config_path,
+          digest=','.join([h for (h, unused) in layer_data]),
+          layer=','.join([layer for (unused, layer) in layer_data]))
+      self.assertEqual(tag, name)
+      self.assertEqual(published_tag, expected_tag)
+      self.assertEqual(digest.digest, expected_digest)
 
 if __name__ == '__main__':
   unittest.main()
