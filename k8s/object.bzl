@@ -89,6 +89,12 @@ def _impl(ctx):
                 for (k, v) in image_spec.items()
             ])]
 
+    # Add workspace_status_command files to the args that are pushed to the resolver and adds the
+    # files to the runfiles so they are available to the resolver executable.
+    stamp_inputs = [ctx.info_file, ctx.version_file]
+    stamp_args = " ".join(["--stamp-info-file=%s" % _runfiles(ctx, f) for f in stamp_inputs])
+    all_inputs += stamp_inputs
+
     image_chroot_arg = ctx.attr.image_chroot
     image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
     if "{" in ctx.attr.image_chroot:
@@ -116,6 +122,7 @@ def _impl(ctx):
             ]),
             "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
             "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
+            "%{stamp_args}": stamp_args,
             "%{yaml}": _runfiles(ctx, ctx.outputs.substituted),
         },
         output = ctx.outputs.executable,

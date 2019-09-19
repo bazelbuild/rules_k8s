@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "STABLE_GIT_COMMIT $(git log -1 --pretty=%h --abbrev=8)"
+echo "STABLE_USER_NAME $USER"
+echo "REPOSITORY image-stamping"
