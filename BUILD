@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
@@ -20,3 +22,11 @@ exports_files([
     "LICENSE",
     "__init__.py",
 ])
+
+gazelle(
+    name = "gazelle",
+    prefix = "github.com/bazelbuild/rules_k8s",
+)
+
+# Make Gazelle ignore Go files in the examples directory used in e2e tests.
+# gazelle:exclude examples
