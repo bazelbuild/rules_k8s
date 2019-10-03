@@ -14,7 +14,7 @@
 
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
-package(default_visibility = ["//k8s:__subpackages__"])
+package(default_visibility = ["//visibility:private"])
 
 licenses(["notice"])  # Apache 2.0
 
@@ -32,4 +32,5 @@ go_library(
 go_binary(
     name = "resolver",
     embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
 )
