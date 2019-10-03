@@ -37,21 +37,6 @@ git_repository(
 )
 
 http_archive(
-    name = "io_bazel_rules_go",
-    sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
-        "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
-    ],
-)
-
-load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
-
-go_rules_dependencies()
-
-go_register_toolchains()
-
-http_archive(
     name = "com_github_grpc_grpc",
     sha256 = "ad83a8d8446b817a41d974ed2489ee77d3de83d4c27eeafe6299bc0906cd63dc",
     strip_prefix = "grpc-d3316ad22e9122a2022ffe41f819dd670db05c49",
@@ -63,19 +48,13 @@ load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
 
-http_archive(
-    name = "io_bazel_rules_docker",
-    sha256 = "30b413001bb8012ef5b59b8a38eacfc8d4a0005a7bd8d6bbd2d0d1b041ec6ba4",
-    strip_prefix = "rules_docker-ddaae1d509be871d8d5287ec2aa1648ce19781a5",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/ddaae1d509be871d8d5287ec2aa1648ce19781a5.tar.gz"],
-)
+load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
-load(
-    "@io_bazel_rules_docker//repositories:repositories.bzl",
-    container_repositories = "repositories",
-)
+k8s_repositories()
 
-container_repositories()
+load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
+
+k8s_go_deps()
 
 load(
     "@io_bazel_rules_docker//container:container.bzl",
@@ -97,10 +76,6 @@ http_file(
         "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
     ],
 )
-
-load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
-
-k8s_repositories()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
@@ -340,3 +315,5 @@ bind(
     name = "error_prone_annotations",
     actual = "@error_prone_annotations_maven//jar",
 )
+
+# gazelle:repo bazel_gazelle

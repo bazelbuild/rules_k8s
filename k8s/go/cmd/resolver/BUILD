@@ -12,21 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:private"])
 
 licenses(["notice"])  # Apache 2.0
 
-exports_files([
-    "LICENSE",
-    "__init__.py",
-])
-
-gazelle(
-    name = "gazelle",
-    prefix = "github.com/bazelbuild/rules_k8s",
+go_library(
+    name = "go_default_library",
+    srcs = ["resolver.go"],
+    importpath = "github.com/bazelbuild/rules_k8s/k8s/go/cmd/resolver",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@io_bazel_rules_docker//container/go/pkg/compat:go_default_library",
+        "@io_bazel_rules_docker//container/go/pkg/utils:go_default_library",
+    ],
 )
 
-# Make Gazelle ignore Go files in the examples directory used in e2e tests.
-# gazelle:exclude examples
+go_binary(
+    name = "resolver",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)
