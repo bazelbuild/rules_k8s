@@ -65,9 +65,9 @@ py_library(
     if "io_bazel_rules_docker" not in excludes:
         http_archive(
             name = "io_bazel_rules_docker",
-            sha256 = "566ac2175bc8726979e3a305179635b8eefa7bad793a03b274907aceb8eb2568",
-            strip_prefix = "rules_docker-190569e961d56102d469b3b696575a945829d7ef",
-            urls = ["https://github.com/bazelbuild/rules_docker/archive/190569e961d56102d469b3b696575a945829d7ef.tar.gz"],
+            sha256 = "999aaab7b52847899e1c114570e6ff4595b86d430eeaf372beb145eea0894154",
+            strip_prefix = "rules_docker-91780a58c82cf88d0b1fe134e0bcf6ee93f09a85",
+            urls = ["https://github.com/bazelbuild/rules_docker/archive/91780a58c82cf88d0b1fe134e0bcf6ee93f09a85.tar.gz"],
         )
     if "k8s_config" not in excludes:
         # WORKSPACE target to configure the kubectl tool
