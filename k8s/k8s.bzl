@@ -51,12 +51,23 @@ py_library(
     )
 
     if "io_bazel_rules_go" not in excludes:
-        # Only needed when building kubectl from source. It's always included
-        # here to keep all the http_archive calls in one function for simplicity.
         http_archive(
             name = "io_bazel_rules_go",
             sha256 = "f04d2373bcaf8aa09bccb08a98a57e721306c8f6043a2a0ee610fd6853dcde3d",
             url = "https://github.com/bazelbuild/rules_go/releases/download/0.18.6/rules_go-0.18.6.tar.gz",
+        )
+    if "bazel_gazelle" not in excludes:
+        http_archive(
+            name = "bazel_gazelle",
+            sha256 = "7fc87f4170011201b1690326e8c16c5d802836e3a0d617d8f75c3af2b23180c4",
+            urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/0.18.2/bazel-gazelle-0.18.2.tar.gz"],
+        )
+    if "io_bazel_rules_docker" not in excludes:
+        http_archive(
+            name = "io_bazel_rules_docker",
+            sha256 = "566ac2175bc8726979e3a305179635b8eefa7bad793a03b274907aceb8eb2568",
+            strip_prefix = "rules_docker-190569e961d56102d469b3b696575a945829d7ef",
+            urls = ["https://github.com/bazelbuild/rules_docker/archive/190569e961d56102d469b3b696575a945829d7ef.tar.gz"],
         )
     if "k8s_config" not in excludes:
         # WORKSPACE target to configure the kubectl tool
