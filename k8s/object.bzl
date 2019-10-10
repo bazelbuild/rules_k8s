@@ -17,7 +17,6 @@ load(
     "@io_bazel_rules_docker//container:layer_tools.bzl",
     _get_layers = "get_from_target",
     _layer_tools = "tools",
-    _img_args = "generate_args_for_image",
 )
 load(
     "@io_bazel_rules_docker//skylib:label.bzl",
@@ -273,6 +272,12 @@ _common_attrs = {
     # don't expose the extra actions.
     "cluster": attr.string(),
     "context": attr.string(),
+    "go_resolver": attr.label(
+        default = Label("//k8s/go/cmd/resolver"),
+        cfg = "host",
+        executable = True,
+        allow_files = True,
+    ),
     "image_chroot": attr.string(),
     # This is only needed for describe.
     "kind": attr.string(),
@@ -286,19 +291,13 @@ _common_attrs = {
         executable = True,
         allow_files = True,
     ),
-    "go_resolver" : attr.label(
-        default = Label("//k8s/go/cmd/resolver"),
-        cfg = "host",
-        executable = True,
-        allow_files = True,
-    ),
-    "use_legacy_resolver": attr.bool(
-        default = True,
-        doc = "Use the legacy python resolver if True. Use the experimental"+
-        " Go resolver if false.",
-    ),
     # Extra arguments to pass to the resolver.
     "resolver_args": attr.string_list(),
+    "use_legacy_resolver": attr.bool(
+        default = True,
+        doc = "Use the legacy python resolver if True. Use the experimental" +
+              " Go resolver if false.",
+    ),
     "user": attr.string(),
     "_stamper": attr.label(
         default = Label("//k8s:stamper"),
