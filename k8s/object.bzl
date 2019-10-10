@@ -17,6 +17,7 @@ load(
     "@io_bazel_rules_docker//container:layer_tools.bzl",
     _get_layers = "get_from_target",
     _layer_tools = "tools",
+    _img_args = "generate_args_for_image",
 )
 load(
     "@io_bazel_rules_docker//skylib:label.bzl",
@@ -76,9 +77,24 @@ def _impl(ctx):
             image_spec["digest"] = ",".join([_runfiles(ctx, f) for f in blobsums])
             all_inputs += blobsums
 
-            blobs = image.get("zipped_layer", [])
-            image_spec["layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
-            all_inputs += blobs
+            if not ctx.attr.use_legacy_resolver:
+                # Add additional files about the image used by the Go resolver
+                # to load the image more efficiently.
+                diff_ids = image.get("diff_id", [])
+                image_spec["diff_id"] = ",".join([_runfiles(ctx, f) for f in diff_ids])
+                all_inputs += diff_ids
+
+                blobs = image.get("zipped_layer", [])
+                image_spec["compressed_layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
+                all_inputs += blobs
+
+                uncompressed_blobs = image.get("unzipped_layer", [])
+                image_spec["uncompressed_layer"] = ",".join([_runfiles(ctx, f) for f in uncompressed_blobs])
+                all_inputs += uncompressed_blobs
+            else:
+                blobs = image.get("zipped_layer", [])
+                image_spec["layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
+                all_inputs += blobs
 
             image_spec["config"] = _runfiles(ctx, image["config"])
             all_inputs += [image["config"]]
@@ -121,7 +137,7 @@ def _impl(ctx):
                 for spec in image_specs
             ]),
             "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
-            "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
+            "%{resolver}": _runfiles(ctx, ctx.executable.resolver if ctx.attr.use_legacy_resolver else ctx.executable.go_resolver),
             "%{stamp_args}": stamp_args,
             "%{yaml}": _runfiles(ctx, ctx.outputs.substituted),
         },
@@ -133,6 +149,7 @@ def _impl(ctx):
             runfiles = ctx.runfiles(
                 files = [
                     ctx.executable.resolver,
+                    ctx.executable.go_resolver,
                     ctx.outputs.substituted,
                 ] + all_inputs,
                 transitive_files = ctx.attr.resolver[DefaultInfo].default_runfiles.files,
@@ -156,7 +173,7 @@ def _resolve(ctx, string, output):
     )
 
 def _common_impl(ctx):
-    files = [ctx.executable.resolver]
+    files = [ctx.executable.resolver, ctx.executable.go_resolver]
 
     cluster_arg = ctx.attr.cluster
     cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
@@ -268,6 +285,17 @@ _common_attrs = {
         cfg = "host",
         executable = True,
         allow_files = True,
+    ),
+    "go_resolver" : attr.label(
+        default = Label("//k8s/go/cmd/resolver"),
+        cfg = "host",
+        executable = True,
+        allow_files = True,
+    ),
+    "use_legacy_resolver": attr.bool(
+        default = True,
+        doc = "Use the legacy python resolver if True. Use the experimental"+
+        " Go resolver if false.",
     ),
     # Extra arguments to pass to the resolver.
     "resolver_args": attr.string_list(),
