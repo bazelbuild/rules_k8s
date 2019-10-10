@@ -16,9 +16,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"path"
+	"reflect"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/bazelbuild/rules_docker/container/go/pkg/compat"
 	"github.com/bazelbuild/rules_docker/container/go/pkg/utils"
@@ -186,10 +190,93 @@ func publish(spec []imageSpec, stamper *compat.Stamper) (map[string]string, map[
 	return overrides, unseen, nil
 }
 
+type resolver struct {
+	resolvedImages map[string]string
+	unseen         map[string]bool
+}
+
+func (r *resolver) resolveItem(i interface{}) (interface{}, error) {
+	if s, ok := i.(string); ok {
+		log.Printf("Resolve item: %q", s)
+		return s, nil
+	}
+	if l, ok := i.([]interface{}); ok {
+		return r.resolveList(l)
+	}
+	if m, ok := i.(map[interface{}]interface{}); ok {
+		return r.resolveMap(m)
+	}
+	log.Printf("Fallthrough resolving %v of type %v.", i, reflect.TypeOf(i))
+	return i, nil
+}
+
+func (r *resolver) resolveList(l []interface{}) ([]interface{}, error) {
+	result := []interface{}{}
+	for _, i := range l {
+		o, err := r.resolveItem(i)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, o)
+	}
+	return result, nil
+}
+
+func (r *resolver) resolveMap(m map[interface{}]interface{}) (map[interface{}]interface{}, error) {
+	result := make(map[interface{}]interface{})
+	for k, v := range m {
+		rk, err := r.resolveItem(k)
+		if err != nil {
+			return nil, err
+		}
+		rv, err := r.resolveItem(v)
+		if err != nil {
+			return nil, err
+		}
+		result[rk] = rv
+	}
+	return result, nil
+}
+
+func (r *resolver) walkYAML(b []byte) error {
+	var l []interface{}
+	lErr := yaml.Unmarshal(b, &l)
+	if lErr == nil {
+		r.resolveItem(l)
+		return nil
+	}
+	var m map[interface{}]interface{}
+	mErr := yaml.Unmarshal(b, &m)
+	if mErr == nil {
+		r.resolveMap(m)
+		return nil
+	}
+
+	return fmt.Errorf("unable to parse given blob as a YAML list or map: %v %v", lErr, mErr)
+}
+
+func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
+	t, err := ioutil.ReadFile(templateFile)
+	if err != nil {
+		return fmt.Errorf("unable to open template file %q: %v", templateFile, err)
+	}
+
+	r := resolver{
+		resolvedImages: resolvedImages,
+		unseen:         unseen,
+	}
+	if r.walkYAML(t); err != nil {
+		return fmt.Errorf("unable to resolve YAML template %q: %v", templateFile, err)
+	}
+	return nil
+}
+
 func main() {
 	flag.Var(&imgSpecs, "image_spec", "Associative lists of the constitutent elements of a docker image.")
 	flag.Var(&stampInfoFile, "stamp-info-file", "One or more Bazel stamp info files.")
 	flag.Parse()
+
+	log.Println("Template", *k8sTemplate)
 
 	stamper, err := compat.NewStamper(stampInfoFile)
 	if err != nil {
@@ -204,7 +291,18 @@ func main() {
 		}
 		specs = append(specs, spec)
 	}
-	if _, _, err := publish(specs, stamper); err != nil {
+	resolvedImages, unseen, err := publish(specs, stamper)
+	if err != nil {
 		log.Fatalf("Unable to publish images: %v", err)
+	}
+	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen); err != nil {
+		log.Fatalf("Unable to resolve template file %q: %v", *k8sTemplate, err)
+	}
+	if len(unseen) > 0 && !*allowUnusedImages {
+		log.Printf("The following images given as --image_spec were not found in the template:")
+		for i := range unseen {
+			log.Printf("%s", i)
+		}
+		log.Fatalf("--allow_unused_images can be specified to ignore this error.")
 	}
 }

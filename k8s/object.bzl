@@ -294,7 +294,7 @@ _common_attrs = {
     # Extra arguments to pass to the resolver.
     "resolver_args": attr.string_list(),
     "use_legacy_resolver": attr.bool(
-        default = True,
+        default = False,
         doc = "Use the legacy python resolver if True. Use the experimental" +
               " Go resolver if false.",
     ),

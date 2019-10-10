@@ -29,6 +29,7 @@ go_library(
         "@com_github_google_go_containerregistry//pkg/v1/remote:go_default_library",
         "@io_bazel_rules_docker//container/go/pkg/compat:go_default_library",
         "@io_bazel_rules_docker//container/go/pkg/utils:go_default_library",
+        "@in_gopkg_yaml_v2//:go_default_library",
     ],
 )
 
