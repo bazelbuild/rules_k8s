@@ -238,21 +238,27 @@ func (r *resolver) resolveMap(m map[interface{}]interface{}) (map[interface{}]in
 	return result, nil
 }
 
-func (r *resolver) walkYAML(b []byte) error {
+func (r *resolver) resolveYAML(b []byte) ([]byte, error) {
 	var l []interface{}
 	lErr := yaml.Unmarshal(b, &l)
 	if lErr == nil {
-		r.resolveItem(l)
-		return nil
+		o, err := r.resolveItem(l)
+		if err != nil {
+			return nil, err
+		}
+		return yaml.Marshal(o)
 	}
 	var m map[interface{}]interface{}
 	mErr := yaml.Unmarshal(b, &m)
 	if mErr == nil {
-		r.resolveMap(m)
-		return nil
+		o, err := r.resolveMap(m)
+		if err != nil {
+			return nil, err
+		}
+		return yaml.Marshal(o)
 	}
 
-	return fmt.Errorf("unable to parse given blob as a YAML list or map: %v %v", lErr, mErr)
+	return nil, fmt.Errorf("unable to parse given blob as a YAML list or map: %v %v", lErr, mErr)
 }
 
 func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
@@ -265,9 +271,12 @@ func resolveTemplate(templateFile string, resolvedImages map[string]string, unse
 		resolvedImages: resolvedImages,
 		unseen:         unseen,
 	}
-	if r.walkYAML(t); err != nil {
+
+	resolved, err := r.resolveYAML(t)
+	if err != nil {
 		return fmt.Errorf("unable to resolve YAML template %q: %v", templateFile, err)
 	}
+	log.Printf("Resolved: %s", string(resolved))
 	return nil
 }
 
