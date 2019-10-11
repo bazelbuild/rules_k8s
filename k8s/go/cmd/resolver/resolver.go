@@ -19,16 +19,14 @@ import (
 	"io/ioutil"
 	"log"
 	"path"
-	"reflect"
 	"strings"
-
-	"gopkg.in/yaml.v2"
 
 	"github.com/bazelbuild/rules_docker/container/go/pkg/compat"
 	"github.com/bazelbuild/rules_docker/container/go/pkg/utils"
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -190,15 +188,66 @@ func publish(spec []imageSpec, stamper *compat.Stamper) (map[string]string, map[
 	return overrides, unseen, nil
 }
 
+// resolver implements walking over arbitrary k8s YAML templates and
+// transforming every string in the YAML with a configured string resolver.
 type resolver struct {
+	// resolvedImages is a map from the tagged image name to the fully qualified
+	// image name by sha256 digest.
 	resolvedImages map[string]string
-	unseen         map[string]bool
+	// unseen is the set of images that haven't been seen yet. Image names
+	// encountered in the k8s YAML template are removed from this set.
+	unseen map[string]bool
+	// strResolver is called to resolve every individual string encountered in
+	// the k8s YAML template. The functor interface allows mocking the string
+	// resolver in unit tests.
+	strResolver func(*resolver, string) (string, error)
 }
 
+// resolveString resolves a string found in the k8s YAML template by replacing
+// a tagged image name with an image name referenced by its sha256 digest. If
+// the given string doesn't represent a tagged image, it is returned as is.
+// The given resolver is also modified:
+// 1. If the given string was a tagged image, the resolved image lookup in the
+//    given resolver is updated to include a mapping from the given string to
+//    the resolved image name.
+// 2. If the given string was a tagged image, the set of unseen images in the
+//    given resolver is updated to exclude the given string.
+func resolveString(r *resolver, s string) (string, error) {
+	o, ok := r.resolvedImages[s]
+	if ok {
+		return o, nil
+	}
+	t, err := name.NewTag(s)
+	if err != nil {
+		// Silently ignore strings that can't be parsed as tagged image
+		// referneces.
+		return s, nil
+	}
+	auth, err := authn.DefaultKeychain.Resolve(t.Context())
+	if err != nil {
+		return "", fmt.Errorf("unable to key the authenticator using the default keychain for image %v: %v", t, auth)
+	}
+	img, err := remote.Image(t, remote.WithAuth(auth))
+	if err != nil {
+		return "", fmt.Errorf("unable to get image %v from registry: %v", t, err)
+	}
+	d, err := img.Digest()
+	if err != nil {
+		return "", fmt.Errorf("unable to get digest for image %v: %v", t, err)
+	}
+	resolved := fmt.Sprintf("%s/%s@%v", t.Context().RegistryStr(), t.Context().RepositoryStr(), d)
+	r.resolvedImages[s] = resolved
+	if _, ok := r.unseen[s]; ok {
+		delete(r.unseen, s)
+	}
+	return resolved, nil
+}
+
+// resolveItem resolves the given YAML object if it's a string or recursively
+// walks into the YAML collection type.
 func (r *resolver) resolveItem(i interface{}) (interface{}, error) {
 	if s, ok := i.(string); ok {
-		log.Printf("Resolve item: %q", s)
-		return s, nil
+		return r.strResolver(r, s)
 	}
 	if l, ok := i.([]interface{}); ok {
 		return r.resolveList(l)
@@ -206,10 +255,10 @@ func (r *resolver) resolveItem(i interface{}) (interface{}, error) {
 	if m, ok := i.(map[interface{}]interface{}); ok {
 		return r.resolveMap(m)
 	}
-	log.Printf("Fallthrough resolving %v of type %v.", i, reflect.TypeOf(i))
 	return i, nil
 }
 
+// resolveList recursively walks the given yaml list.
 func (r *resolver) resolveList(l []interface{}) ([]interface{}, error) {
 	result := []interface{}{}
 	for _, i := range l {
@@ -222,6 +271,7 @@ func (r *resolver) resolveList(l []interface{}) ([]interface{}, error) {
 	return result, nil
 }
 
+// resolveMap recursively walks the given yaml map.
 func (r *resolver) resolveMap(m map[interface{}]interface{}) (map[interface{}]interface{}, error) {
 	result := make(map[interface{}]interface{})
 	for k, v := range m {
@@ -238,6 +288,8 @@ func (r *resolver) resolveMap(m map[interface{}]interface{}) (map[interface{}]in
 	return result, nil
 }
 
+// resolveYAML recursively walks the given blob of arbitrary YAML and calls
+// the strResolver on each string in the YAML document.
 func (r *resolver) resolveYAML(b []byte) ([]byte, error) {
 	var l []interface{}
 	lErr := yaml.Unmarshal(b, &l)
@@ -261,6 +313,10 @@ func (r *resolver) resolveYAML(b []byte) ([]byte, error) {
 	return nil, fmt.Errorf("unable to parse given blob as a YAML list or map: %v %v", lErr, mErr)
 }
 
+// resolveTemplate resolves the given YAML template using the given mapping from
+// tagged to fully qualified image names referenced by their digest and the
+// set of image names that haven't been seen yet. The given set of unseen images
+// is updated to exclude the image names encountered in the given template.
 func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
 	t, err := ioutil.ReadFile(templateFile)
 	if err != nil {
@@ -270,13 +326,14 @@ func resolveTemplate(templateFile string, resolvedImages map[string]string, unse
 	r := resolver{
 		resolvedImages: resolvedImages,
 		unseen:         unseen,
+		strResolver:    resolveString,
 	}
 
 	resolved, err := r.resolveYAML(t)
 	if err != nil {
 		return fmt.Errorf("unable to resolve YAML template %q: %v", templateFile, err)
 	}
-	log.Printf("Resolved: %s", string(resolved))
+	fmt.Println(string(resolved))
 	return nil
 }
 
@@ -284,8 +341,6 @@ func main() {
 	flag.Var(&imgSpecs, "image_spec", "Associative lists of the constitutent elements of a docker image.")
 	flag.Var(&stampInfoFile, "stamp-info-file", "One or more Bazel stamp info files.")
 	flag.Parse()
-
-	log.Println("Template", *k8sTemplate)
 
 	stamper, err := compat.NewStamper(stampInfoFile)
 	if err != nil {
