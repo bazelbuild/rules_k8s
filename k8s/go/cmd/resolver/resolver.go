@@ -213,6 +213,9 @@ type resolver struct {
 // 2. If the given string was a tagged image, the set of unseen images in the
 //    given resolver is updated to exclude the given string.
 func resolveString(r *resolver, s string) (string, error) {
+	if _, ok := r.unseen[s]; ok {
+		delete(r.unseen, s)
+	}
 	o, ok := r.resolvedImages[s]
 	if ok {
 		return o, nil
@@ -237,9 +240,6 @@ func resolveString(r *resolver, s string) (string, error) {
 	}
 	resolved := fmt.Sprintf("%s/%s@%v", t.Context().RegistryStr(), t.Context().RepositoryStr(), d)
 	r.resolvedImages[s] = resolved
-	if _, ok := r.unseen[s]; ok {
-		delete(r.unseen, s)
-	}
 	return resolved, nil
 }
 
