@@ -12,7 +12,7 @@ spec:
       containers:
       - name: hello-http
         # Pick a public image that's unlikely to become unavailable.
-        image: gcr.io/google-containers/pause:2.0
+        image: gcr.io/google-containers/pause:3.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
