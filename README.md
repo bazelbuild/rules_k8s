@@ -22,35 +22,23 @@ Add the following to your `WORKSPACE` file to add the necessary external depende
 ```python
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Download the latest release of the rules_docker repository. See
-# https://github.com/bazelbuild/rules_docker#setup for instructions to download
-# the latest available rules_docker release.
-http_archive(
-    name = "io_bazel_rules_docker",
-    # Fill in the rest below using the link above.
-    sha256 = ...
-    strip_prefix = ...
-    urls = ...
-)
-load(
-    "@io_bazel_rules_docker//repositories:repositories.bzl",
-    container_repositories = "repositories",
-)
-container_repositories()
-
 # This requires rules_docker to be fully instantiated before
 # it is pulled in.
-# Download the rules_k8s repository at release v0.1
+# Download the rules_k8s repository at release v0.2
 http_archive(
     name = "io_bazel_rules_k8s",
-    sha256 = "91fef3e6054096a8947289ba0b6da3cba559ecb11c851d7bdfc9ca395b46d8d8",
-    strip_prefix = "rules_k8s-0.1",
-    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.1/rules_k8s-v0.1.tar.gz"],
+    sha256 = "649a851538f863410fd78147b78334bc7f47008d77712a4ee2f76d6aade704e7",
+    strip_prefix = "rules_k8s-0.2",
+    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.2/rules_k8s-v0.2.tar.gz"],
 )
 
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
 
 k8s_repositories()
+
+load("@io_bazel_rules_k8s//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
+
+k8s_go_deps()
 ```
 
 NEW: Starting with Bazel 0.27.0, you also need to add to your .bazelrc
