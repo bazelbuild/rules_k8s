@@ -217,7 +217,7 @@ func resolveString(r *resolver, s string) (string, error) {
 	if ok {
 		return o, nil
 	}
-	t, err := name.NewTag(s)
+	t, err := name.NewTag(s, name.StrictValidation)
 	if err != nil {
 		// Silently ignore strings that can't be parsed as tagged image
 		// referneces.
@@ -225,7 +225,7 @@ func resolveString(r *resolver, s string) (string, error) {
 	}
 	auth, err := authn.DefaultKeychain.Resolve(t.Context())
 	if err != nil {
-		return "", fmt.Errorf("unable to key the authenticator using the default keychain for image %v: %v", t, auth)
+		return "", fmt.Errorf("unable to get the authenticator using the default keychain for image %v: %v", t, auth)
 	}
 	img, err := remote.Image(t, remote.WithAuth(auth))
 	if err != nil {
