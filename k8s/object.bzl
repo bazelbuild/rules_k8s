@@ -229,7 +229,7 @@ def _common_impl(ctx):
         kubectl_tool = kubectl_tool_info.tool_path
         if kubectl_tool_info.tool_target:
             kubectl_tool = _runfiles(ctx, kubectl_tool_info.tool_target.files.to_list()[0])
-            extrafiles = depset(transitive = kubectl_tool_info.tool_target.files)
+            extrafiles = depset(transitive = [kubectl_tool_info.tool_target.files])
 
         substitutions = {
             "%{cluster}": cluster_arg,
