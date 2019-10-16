@@ -230,15 +230,11 @@ func resolveString(r *resolver, s string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to get the authenticator using the default keychain for image %v: %v", t, auth)
 	}
-	img, err := remote.Image(t, remote.WithAuth(auth))
+	desc, err := remote.Get(t, remote.WithAuth(auth))
 	if err != nil {
 		return "", fmt.Errorf("unable to get image %v from registry: %v", t, err)
 	}
-	d, err := img.Digest()
-	if err != nil {
-		return "", fmt.Errorf("unable to get digest for image %v: %v", t, err)
-	}
-	resolved := fmt.Sprintf("%s/%s@%v", t.Context().RegistryStr(), t.Context().RepositoryStr(), d)
+	resolved := fmt.Sprintf("%s/%s@%v", t.Context().RegistryStr(), t.Context().RepositoryStr(), desc.Digest)
 	r.resolvedImages[s] = resolved
 	return resolved, nil
 }
