@@ -14,10 +14,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
+	"os"
 	"path"
 	"strings"
 
@@ -201,6 +203,9 @@ type resolver struct {
 	// the k8s YAML template. The functor interface allows mocking the string
 	// resolver in unit tests.
 	strResolver func(*resolver, string) (string, error)
+	// numDocs stores the number of documents the resolver worked on when
+	// resolveYAML was called. This is used for testing only.
+	numDocs int
 }
 
 // resolveString resolves a string found in the k8s YAML template by replacing
@@ -284,29 +289,99 @@ func (r *resolver) resolveMap(m map[interface{}]interface{}) (map[interface{}]in
 	return result, nil
 }
 
-// resolveYAML recursively walks the given blob of arbitrary YAML and calls
-// the strResolver on each string in the YAML document.
-func (r *resolver) resolveYAML(b []byte) ([]byte, error) {
-	var l []interface{}
-	lErr := yaml.Unmarshal(b, &l)
-	if lErr == nil {
-		o, err := r.resolveItem(l)
-		if err != nil {
-			return nil, err
-		}
-		return yaml.Marshal(o)
+// yamlDoc implements the yaml.Unmarshaler interface that allows decoding an
+// arbitrary YAML document.
+type yamlDoc struct {
+	// vList stores an arbitrary YAML list.
+	vList []interface{}
+	// vMap stores an arbitrary YAML map.
+	vMap map[interface{}]interface{}
+	// isInt stores whether this YAML document stores an integer.
+	isInt bool
+	// vInt stores a YAML integer.
+	vInt int
+	// isBool stores whether this YAML document stores a boolean.
+	isBool bool
+	// vBool stores a YAML boolean.
+	vBool bool
+	// isStr stores whether this YAML document stores a string.
+	isStr bool
+	// vStr stores a YAML string.
+	vStr string
+}
+
+// UnmarshalYAML loads an arbitrary YAML document which can be a YAML list or
+// a YAML map into the given YAML document.
+func (y *yamlDoc) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	if err := unmarshal(&y.vList); err == nil {
+		return nil
 	}
-	var m map[interface{}]interface{}
-	mErr := yaml.Unmarshal(b, &m)
-	if mErr == nil {
-		o, err := r.resolveMap(m)
-		if err != nil {
+	if err := unmarshal(&y.vMap); err == nil {
+		return nil
+	}
+	if err := unmarshal(&y.vInt); err == nil {
+		y.isInt = true
+		return nil
+	}
+	if err := unmarshal(&y.vBool); err == nil {
+		y.isBool = true
+		return nil
+	}
+	if err := unmarshal(&y.vStr); err == nil {
+		y.isStr = true
+		return nil
+	}
+	return fmt.Errorf("unable to parse given blob as a YAML list, map or string, integer or boolean")
+}
+
+// val gets the stored YAML value in this document.
+func (y *yamlDoc) val() interface{} {
+	if y.vList != nil {
+		return y.vList
+	}
+	if y.vMap != nil {
+		return y.vMap
+	}
+	if y.isInt {
+		return y.vInt
+	}
+	if y.isBool {
+		return y.vBool
+	}
+	if y.isStr {
+		return y.vStr
+	}
+	return nil
+}
+
+// resolveYAML recursively walks the given stream of arbitrary YAML documents
+// and calls the strResolver on each string in the YAML document.
+func (r *resolver) resolveYAML(t io.Reader) ([]byte, error) {
+	d := yaml.NewDecoder(t)
+	buf := bytes.NewBuffer(nil)
+	e := yaml.NewEncoder(buf)
+	defer e.Close()
+	for {
+		y := yamlDoc{}
+		err := d.Decode(&y)
+		if err != nil && err != io.EOF {
 			return nil, err
 		}
-		return yaml.Marshal(o)
+		done := err == io.EOF
+		o, err := r.resolveItem(y.val())
+		if o != nil {
+			r.numDocs++
+			err = e.Encode(o)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if done {
+			break
+		}
 	}
 
-	return nil, fmt.Errorf("unable to parse given blob as a YAML list or map: %v %v", lErr, mErr)
+	return buf.Bytes(), nil
 }
 
 // resolveTemplate resolves the given YAML template using the given mapping from
@@ -314,10 +389,11 @@ func (r *resolver) resolveYAML(b []byte) ([]byte, error) {
 // set of image names that haven't been seen yet. The given set of unseen images
 // is updated to exclude the image names encountered in the given template.
 func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
-	t, err := ioutil.ReadFile(templateFile)
+	t, err := os.Open(templateFile)
 	if err != nil {
 		return fmt.Errorf("unable to open template file %q: %v", templateFile, err)
 	}
+	defer t.Close()
 
 	r := resolver{
 		resolvedImages: resolvedImages,
