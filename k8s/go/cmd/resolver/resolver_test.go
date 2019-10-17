@@ -123,6 +123,12 @@ val4: val5
 			want:     []string{"val1", "val2", "val3", "val4", "val5"},
 			wantDocs: 5,
 		},
+		{
+			name:     "EmptyDoc",
+			yamlDocs: "",
+			want:     []string{},
+			wantDocs: 0,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
