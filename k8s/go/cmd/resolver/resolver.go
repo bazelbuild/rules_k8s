@@ -217,6 +217,8 @@ type resolver struct {
 //    the resolved image name.
 // 2. If the given string was a tagged image, the set of unseen images in the
 //    given resolver is updated to exclude the given string.
+// The resolver is best-effort, i.e., if any errors are encountered, the given
+// string is returned as is.
 func resolveString(r *resolver, s string) (string, error) {
 	if _, ok := r.unseen[s]; ok {
 		delete(r.unseen, s)
@@ -227,8 +229,6 @@ func resolveString(r *resolver, s string) (string, error) {
 	}
 	t, err := name.NewTag(s, name.StrictValidation)
 	if err != nil {
-		// Silently ignore strings that can't be parsed as tagged image
-		// referneces.
 		return s, nil
 	}
 	auth, err := authn.DefaultKeychain.Resolve(t.Context())
