@@ -233,11 +233,11 @@ func resolveString(r *resolver, s string) (string, error) {
 	}
 	auth, err := authn.DefaultKeychain.Resolve(t.Context())
 	if err != nil {
-		return "", fmt.Errorf("unable to get the authenticator using the default keychain for image %v: %v", t, auth)
+		return s, nil
 	}
 	desc, err := remote.Get(t, remote.WithAuth(auth))
 	if err != nil {
-		return "", fmt.Errorf("unable to get image %v from registry: %v", t, err)
+		return s, nil
 	}
 	resolved := fmt.Sprintf("%s/%s@%v", t.Context().RegistryStr(), t.Context().RepositoryStr(), desc.Digest)
 	r.resolvedImages[s] = resolved
@@ -265,7 +265,7 @@ func (r *resolver) resolveList(l []interface{}) ([]interface{}, error) {
 	for _, i := range l {
 		o, err := r.resolveItem(i)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error resolving item %v in list: %v", i, err)
 		}
 		result = append(result, o)
 	}
@@ -278,11 +278,11 @@ func (r *resolver) resolveMap(m map[interface{}]interface{}) (map[interface{}]in
 	for k, v := range m {
 		rk, err := r.resolveItem(k)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error resolving key %v in map: %v", k, err)
 		}
 		rv, err := r.resolveItem(v)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error resolving value %v in map: %v", v, err)
 		}
 		result[rk] = rv
 	}
@@ -369,6 +369,9 @@ func (r *resolver) resolveYAML(t io.Reader) ([]byte, error) {
 		}
 		done := err == io.EOF
 		o, err := r.resolveItem(y.val())
+		if err != nil {
+			return nil, fmt.Errorf("error resolving YAML template: %v", err)
+		}
 		if o != nil {
 			r.numDocs++
 			err = e.Encode(o)
