@@ -15,12 +15,19 @@ workspace(name = "io_bazel_rules_k8s")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
+
+k8s_repositories()
+
+load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
+
+k8s_go_deps()
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "2ee9dcec820352671eb83e081295ba43f7a4157181dad549024d7070d079cf65",
-    strip_prefix = "protobuf-3.9.0",
-    url = "https://github.com/google/protobuf/archive/v3.9.0.tar.gz",
+    sha256 = "758249b537abba2f21ebc2d02555bf080917f0f2f88f4cbe2903e0e28c4187ed",
+    strip_prefix = "protobuf-3.10.0",
+    url = "https://github.com/google/protobuf/archive/v3.10.0.tar.gz",
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -38,23 +45,22 @@ git_repository(
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "ad83a8d8446b817a41d974ed2489ee77d3de83d4c27eeafe6299bc0906cd63dc",
-    strip_prefix = "grpc-d3316ad22e9122a2022ffe41f819dd670db05c49",
-    # Commit from 2019-05-30
-    urls = ["https://github.com/grpc/grpc/archive/d3316ad22e9122a2022ffe41f819dd670db05c49.tar.gz"],
+    sha256 = "ffadb8c6bcd725b60c370484062363c4c476335fbd5f377dcc66ac9c91aeae03",
+    strip_prefix = "grpc-1.24.1",
+    urls = ["https://github.com/grpc/grpc/archive/v1.24.1.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
 
-load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
+load("@upb//bazel:workspace_deps.bzl", "upb_deps")
 
-k8s_repositories()
+upb_deps()
 
-load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
+load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
 
-k8s_go_deps()
+apple_rules_dependencies()
 
 load(
     "@io_bazel_rules_docker//container:container.bzl",
@@ -156,6 +162,10 @@ pip_repositories()
 
 http_archive(
     name = "build_stack_rules_proto",
+    patch_args = ["-p1"],
+    patches = [
+        "//third_party/build_stack_rules_proto:stackb.patch",
+    ],
     sha256 = "85ccc69a964a9fe3859b1190a7c8246af2a4ead037ee82247378464276d4262a",
     strip_prefix = "rules_proto-d9a123032f8436dbc34069cfc3207f2810a494ee",
     urls = ["https://github.com/stackb/rules_proto/archive/d9a123032f8436dbc34069cfc3207f2810a494ee.tar.gz"],

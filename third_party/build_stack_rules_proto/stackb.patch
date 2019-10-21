@@ -1,0 +1,25 @@
+diff --git a/cpp/BUILD.bazel b/cpp/BUILD.bazel
+index f1bfd36..33b214d 100644
+--- a/cpp/BUILD.bazel
++++ b/cpp/BUILD.bazel
+@@ -19,6 +19,6 @@ proto_plugin(
+         "{basename}.grpc.pb.cc",
+         "{basename}_mock.grpc.pb.h",
+     ],
+-    tool = "@com_github_grpc_grpc//:grpc_cpp_plugin",
++    tool = "@com_github_grpc_grpc//src/compiler:grpc_cpp_plugin",
+     visibility = ["//visibility:public"],
+ )
+diff --git a/python/BUILD.bazel b/python/BUILD.bazel
+index 67ab2cd..e6ea86f 100644
+--- a/python/BUILD.bazel
++++ b/python/BUILD.bazel
+@@ -9,7 +9,7 @@ proto_plugin(
+ proto_plugin(
+     name = "grpc_python",
+     outputs = ["_pb2_grpc.py"],
+-    tool = "@com_github_grpc_grpc//:grpc_python_plugin",
++    tool = "@com_github_grpc_grpc//src/compiler:grpc_python_plugin",
+     transitivity = {
+         "google/protobuf": "exclude",
+     },

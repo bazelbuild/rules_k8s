@@ -86,8 +86,8 @@ wget -q https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildi
 chmod +x ./buildifier
 
 # Check that all of our tools and samples build
-bazel build -- //... $EXCLUDED_TARGETS
-bazel test  -- //... $EXCLUDED_TARGETS
+bazel build --verbose_failures -- //... $EXCLUDED_TARGETS
+bazel test  --verbose_failures -- //... $EXCLUDED_TARGETS
 
 # Run the garbage collection script to delete old namespaces.
 bazel run -- //examples:e2e_gc

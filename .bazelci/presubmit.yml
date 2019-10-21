@@ -29,6 +29,9 @@ platforms:
     test_targets:
     - "..."
   macos:
+    shell_commands:
+    - mkdir /tmp/bin
+    - ln -s /usr/bin/python2.7 /tmp/bin/python2
     build_targets:
     - "--"
     - "..."
@@ -36,5 +39,11 @@ platforms:
     - "-//images/gcloud-bazel:gcloud_installer"
     - "-//images/gcloud-bazel:gcloud_install"
     - "-//images/gcloud-bazel:gcloud-layer"
+    build_flags:
+    - "--verbose_failures"
+    - "--action_env=PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/tmp/bin/"
     test_targets:
     - "..."
+    test_flags:
+    - "--verbose_failures"
+    - "--action_env=PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/tmp/bin/"
