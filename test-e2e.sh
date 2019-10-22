@@ -81,16 +81,20 @@ kubectl version
 # Don't build/test the prow image as it requires Docker
 EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
 
+# copt flag is needed to compila a gRPC dependency (@udp)
+# verbose_failures is added for better error debugging
+BAZEL_FLAGS="--copt=-Wno-c99-extensions --verbose_failures"
+
 # Install buildifier 0.22.0 and run lint checks
 wget -q https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier
 chmod +x ./buildifier
 
 # Check that all of our tools and samples build
-bazel build -- //... $EXCLUDED_TARGETS
-bazel test  -- //... $EXCLUDED_TARGETS
+bazel build $BAZEL_FLAGS -- //... $EXCLUDED_TARGETS
+bazel test  $BAZEL_FLAGS -- //... $EXCLUDED_TARGETS
 
 # Run the garbage collection script to delete old namespaces.
-bazel run -- //examples:e2e_gc
+bazel run $BAZEL_FLAGS -- //examples:e2e_gc
 
 # Create a unique namespace for this job using the repo name and the build id
 E2E_NAMESPACE="build-${BUILD_ID:-0}"
