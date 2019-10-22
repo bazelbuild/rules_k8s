@@ -30,6 +30,9 @@ platforms:
     - "..."
   macos:
     shell_commands:
+    # create a python2 symlink
+    # see https://github.com/bazelbuild/continuous-integration/issues/854
+    # TODO(nlopezgi): remove once issue above is fixed
     - mkdir /tmp/bin
     - ln -s /usr/bin/python2.7 /tmp/bin/python2
     build_targets:
@@ -41,9 +44,15 @@ platforms:
     - "-//images/gcloud-bazel:gcloud-layer"
     build_flags:
     - "--verbose_failures"
+    # add the python2 symlink to the PATH
+    # see https://github.com/bazelbuild/continuous-integration/issues/854
+    # TODO(nlopezgi): remove once issue above is fixed
     - "--action_env=PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/tmp/bin/"
     test_targets:
     - "..."
     test_flags:
     - "--verbose_failures"
+    # add the python2 symlink to the PATH
+    # see https://github.com/bazelbuild/continuous-integration/issues/854
+    # TODO(nlopezgi): remove once issue above is fixed
     - "--action_env=PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/tmp/bin/"

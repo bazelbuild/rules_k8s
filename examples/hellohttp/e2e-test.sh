@@ -22,6 +22,10 @@ set -o xtrace
 
 source ./examples/util.sh
 
+# copt flag is needed to compila a gRPC dependency (@udp)
+# verbose_failures is added for better error debugging
+BAZEL_FLAGS="--copt=-Wno-c99-extensions --verbose_failures"
+
 validate_args $@
 shift 2
 
@@ -49,7 +53,7 @@ function EXPECT_CONTAINS() {
 # Ensure there is an ip address for hello-http-staging:8080
 apply-lb() {
   echo Applying service...
-  bazel run examples/hellohttp:staging-service.apply
+  bazel run $BAZEL_FLAGS examples/hellohttp:staging-service.apply
 }
 
 check_msg() {
@@ -83,19 +87,19 @@ edit() {
 
 apply() {
   echo Applying $LANGUAGE...
-  bazel run examples/hellohttp/${LANGUAGE}:staging.apply
+  bazel run $BAZEL_FLAGS examples/hellohttp/${LANGUAGE}:staging.apply
 }
 
 delete() {
   echo Deleting $LANGUAGE...
   kubectl get all --namespace="${namespace}" --selector=app=hello-http-staging
-  bazel run examples/hellohttp/${LANGUAGE}:staging.describe
-  bazel run examples/hellohttp/${LANGUAGE}:staging.delete
+  bazel run $BAZEL_FLAGS examples/hellohttp/${LANGUAGE}:staging.describe
+  bazel run $BAZEL_FLAGS examples/hellohttp/${LANGUAGE}:staging.delete
 }
 
 check_bad_substitution() {
   echo Checking a bad substitution...
-  if ! bazel run examples/hellohttp:error-on-run; then
+  if ! bazel run $BAZEL_FLAGS examples/hellohttp:error-on-run; then
     echo "Success, substitution failed."
     return 0
   else
@@ -106,7 +110,7 @@ check_bad_substitution() {
 
 check_no_images_resolution() {
     echo Checking resolution with no images attribute...
-    bazel build examples/hellohttp:resolve-external
+    bazel build $BAZEL_FLAGS examples/hellohttp:resolve-external
     OUTPUT=$(bazel-bin/examples/hellohttp/resolve-external 2>&1)
     echo Checking output: "${OUTPUT}" matches: "/pause@"
     echo "${OUTPUT}" | grep "[/]pause[@]"
@@ -116,11 +120,11 @@ check_no_images_resolution() {
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
     # passes it to the execution of the template
-    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply)" "apply --v=2"
+    EXPECT_CONTAINS "$(bazel run $BAZEL_FLAGS examples/hellohttp/java:staging.apply)" "apply --v=2"
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply -- --v=1)" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$(bazel run $BAZEL_FLAGS examples/hellohttp/java:staging.apply -- --v=1)" "apply --v=2 --v=1"
 }
 
 check_bad_substitution

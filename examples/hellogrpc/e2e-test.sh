@@ -22,6 +22,10 @@ set -o xtrace
 
 source ./examples/util.sh
 
+# copt flag is needed to compila a gRPC dependency (@udp)
+# verbose_failures is added for better error debugging
+BAZEL_FLAGS="--copt=-Wno-c99-extensions --verbose_failures"
+
 validate_args $@
 shift 2
 
@@ -65,18 +69,18 @@ function EXPECT_CONTAINS_PATTERN() {
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
   echo Applying service...
-  bazel build examples/hellogrpc:staging-service.apply
+  bazel build $BAZEL_FLAGS examples/hellogrpc:staging-service.apply
   bazel-bin/examples/hellogrpc/staging-service.apply
 }
 
 create() {
   echo Creating $LANGUAGE...
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.create
+  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.create
   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
 }
 
 check_msg() {
-  bazel build examples/hellogrpc/${LANGUAGE}/client
+  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/client
 
   while [[ -z $(get_lb_ip $local hello-grpc-staging) ]]; do
     echo "service has not yet received an IP address, sleeping for 5s..."
@@ -91,7 +95,7 @@ check_msg() {
   # Make Bazel generate a temporary script that runs the client executable.
   tmp_exec=hellogrpc_${LANGUAGE}_client
   # This will only generate the temp executable. It won't actually run it.
-  bazel run //examples/hellogrpc/${LANGUAGE}/client --script_path=${tmp_exec}
+  bazel run $BAZEL_FLAGS //examples/hellogrpc/${LANGUAGE}/client --script_path=${tmp_exec}
   OUTPUT=$(./${tmp_exec} $(get_lb_ip $local hello-grpc-staging))
   rm ${tmp_exec}
   echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
@@ -105,22 +109,22 @@ edit() {
 
 update() {
   echo Updating $LANGUAGE...
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.replace
+  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.replace
   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
 }
 
 delete() {
   echo Deleting $LANGUAGE...
   kubectl get all --namespace="${namespace}" --selector=app=hello-grpc-staging
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.describe
+  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.describe
   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe || echo "Resource didn't exist!"
-  bazel build examples/hellogrpc/${LANGUAGE}/server:staging.delete
+  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.delete
   bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
 }
 
 check_kubeconfig_args() {
   for cmd in apply delete; do
-    bazel build examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
+    bazel build $BAZEL_FLAGS examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
     OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.${cmd})"
     EXPECT_CONTAINS_PATTERN "${OUTPUT}" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
   done
@@ -130,11 +134,11 @@ check_kubeconfig_args() {
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
     # passes it to the execution of the template
-    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply)" "apply --v=2"
+    EXPECT_CONTAINS "$(bazel run $BAZEL_FLAGS examples/hellogrpc:staging.apply)" "apply --v=2"
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply -- --v=1)" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$(bazel run $BAZEL_FLAGS examples/hellogrpc:staging.apply -- --v=1)" "apply --v=2 --v=1"
 }
 
 check_kubeconfig_args

@@ -54,6 +54,7 @@ load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
 
+# upb_deps and apple_rules_dependencies are needed for grpc
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
 
 upb_deps()
