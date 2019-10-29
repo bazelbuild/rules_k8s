@@ -24,12 +24,12 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # This requires rules_docker to be fully instantiated before
 # it is pulled in.
-# Download the rules_k8s repository at release v0.2
+# Download the rules_k8s repository at release v0.3
 http_archive(
     name = "io_bazel_rules_k8s",
-    sha256 = "649a851538f863410fd78147b78334bc7f47008d77712a4ee2f76d6aade704e7",
-    strip_prefix = "rules_k8s-0.2",
-    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.2/rules_k8s-v0.2.tar.gz"],
+    sha256 = "a34539941fd920432b7c545f720129e2f2e6b2285f1beb66de25e429f91759bf",
+    strip_prefix = "rules_k8s-0.3",
+    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.3/rules_k8s-v0.3.tar.gz"],
 )
 
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
