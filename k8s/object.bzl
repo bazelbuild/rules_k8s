@@ -164,7 +164,7 @@ def _resolve(ctx, string, output):
     )
 
 def _common_impl(ctx):
-    files = [ctx.executable.resolver, ctx.executable.go_resolver]
+    files = [ctx.executable.resolver]
 
     cluster_arg = ctx.attr.cluster
     cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
