@@ -29,44 +29,6 @@ exports_files([
     "describe.sh.tpl",
 ])
 
-py_library(
-    name = "resolver_lib",
-    srcs = [
-        "__init__.py",
-        "resolver.py",
-        "//:__init__.py",
-    ],
-    deps = [
-        "@com_github_yaml_pyyaml//:yaml",
-        "@containerregistry",
-    ],
-)
-
-py_test(
-    name = "resolver_test",
-    srcs = ["resolver_test.py"],
-    data = [
-        "//examples/hellogrpc/cc/server:server.tar",
-    ],
-    python_version = "PY2",
-    deps = [
-        ":resolver_lib",
-        "@mock",
-    ],
-)
-
-par_binary(
-    name = "resolver",
-    srcs = ["resolver.py"],
-    main = "resolver.py",
-    python_version = "PY2",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@com_github_yaml_pyyaml//:yaml",
-        "@containerregistry",
-    ],
-)
-
 par_binary(
     name = "stamper",
     srcs = ["stamper.py"],

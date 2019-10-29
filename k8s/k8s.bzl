@@ -67,9 +67,9 @@ py_library(
     if "io_bazel_rules_docker" not in excludes:
         http_archive(
             name = "io_bazel_rules_docker",
-            sha256 = "5fcad5748a03d961c457ae15348684aa6eceb8f1cd6ae5fd7271fb5a271acdaf",
-            strip_prefix = "rules_docker-7476c25fcf188dbfc4eb154ad309eda7df24652c",
-            urls = ["https://github.com/bazelbuild/rules_docker/archive/7476c25fcf188dbfc4eb154ad309eda7df24652c.tar.gz"],
+            sha256 = "14ac30773fdb393ddec90e158c9ec7ebb3f8a4fd533ec2abbfd8789ad81a284b",
+            strip_prefix = "rules_docker-0.12.1",
+            urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.12.1/rules_docker-v0.12.1.tar.gz"],
         )
     if "bazel_skylib" not in excludes:
         http_archive(
