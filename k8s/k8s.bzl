@@ -36,10 +36,20 @@ py_library(
         "lib",
     ],
     visibility = ["//visibility:public"],
-)""",
-            sha256 = "6b4314b1b2051ddb9d4fcd1634e1fa9c1bb4012954273c9ff3ef689f6ec6c93e",
-            strip_prefix = "pyyaml-3.12",
-            urls = ["https://github.com/yaml/pyyaml/archive/3.12.zip"],
+)
+
+py_library(
+    name = "yaml3",
+    srcs = glob(["lib3/yaml/*.py"]),
+    imports = [
+        "lib3",
+    ],
+    visibility = ["//visibility:public"],
+)
+""",
+            sha256 = "e9df8412ddabc9c21b4437ee138875b95ebb32c25f07f962439e16005152e00e",
+            strip_prefix = "pyyaml-5.1.2",
+            urls = ["https://github.com/yaml/pyyaml/archive/5.1.2.zip"],
         )
 
     # Register the default kubectl toolchain targets for supported platforms

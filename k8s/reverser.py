@@ -32,7 +32,7 @@ def main():
   with open(args.template, 'r') as f:
     inputs = f.read()
 
-  content = yaml.dump_all(reversed([x for x in yaml.load_all(inputs)]))
+  content = yaml.dump_all(reversed([x for x in yaml.load_all(inputs, Loader=yaml.SafeLoader)]))
 
   print(content)
 

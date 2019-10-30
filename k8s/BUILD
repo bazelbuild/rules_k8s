@@ -33,7 +33,6 @@ par_binary(
     name = "stamper",
     srcs = ["stamper.py"],
     main = "stamper.py",
-    python_version = "PY2",
     visibility = ["//visibility:public"],
 )
 
@@ -41,9 +40,9 @@ par_binary(
     name = "reverser",
     srcs = ["reverser.py"],
     main = "reverser.py",
-    python_version = "PY2",
     visibility = ["//visibility:public"],
-    deps = [
-        "@com_github_yaml_pyyaml//:yaml",
-    ],
+    deps = select({
+        "@bazel_tools//tools/python:PY2": ["@com_github_yaml_pyyaml//:yaml"],
+        "@bazel_tools//tools/python:PY3": ["@com_github_yaml_pyyaml//:yaml3"],
+    }),
 )
