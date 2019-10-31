@@ -316,15 +316,33 @@ npm_install(
     package_json = "//examples/hellohttp/nodejs:package.json",
 )
 
-# error_prone_annotations required by protobuf 3.7.1
-maven_jar(
-    name = "error_prone_annotations_maven",
-    artifact = "com.google.errorprone:error_prone_annotations:2.3.2",
+RULES_JVM_EXTERNAL_TAG = "2.9"
+RULES_JVM_EXTERNAL_SHA = "e5b97a31a3e8feed91636f42e19b11c49487b85e5de2f387c999ea14d77c7f45"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    name = "maven",
+    artifacts = [
+        "com.google.errorprone:error_prone_annotations:2.3.2",
+    ],
+    repositories = [
+        "https://jcenter.bintray.com",
+        "https://repo1.maven.org/maven2",
+    ],
+)
+
+# error_prone_annotations required by protobuf 3.7.1
 bind(
     name = "error_prone_annotations",
-    actual = "@error_prone_annotations_maven//jar",
+    actual = "@maven//:com_google_errorprone_error_prone_annotations",
 )
 
 # gazelle:repo bazel_gazelle
