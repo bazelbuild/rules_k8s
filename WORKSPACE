@@ -25,9 +25,9 @@ k8s_go_deps()
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "758249b537abba2f21ebc2d02555bf080917f0f2f88f4cbe2903e0e28c4187ed",
-    strip_prefix = "protobuf-3.10.0",
-    url = "https://github.com/google/protobuf/archive/v3.10.0.tar.gz",
+    sha256 = "6adf73fd7f90409e479d6ac86529ade2d45f50494c5c10f539226693cb8fe4f7",
+    strip_prefix = "protobuf-3.10.1",
+    url = "https://github.com/google/protobuf/archive/v3.10.1.tar.gz",
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
