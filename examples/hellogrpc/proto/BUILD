@@ -37,6 +37,10 @@ java_grpc_library(
 
 go_grpc_library(
     name = "simple_go_grpc",
+    go_deps = [
+        "@org_golang_google_grpc//codes:go_default_library",
+        "@org_golang_google_grpc//status:go_default_library",
+    ],
     importpath = "github.com/bazelbuild/rules_k8s/examples/hellogrpc/proto/go",
     visibility = ["//examples/hellogrpc/go:__subpackages__"],
     deps = [":simple_proto"],

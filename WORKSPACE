@@ -25,9 +25,9 @@ k8s_go_deps()
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "758249b537abba2f21ebc2d02555bf080917f0f2f88f4cbe2903e0e28c4187ed",
-    strip_prefix = "protobuf-3.10.0",
-    url = "https://github.com/google/protobuf/archive/v3.10.0.tar.gz",
+    sha256 = "6adf73fd7f90409e479d6ac86529ade2d45f50494c5c10f539226693cb8fe4f7",
+    strip_prefix = "protobuf-3.10.1",
+    url = "https://github.com/google/protobuf/archive/v3.10.1.tar.gz",
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -149,7 +149,7 @@ py_library(
 
 git_repository(
     name = "rules_python",
-    commit = "230f6d15b4ab23cd3a46c54023c9e5fb3e1e3542",  # 2019-03-07
+    commit = "a610acec1653001b736338e4bc2dbe9609ed86b2",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
@@ -316,15 +316,30 @@ npm_install(
     package_json = "//examples/hellohttp/nodejs:package.json",
 )
 
-# error_prone_annotations required by protobuf 3.7.1
-maven_jar(
-    name = "error_prone_annotations_maven",
-    artifact = "com.google.errorprone:error_prone_annotations:2.3.2",
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = "e5b97a31a3e8feed91636f42e19b11c49487b85e5de2f387c999ea14d77c7f45",
+    strip_prefix = "rules_jvm_external-2.9",
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/2.9.zip",
 )
 
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    name = "maven",
+    artifacts = [
+        "com.google.errorprone:error_prone_annotations:2.3.2",
+    ],
+    repositories = [
+        "https://jcenter.bintray.com",
+        "https://repo1.maven.org/maven2",
+    ],
+)
+
+# error_prone_annotations required by protobuf 3.7.1
 bind(
     name = "error_prone_annotations",
-    actual = "@error_prone_annotations_maven//jar",
+    actual = "@maven//:com_google_errorprone_error_prone_annotations",
 )
 
 # gazelle:repo bazel_gazelle
