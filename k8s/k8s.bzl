@@ -62,10 +62,10 @@ py_library(
     if "io_bazel_rules_go" not in excludes:
         http_archive(
             name = "io_bazel_rules_go",
-            sha256 = "b480589f57e8b09f4b0892437b9afe889e0d6660e92f5d53d3f0546c01e67ca5",
+            sha256 = "b9aa86ec08a292b97ec4591cf578e020b35f98e12173bbd4a921f84f583aebd9",
             urls = [
-                "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.19.7/rules_go-v0.19.7.tar.gz",
-                "https://github.com/bazelbuild/rules_go/releases/download/v0.19.7/rules_go-v0.19.7.tar.gz",
+                "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/v0.20.2/rules_go-v0.20.2.tar.gz",
+                "https://github.com/bazelbuild/rules_go/releases/download/v0.20.2/rules_go-v0.20.2.tar.gz",
             ],
         )
     if "bazel_gazelle" not in excludes:
