@@ -149,7 +149,7 @@ py_library(
 
 git_repository(
     name = "rules_python",
-    commit = "7b222cfdb4e59b9fd2a609e1fbb233e94fdcde7c",  # 2019-03-07
+    commit = "94677401bc56ed5d756f50b441a6a5c7f735a6d4",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
