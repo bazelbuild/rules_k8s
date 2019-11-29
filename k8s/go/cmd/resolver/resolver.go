@@ -206,6 +206,8 @@ type resolver struct {
 	// numDocs stores the number of documents the resolver worked on when
 	// resolveYAML was called. This is used for testing only.
 	numDocs int
+	// stamper resolves stuff
+	stamper *compat.Stamper
 }
 
 // resolveString resolves a string found in the k8s YAML template by replacing
@@ -229,6 +231,7 @@ func resolveString(r *resolver, s string) (string, error) {
 	}
 	t, err := name.NewTag(s, name.StrictValidation)
 	if err != nil {
+		s = r.stamper.Stamp(s)
 		return s, nil
 	}
 	auth, err := authn.DefaultKeychain.Resolve(t.Context())
@@ -240,6 +243,7 @@ func resolveString(r *resolver, s string) (string, error) {
 		return s, nil
 	}
 	resolved := fmt.Sprintf("%s/%s@%v", t.Context().RegistryStr(), t.Context().RepositoryStr(), desc.Digest)
+
 	r.resolvedImages[s] = resolved
 	return resolved, nil
 }
@@ -391,7 +395,7 @@ func (r *resolver) resolveYAML(t io.Reader) ([]byte, error) {
 // tagged to fully qualified image names referenced by their digest and the
 // set of image names that haven't been seen yet. The given set of unseen images
 // is updated to exclude the image names encountered in the given template.
-func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
+func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool, stamper *compat.Stamper) error {
 	t, err := os.Open(templateFile)
 	if err != nil {
 		return fmt.Errorf("unable to open template file %q: %v", templateFile, err)
@@ -401,6 +405,7 @@ func resolveTemplate(templateFile string, resolvedImages map[string]string, unse
 	r := resolver{
 		resolvedImages: resolvedImages,
 		unseen:         unseen,
+		stamper:        stamper,
 		strResolver:    resolveString,
 	}
 
@@ -434,7 +439,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to publish images: %v", err)
 	}
-	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen); err != nil {
+	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen, stamper); err != nil {
 		log.Fatalf("Unable to resolve template file %q: %v", *k8sTemplate, err)
 	}
 	if len(unseen) > 0 && !*allowUnusedImages {

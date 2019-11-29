@@ -3,8 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 
+	"github.com/bazelbuild/rules_docker/container/go/pkg/compat"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -155,5 +158,69 @@ val4: val5
 				t.Errorf("YAML walker did not visit all YAML documents, got %d, want %d.", r.numDocs, tc.wantDocs)
 			}
 		})
+	}
+}
+
+// TestStrResolver should have a comment
+func TestStrResolver(t *testing.T) {
+	y := []byte(`val1: val2
+val3: val4
+val5:
+  val6: val7
+val8:
+  val9: val10
+  val11:
+    val12:
+      val13:
+      val14: val15
+  val16:
+    val17:
+    - val18: val19
+      val20: val21
+      val22: "{key1}"
+      val24:
+      - val25: val26
+`)
+	got := make(map[string]bool)
+	sr := func(r *resolver, s string) (string, error) {
+		s, err := resolveString(r, s)
+		got[s] = true
+		return s, err
+	}
+	content := []byte("key1 value1")
+	tmpfile, err := ioutil.TempFile("", "example")
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.Remove(tmpfile.Name()) // clean up
+
+	if _, err := tmpfile.Write(content); err != nil {
+		t.Error(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		t.Error(err)
+	}
+	s, err := compat.NewStamper([]string{tmpfile.Name()})
+	if err != nil {
+		t.Error(err)
+	}
+	r := &resolver{
+		stamper:     s,
+		strResolver: sr,
+	}
+	if _, err := r.resolveYAML(bytes.NewBuffer(y)); err != nil {
+		t.Fatalf("Failed to resolve YAML: %v", err)
+	}
+	want := make(map[string]bool)
+	for i := 1; i <= 26; i++ {
+		if i != 23 {
+			want[fmt.Sprintf("val%d", i)] = true
+		} else {
+			want["value1"] = true
+		}
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("YAML walker did not visit all strings (-want +got):\n%s", diff)
 	}
 }
