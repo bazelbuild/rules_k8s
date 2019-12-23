@@ -45,9 +45,9 @@ git_repository(
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "ffbe61269160ea745e487f79b0fd06b6edd3d50c6d9123f053b5634737cf2f69",
-    strip_prefix = "grpc-1.25.0",
-    urls = ["https://github.com/grpc/grpc/archive/v1.25.0.tar.gz"],
+    sha256 = "2fcb7f1ab160d6fd3aaade64520be3e5446fc4c6fa7ba6581afdc4e26094bd81",
+    strip_prefix = "grpc-1.26.0",
+    urls = ["https://github.com/grpc/grpc/archive/v1.26.0.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -167,9 +167,9 @@ http_archive(
     patches = [
         "//third_party/build_stack_rules_proto:stackb.patch",
     ],
-    sha256 = "85ccc69a964a9fe3859b1190a7c8246af2a4ead037ee82247378464276d4262a",
-    strip_prefix = "rules_proto-d9a123032f8436dbc34069cfc3207f2810a494ee",
-    urls = ["https://github.com/stackb/rules_proto/archive/d9a123032f8436dbc34069cfc3207f2810a494ee.tar.gz"],
+    sha256 = "966316838b6454ca2f51718d6a801f8ebf7d1d41c82a51ac24af4d92115fa323",
+    strip_prefix = "rules_proto-0a888dbeacebfe06acb7ba740e0723b1adb0dd52",
+    urls = ["https://github.com/stackb/rules_proto/archive/0a888dbeacebfe06acb7ba740e0723b1adb0dd52.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
