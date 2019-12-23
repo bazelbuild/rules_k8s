@@ -298,9 +298,7 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/0.42.3/rules_nodejs-0.42.3.tar.gz"],
 )
 
-load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories", "npm_install")
-
-node_repositories(package_json = ["//examples/hellohttp/nodejs:package.json"])
+load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
 # We use nodejs_image to build a sample service
 load(
@@ -310,9 +308,11 @@ load(
 
 _nodejs_image_repos()
 
-npm_install(
+yarn_install(
     name = "examples_hellohttp_npm",
     package_json = "//examples/hellohttp/nodejs:package.json",
+    symlink_node_modules = False,
+    yarn_lock = "//examples:yarn.lock",
 )
 
 http_archive(
