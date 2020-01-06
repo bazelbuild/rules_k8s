@@ -182,7 +182,7 @@ func publish(spec []imageSpec, stamper *compat.Stamper) (map[string]string, map[
 	for _, s := range spec {
 		digestRef, err := publishSingle(s, stamper)
 		if err != nil {
-			return nil, nil, fmt.Errorf("unable to publish image %s", s.name)
+			return nil, nil, err
 		}
 		overrides[s.name] = digestRef
 		unseen[s.name] = true
