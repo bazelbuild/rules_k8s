@@ -41,3 +41,6 @@ bazel-bin
 bazel-genfiles
 bazel-out
 bazel-testlogs
+
+# Npm packages
+node_modules 

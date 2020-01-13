@@ -22,7 +22,7 @@ licenses(["notice"])  # Apache 2.0
 nodejs_image(
     name = "server",
     data = [":server.js"],
-    entry_point = "io_bazel_rules_k8s/examples/hellohttp/nodejs/server.js",
+    entry_point = "@io_bazel_rules_k8s//examples/hellohttp/nodejs:server.js",
     node_modules = "@examples_hellohttp_npm//:node_modules",
 )
 
