@@ -27,8 +27,6 @@ load(
     _get_runfile_path = "runfile",
 )
 
-SubFileInfo = provider(fields = ["file"])
-
 def _runfiles(ctx, f):
     return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
 
@@ -50,7 +48,7 @@ def _add_dicts(*dicts):
 def _impl(ctx):
     """Core implementation of k8s_object."""
 
-    all_inputs = []
+    all_inputs = [ctx.file.template]
     image_specs = []
     if ctx.attr.images:
         # Compute the set of layers from the image_targets.
@@ -116,14 +114,18 @@ def _impl(ctx):
         image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
         all_inputs.append(image_chroot_file)
 
-    ctx.actions.expand_template(
-        template = ctx.file.template,
-        substitutions = {
-            key: ctx.expand_make_variables(key, value, {})
-            for (key, value) in ctx.attr.substitutions.items()
-        },
-        output = ctx.outputs.substituted,
+    substitutions_file = ctx.actions.declare_file(ctx.label.name + ".substitutions")
+    ctx.actions.write(
+        output = substitutions_file,
+        content = "\n".join([
+            "%s\n%s" % (
+                key,
+                ctx.expand_make_variables(key, value, {})
+            )
+            for key, value in ctx.attr.substitutions.items()
+        ]).strip("\n"),
     )
+    all_inputs += [substitutions_file]
 
     ctx.actions.expand_template(
         template = ctx.file._template,
@@ -136,18 +138,17 @@ def _impl(ctx):
             "%{resolver_args}": " ".join(ctx.attr.resolver_args or []),
             "%{resolver}": _runfiles(ctx, ctx.executable.resolver),
             "%{stamp_args}": stamp_args,
-            "%{yaml}": _runfiles(ctx, ctx.outputs.substituted),
+            "%{substitutions}": _runfiles(ctx, substitutions_file),
+            "%{yaml}": _runfiles(ctx, ctx.file.template),
         },
         output = ctx.outputs.executable,
     )
 
     return [
-        SubFileInfo(file = ctx.outputs.substituted),
         DefaultInfo(
             runfiles = ctx.runfiles(
                 files = [
                     ctx.executable.resolver,
-                    ctx.outputs.substituted,
                 ] + all_inputs,
                 transitive_files = ctx.attr.resolver[DefaultInfo].default_runfiles.files,
             ),
@@ -324,9 +325,6 @@ _k8s_object = rule(
         _layer_tools,
     ),
     executable = True,
-    outputs = {
-        "substituted": "%{name}.substituted.yaml",
-    },
     implementation = _impl,
 )
 

@@ -14,6 +14,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -34,6 +35,7 @@ import (
 var (
 	imgChroot         = flag.String("image_chroot", "", "The repository under which to chroot image references when publishing them.")
 	k8sTemplate       = flag.String("template", "", "The k8s YAML template file to resolve.")
+	substitutionsFile = flag.String("substitutions", "", "A file with a list of substitutions that were made in the YAML template. Any stamp values that appear are stamped by the resolver.")
 	allowUnusedImages = flag.Bool("allow_unused_images", false, "Allow images that don't appear in the JSON. This is useful when generating multiple SKUs of a k8s_object, only some of which use a particular image.")
 	stampInfoFile     utils.ArrayStringFlags
 	imgSpecs          utils.ArrayStringFlags
@@ -120,6 +122,34 @@ func parseImageSpec(spec string) (imageSpec, error) {
 	return result, nil
 }
 
+// parseSubsitutions parses a substitution file, which should be a newline-separated
+// of strings to search for and values to replace them with. The replacement values
+// are stamped using the provided stamper.
+func parseSubstitutions(file string, stamper *compat.Stamper) (map[string]string, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open file: %v", err)
+	}
+	defer f.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	if len(lines)%2 != 0 {
+		return nil, fmt.Errorf("file has an odd number of lines")
+	}
+
+	result := make(map[string]string, len(lines)/2)
+	for i := 0; i < len(lines); i += 2 {
+		result[lines[i]] = stamper.Stamp(lines[i+1])
+	}
+
+	return result, nil
+}
+
 // publishSingle publishes a docker image with the given spec to the remote
 // registry indicated in the image name. The image name is stamped with the
 // given stamper.
@@ -199,6 +229,9 @@ type resolver struct {
 	// unseen is the set of images that haven't been seen yet. Image names
 	// encountered in the k8s YAML template are removed from this set.
 	unseen map[string]bool
+	// substitutions is a map of values we want to replace in the template
+	// whenever we see them, along with their replacements.
+	substitutions map[string]string
 	// strResolver is called to resolve every individual string encountered in
 	// the k8s YAML template. The functor interface allows mocking the string
 	// resolver in unit tests.
@@ -220,6 +253,9 @@ type resolver struct {
 // The resolver is best-effort, i.e., if any errors are encountered, the given
 // string is returned as is.
 func resolveString(r *resolver, s string) (string, error) {
+	for k, v := range r.substitutions {
+		s = strings.ReplaceAll(s, k, v)
+	}
 	if _, ok := r.unseen[s]; ok {
 		delete(r.unseen, s)
 	}
@@ -390,8 +426,9 @@ func (r *resolver) resolveYAML(t io.Reader) ([]byte, error) {
 // resolveTemplate resolves the given YAML template using the given mapping from
 // tagged to fully qualified image names referenced by their digest and the
 // set of image names that haven't been seen yet. The given set of unseen images
-// is updated to exclude the image names encountered in the given template.
-func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
+// is updated to exclude the image names encountered in the given template. The
+// given substitutions are made in the template.
+func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool, substitutions map[string]string) error {
 	t, err := os.Open(templateFile)
 	if err != nil {
 		return fmt.Errorf("unable to open template file %q: %v", templateFile, err)
@@ -401,6 +438,7 @@ func resolveTemplate(templateFile string, resolvedImages map[string]string, unse
 	r := resolver{
 		resolvedImages: resolvedImages,
 		unseen:         unseen,
+		substitutions:  substitutions,
 		strResolver:    resolveString,
 	}
 
@@ -430,11 +468,20 @@ func main() {
 		}
 		specs = append(specs, spec)
 	}
+
+	substitutions := map[string]string{}
+	if *substitutionsFile != "" {
+		substitutions, err = parseSubstitutions(*substitutionsFile, stamper)
+		if err != nil {
+			log.Fatalf("Unable to parse substitutions file %s: %v", *substitutionsFile, err)
+		}
+	}
+
 	resolvedImages, unseen, err := publish(specs, stamper)
 	if err != nil {
 		log.Fatalf("Unable to publish images: %v", err)
 	}
-	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen); err != nil {
+	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen, substitutions); err != nil {
 		log.Fatalf("Unable to resolve template file %q: %v", *k8sTemplate, err)
 	}
 	if len(unseen) > 0 && !*allowUnusedImages {

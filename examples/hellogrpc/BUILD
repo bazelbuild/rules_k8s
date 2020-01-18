@@ -42,28 +42,6 @@ k8s_service(
     template = "service.yaml",
 )
 
-file_test(
-    name = "staging-service-substitution-test",
-    content = """\
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: hello-grpc-staging
-    extratag: substituted-value
-  name: hello-grpc-staging
-spec:
-  ports:
-  - port: 50051
-    protocol: TCP
-    targetPort: 50051
-  selector:
-    app: hello-grpc-staging
-  type: LoadBalancer
-""",
-    file = ":staging-service.substituted.yaml",
-)
-
 config_setting(
     name = "is_prod",
     define_values = {"environment": "staging"},

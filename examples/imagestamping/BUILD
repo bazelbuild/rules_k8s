@@ -24,6 +24,10 @@ k8s_object(
     images = {
         "index.docker.io/parsec86/{REPOSITORY}:{STABLE_GIT_COMMIT}": "//examples/imagestamping/go:go-container",
     },
+    # Stamp values can also be used in substitutions
+    substitutions = {
+        "%{deployed_by}": "{STABLE_USER}",
+    },
     # K8s deployment template with a stamping variable to replace
     template = ":deployment.yaml",
 )

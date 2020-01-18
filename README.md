@@ -522,6 +522,8 @@ A rule for interacting with Kubernetes objects.
         template with the value "value" by way of first make variable
         substitution and then expand_template replacement.
         </p>
+        <p>Any stamp variables are also replaced with their values. This is done
+        after make variable substitution.</p>
       </td>
     </tr>
     <tr>
