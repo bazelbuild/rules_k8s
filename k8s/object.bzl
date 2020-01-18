@@ -114,16 +114,15 @@ def _impl(ctx):
         image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
         all_inputs.append(image_chroot_file)
 
-    substitutions_file = ctx.actions.declare_file(ctx.label.name + ".substitutions")
+    substitutions_file = ctx.actions.declare_file(ctx.label.name + ".substitutions.json")
     ctx.actions.write(
         output = substitutions_file,
-        content = "\n".join([
-            "%s\n%s" % (
-                key,
-                ctx.expand_make_variables(key, value, {})
-            )
-            for key, value in ctx.attr.substitutions.items()
-        ]).strip("\n"),
+        content = struct(
+            substitutions = {
+                key: ctx.expand_make_variables(key, value, {})
+                for (key, value) in ctx.attr.substitutions.items()
+            },
+        ).to_json(),
     )
     all_inputs += [substitutions_file]
 

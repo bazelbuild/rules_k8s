@@ -14,11 +14,12 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -122,32 +123,27 @@ func parseImageSpec(spec string) (imageSpec, error) {
 	return result, nil
 }
 
-// parseSubsitutions parses a substitution file, which should be a newline-separated
-// of strings to search for and values to replace them with. The replacement values
+// parseSubsitutions parses a substitution file, which should be a JSON object
+// with strings to search for and values to replace them with. The replacement values
 // are stamped using the provided stamper.
 func parseSubstitutions(file string, stamper *compat.Stamper) (map[string]string, error) {
-	f, err := os.Open(file)
+	b, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("unable to open file: %v", err)
-	}
-	defer f.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+		return nil, fmt.Errorf("unable to read file: %v", err)
 	}
 
-	if len(lines)%2 != 0 {
-		return nil, fmt.Errorf("file has an odd number of lines")
+	result := struct {
+		Substitutions map[string]string
+	}{}
+	if err := json.Unmarshal(b, &result); err != nil {
+		return nil, fmt.Errorf("unmarshaling as JSON: %v", err)
 	}
 
-	result := make(map[string]string, len(lines)/2)
-	for i := 0; i < len(lines); i += 2 {
-		result[lines[i]] = stamper.Stamp(lines[i+1])
+	for k, v := range result.Substitutions {
+		result.Substitutions[k] = stamper.Stamp(v)
 	}
 
-	return result, nil
+	return result.Substitutions, nil
 }
 
 // publishSingle publishes a docker image with the given spec to the remote
