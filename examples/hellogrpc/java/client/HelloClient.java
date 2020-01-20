@@ -37,7 +37,7 @@ public class HelloClient {
     /** Construct client connecting to Simple server at {@code host:port}. */
     public HelloClient(String host, int port) {
 	channel = ManagedChannelBuilder.forAddress(host, port)
-	    .usePlaintext(true)
+	    .usePlaintext()
 	    .build();
 	blockingStub = SimpleGrpc.newBlockingStub(channel);
     }
