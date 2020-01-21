@@ -21,7 +21,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"os"
 	"path"
 	"strings"
 
@@ -225,9 +224,6 @@ type resolver struct {
 	// unseen is the set of images that haven't been seen yet. Image names
 	// encountered in the k8s YAML template are removed from this set.
 	unseen map[string]bool
-	// substitutions is a map of values we want to replace in the template
-	// whenever we see them, along with their replacements.
-	substitutions map[string]string
 	// strResolver is called to resolve every individual string encountered in
 	// the k8s YAML template. The functor interface allows mocking the string
 	// resolver in unit tests.
@@ -249,9 +245,6 @@ type resolver struct {
 // The resolver is best-effort, i.e., if any errors are encountered, the given
 // string is returned as is.
 func resolveString(r *resolver, s string) (string, error) {
-	for k, v := range r.substitutions {
-		s = strings.ReplaceAll(s, k, v)
-	}
 	if _, ok := r.unseen[s]; ok {
 		delete(r.unseen, s)
 	}
@@ -425,20 +418,22 @@ func (r *resolver) resolveYAML(t io.Reader) ([]byte, error) {
 // is updated to exclude the image names encountered in the given template. The
 // given substitutions are made in the template.
 func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool, substitutions map[string]string) error {
-	t, err := os.Open(templateFile)
+	t, err := ioutil.ReadFile(templateFile)
 	if err != nil {
-		return fmt.Errorf("unable to open template file %q: %v", templateFile, err)
+		return fmt.Errorf("unable to read template file %q: %v", templateFile, err)
 	}
-	defer t.Close()
+
+	for k, v := range substitutions {
+		t = bytes.ReplaceAll(t, []byte(k), []byte(v))
+	}
 
 	r := resolver{
 		resolvedImages: resolvedImages,
 		unseen:         unseen,
-		substitutions:  substitutions,
 		strResolver:    resolveString,
 	}
 
-	resolved, err := r.resolveYAML(t)
+	resolved, err := r.resolveYAML(bytes.NewReader(t))
 	if err != nil {
 		return fmt.Errorf("unable to resolve YAML template %q: %v", templateFile, err)
 	}
