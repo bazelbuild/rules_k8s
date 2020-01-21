@@ -35,9 +35,6 @@ k8s_deploy(
 
 k8s_service(
     name = "staging-service",
-    substitutions = {
-        "%{SUBSTITUTED_ARGUMENT}": "substituted-value",
-    },
     template = "service.yaml",
 )
 
