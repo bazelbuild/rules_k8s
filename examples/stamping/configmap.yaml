@@ -1,5 +1,5 @@
-apiVersion: apps/v1beta1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
   name: substitution-stamping
 data:
