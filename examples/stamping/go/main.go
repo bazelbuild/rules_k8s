@@ -14,5 +14,5 @@
 package main
 
 func main() {
-	println("hello image stamping test container")
+	println("hello stamping test container")
 }
