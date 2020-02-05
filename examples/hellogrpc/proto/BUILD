@@ -16,6 +16,7 @@ load("@build_stack_rules_proto//cpp:cpp_grpc_library.bzl", "cpp_grpc_library")
 load("@build_stack_rules_proto//go:go_grpc_library.bzl", "go_grpc_library")
 load("@build_stack_rules_proto//java:java_grpc_library.bzl", "java_grpc_library")
 load("@build_stack_rules_proto//python:python_grpc_library.bzl", "python_grpc_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
     name = "simple_proto",
