@@ -16,8 +16,12 @@ platforms:
     - "-//images/gcloud-bazel:gcloud_installer"
     - "-//images/gcloud-bazel:gcloud_install"
     - "-//images/gcloud-bazel:gcloud-layer"
+    build_flags:
+    - "--incompatible_load_proto_rules_from_bzl"
     test_targets:
     - "..."
+    test_flags:
+    - "--incompatible_load_proto_rules_from_bzl"
   ubuntu1804:
     build_targets:
     - "--"
@@ -26,8 +30,12 @@ platforms:
     - "-//images/gcloud-bazel:gcloud_installer"
     - "-//images/gcloud-bazel:gcloud_install"
     - "-//images/gcloud-bazel:gcloud-layer"
+    build_flags:
+    - "--incompatible_load_proto_rules_from_bzl"
     test_targets:
     - "..."
+    test_flags:
+    - "--incompatible_load_proto_rules_from_bzl"
   macos:
     shell_commands:
     # create a python2 symlink
@@ -44,6 +52,7 @@ platforms:
     - "-//images/gcloud-bazel:gcloud-layer"
     build_flags:
     - "--verbose_failures"
+    - "--incompatible_load_proto_rules_from_bzl"
     # add the python2 symlink to the PATH
     # see https://github.com/bazelbuild/continuous-integration/issues/854
     # TODO(nlopezgi): remove once issue above is fixed
@@ -52,6 +61,7 @@ platforms:
     - "..."
     test_flags:
     - "--verbose_failures"
+    - "--incompatible_load_proto_rules_from_bzl"
     # add the python2 symlink to the PATH
     # see https://github.com/bazelbuild/continuous-integration/issues/854
     # TODO(nlopezgi): remove once issue above is fixed

@@ -45,9 +45,9 @@ git_repository(
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "2fcb7f1ab160d6fd3aaade64520be3e5446fc4c6fa7ba6581afdc4e26094bd81",
-    strip_prefix = "grpc-1.26.0",
-    urls = ["https://github.com/grpc/grpc/archive/v1.26.0.tar.gz"],
+    sha256 = "a172ad06c40124cce5f8cdb7c70a4b5f475eb0aa54fd730c4b996d25f90a7a95",
+    strip_prefix = "grpc-a2e4a23fc0d5eb65aeec17d2056f26083a0c87b6",
+    urls = ["https://github.com/grpc/grpc/archive/a2e4a23fc0d5eb65aeec17d2056f26083a0c87b6.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
