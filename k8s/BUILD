@@ -32,18 +32,18 @@ exports_files([
 par_binary(
     name = "stamper",
     srcs = ["stamper.py"],
+    main = "stamper.py",
     python_version = "PY3",
     srcs_version = "PY3",
-    main = "stamper.py",
     visibility = ["//visibility:public"],
 )
 
 par_binary(
     name = "reverser",
     srcs = ["reverser.py"],
+    main = "reverser.py",
     python_version = "PY3",
     srcs_version = "PY3",
-    main = "reverser.py",
     visibility = ["//visibility:public"],
     deps = select({
         "@bazel_tools//tools/python:PY2": ["@com_github_yaml_pyyaml//:yaml"],
