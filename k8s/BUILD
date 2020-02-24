@@ -32,6 +32,8 @@ exports_files([
 par_binary(
     name = "stamper",
     srcs = ["stamper.py"],
+    python_version = "PY3",
+    srcs_version = "PY3",
     main = "stamper.py",
     visibility = ["//visibility:public"],
 )
@@ -39,6 +41,8 @@ par_binary(
 par_binary(
     name = "reverser",
     srcs = ["reverser.py"],
+    python_version = "PY3",
+    srcs_version = "PY3",
     main = "reverser.py",
     visibility = ["//visibility:public"],
     deps = select({
