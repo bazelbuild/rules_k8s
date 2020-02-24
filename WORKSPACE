@@ -25,9 +25,9 @@ k8s_go_deps()
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "cf754718b0aa945b00550ed7962ddc167167bd922b842199eeb6505e6f344852",
-    strip_prefix = "protobuf-3.11.3",
-    url = "https://github.com/google/protobuf/archive/v3.11.3.tar.gz",
+    sha256 = "a79d19dcdf9139fa4b81206e318e33d245c4c9da1ffed21c87288ed4380426f9",
+    strip_prefix = "protobuf-3.11.4",
+    url = "https://github.com/google/protobuf/archive/v3.11.4.tar.gz",
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -45,9 +45,9 @@ git_repository(
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "2df2804a89dc707b8402b4c946956203d2bc1814a4ef4d09a40fa2c4ae1729b8",
-    strip_prefix = "grpc-1.27.1",
-    urls = ["https://github.com/grpc/grpc/archive/v1.27.1.tar.gz"],
+    sha256 = "49c1cca77d07877b878b396b42655c71a412dc14bb95d4f959d6c8971a6bb908",
+    strip_prefix = "grpc-1.27.2",
+    urls = ["https://github.com/grpc/grpc/archive/v1.27.2.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -149,7 +149,7 @@ py_library(
 
 git_repository(
     name = "rules_python",
-    commit = "38f86fb55b698c51e8510c807489c9f4e047480e",  # 2019-03-07
+    commit = "dd7f9c5f01bafbfea08c44092b6b0c8fc8fcb77f",  # 2019-03-07
     remote = "https://github.com/bazelbuild/rules_python.git",
 )
 
