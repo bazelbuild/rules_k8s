@@ -21,9 +21,9 @@ test --test_output=errors --workspace_status_command="bash print-workspace-statu
 # Also, force host binaries to use py2.
 # Note these flags will only work with Bazel 0.25.0 or above.
 build --incompatible_use_python_toolchains
-build --host_force_python=PY2
+build --host_force_python=PY3
 test --incompatible_use_python_toolchains
-test --host_force_python=PY2
+test --host_force_python=PY3
 run --incompatible_use_python_toolchains
-run --host_force_python=PY2
+run --host_force_python=PY3
 
