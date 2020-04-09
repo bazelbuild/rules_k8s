@@ -24,12 +24,12 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # This requires rules_docker to be fully instantiated before
 # it is pulled in.
-# Download the rules_k8s repository at release v0.3.1
+# Download the rules_k8s repository at release v0.4
 http_archive(
     name = "io_bazel_rules_k8s",
-    sha256 = "cc75cf0d86312e1327d226e980efd3599704e01099b58b3c2fc4efe5e321fcd9",
-    strip_prefix = "rules_k8s-0.3.1",
-    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.3.1/rules_k8s-v0.3.1.tar.gz"],
+    sha256 = "d91aeb17bbc619e649f8d32b65d9a8327e5404f451be196990e13f5b7e2d17bb",
+    strip_prefix = "rules_k8s-0.4",
+    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.4/rules_k8s-v0.4.tar.gz"],
 )
 
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
@@ -222,7 +222,7 @@ by leveraging `--workspace_status_command`.  One pattern for this is to check in
 the following:
 ```shell
 $ cat .bazelrc
-build --workspace_status_command=./print-workspace-status.sh
+build --workspace_status_command="bash ./print-workspace-status.sh"
 
 $ cat print-workspace-status.sh
 cat <<EOF
@@ -437,7 +437,7 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>Kind, required</code></p>
         <p>The kind of the Kubernetes object in the yaml.</p>
-        <p><b>If this is omitted, the <code>create, replace, delete,
+        <p><b>If this is omitted, the <code>apply, create, replace, delete,
           describe</code> actions will not exist.</b></p>
       </td>
     </tr>
@@ -447,7 +447,7 @@ A rule for interacting with Kubernetes objects.
         <p><code>string, optional</code></p>
         <p>The name of the cluster to which <code>create, replace, delete,
           describe</code> should speak. Subject to "Make" variable substitution.</p>
-        <p><b>If this is omitted, the <code>create, replace, delete,
+        <p><b>If this is omitted, the <code>apply, create, replace, delete,
           describe</code> actions will not exist.</b></p>
       </td>
     </tr>
