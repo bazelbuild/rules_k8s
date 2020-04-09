@@ -572,7 +572,7 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>string_list, optional</code></p>
         <p>Additional arguments to pass to the resolver directly.</p>
-        <p>NOTE: This option is to pass the specific arguments to the resolver directly, such as <pre>--allow_unused_images</pre>.</p>
+        <p>NOTE: This option is to pass the specific arguments to the resolver directly, such as <code>--allow_unused_images</code>.</p>
       </td>
     </tr>
   </tbody>
