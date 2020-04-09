@@ -437,7 +437,7 @@ A rule for interacting with Kubernetes objects.
       <td>
         <p><code>Kind, required</code></p>
         <p>The kind of the Kubernetes object in the yaml.</p>
-        <p><b>If this is omitted, the <code>create, replace, delete,
+        <p><b>If this is omitted, the <code>apply, create, replace, delete,
           describe</code> actions will not exist.</b></p>
       </td>
     </tr>
@@ -447,7 +447,7 @@ A rule for interacting with Kubernetes objects.
         <p><code>string, optional</code></p>
         <p>The name of the cluster to which <code>create, replace, delete,
           describe</code> should speak. Subject to "Make" variable substitution.</p>
-        <p><b>If this is omitted, the <code>create, replace, delete,
+        <p><b>If this is omitted, the <code>apply, create, replace, delete,
           describe</code> actions will not exist.</b></p>
       </td>
     </tr>
