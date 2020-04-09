@@ -222,7 +222,7 @@ by leveraging `--workspace_status_command`.  One pattern for this is to check in
 the following:
 ```shell
 $ cat .bazelrc
-build --workspace_status_command=./print-workspace-status.sh
+build --workspace_status_command="bash ./print-workspace-status.sh"
 
 $ cat print-workspace-status.sh
 cat <<EOF
