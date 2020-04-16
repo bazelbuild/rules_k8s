@@ -171,6 +171,16 @@ http_archive(
     strip_prefix = "rules_proto-6b334ece48828fb8e45052976d3516f808819ac7",
     urls = ["https://github.com/stackb/rules_proto/archive/6b334ece48828fb8e45052976d3516f808819ac7.tar.gz"],
 )
+# http_archive(
+#     name = "build_stack_rules_proto",
+#     patch_args = ["-p1"],
+#     patches = [
+#         "//third_party/build_stack_rules_proto:stackb.patch",
+#     ],
+#     sha256 = "7e421578cba10736b6411d991514771996c7d21b4575d7f33e1d606a6a2cfe4d",
+#     strip_prefix = "rules_proto-1d6b84118399828511faeecc145d399c1e7bdee2",
+#     urls = ["https://github.com/stackb/rules_proto/archive/1d6b84118399828511faeecc145d399c1e7bdee2.tar.gz"],
+# )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
 
@@ -349,8 +359,8 @@ load("@bazel_gazelle//:deps.bzl", "go_repository")
 go_repository(
     name = "org_golang_google_grpc",
     importpath = "google.golang.org/grpc",
-    sum = "h1:q4XQuHFC6I28BKZpo6IYyb3mNO+l7lSOxRuYTCiDfXk=",
-    version = "v1.23.1",
+    sum = "h1:C1QC6KzgSiLyBabDi87BbjaGreoRgGUF5nOyvfrAZ1k=",
+    version = "v1.28.1",
 )
 
 go_repository(
