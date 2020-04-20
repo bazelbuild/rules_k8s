@@ -349,8 +349,8 @@ load("@bazel_gazelle//:deps.bzl", "go_repository")
 go_repository(
     name = "org_golang_google_grpc",
     importpath = "google.golang.org/grpc",
-    sum = "h1:q4XQuHFC6I28BKZpo6IYyb3mNO+l7lSOxRuYTCiDfXk=",
-    version = "v1.23.1",
+    sum = "h1:C1QC6KzgSiLyBabDi87BbjaGreoRgGUF5nOyvfrAZ1k=",
+    version = "v1.28.1",
 )
 
 go_repository(
