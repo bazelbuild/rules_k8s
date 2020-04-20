@@ -29,6 +29,11 @@ steps:
   - tag
   - ${_IMG}:${SHORT_SHA}
   - ${_IMG}:latest
+
+- name: gcr.io/cloud-builders/docker
+  args:
+  - tag
+  - ${_IMG}:${SHORT_SHA}
   - ${_IMG}:latest-${_USER}
 
 substitutions:
