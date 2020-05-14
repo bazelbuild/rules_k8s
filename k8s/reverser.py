@@ -31,7 +31,7 @@ parser.add_argument(
 def main():
   args = parser.parse_args()
 
-  with open(args.template, 'r') as f:
+  with open(args.template, 'r', encoding='utf-8') as f:
     inputs = f.read()
 
   content = yaml.dump_all(reversed([x for x in yaml.load_all(inputs, Loader=yaml.SafeLoader)]))

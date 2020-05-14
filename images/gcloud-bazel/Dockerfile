@@ -14,7 +14,10 @@
 
 # Ubuntu with bazel, gcloud and its dependencies preinstalled.
 
-FROM launcher.gcr.io/google/bazel:latest
+ARG NEW_VERSION
+ARG OLD_VERSION
+FROM launcher.gcr.io/google/bazel:${OLD_VERSION} as old
+FROM launcher.gcr.io/google/bazel:${NEW_VERSION}
 # Based off github.com/kubernetes/test-infra/images/bazelbuild
 LABEL maintainer="fejta@google.com"
 
@@ -41,3 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-pip \
     && apt-get clean \
     && python -m pip install --upgrade pip setuptools wheel
+
+ARG OLD_VERSION
+COPY --from=old \
+  /usr/local/lib/bazel/bin/bazel-real /usr/local/lib/bazel/bin/bazel-${OLD_VERSION}

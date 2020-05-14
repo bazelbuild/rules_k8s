@@ -15,6 +15,8 @@
 PROJECT ?= rules-k8s
 # gcr.io/rule-k8s/gcloud-bazel by default
 IMG = gcr.io/$(PROJECT)/gcloud-bazel
+OLD ?= 2.2.0
+NEW ?= 3.0.0
 TAG := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
 
 build:
@@ -23,7 +25,7 @@ build:
 push:
 	gcloud builds submit \
 		--config=cloudbuild.yaml \
-		--substitutions=_IMG=$(IMG),_USER=$(USER),SHORT_SHA=$(TAG) \
+		--substitutions=_IMG=$(IMG),_USER=$(USER),SHORT_SHA=$(TAG),_NEW_VERSION=$(NEW),_OLD_VERSION=$(OLD) \
 		--project=$(PROJECT) \
 		.
 

@@ -13,26 +13,35 @@
 # limitations under the License.
 
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: [
-    'build',
-    '--pull',
-    '--label=gcb-id=${BUILD_ID}',
-    '--label=git-short=${SHORT_SHA}',
-    '--label=git-full=${COMMIT_SHA}',
-    '-t',
-    '${_IMG}:${SHORT_SHA}',
-    '.',
-  ]
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', '${_IMG}:${SHORT_SHA}', '${_IMG}:latest']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', '${_IMG}:${SHORT_SHA}', '${_IMG}:latest-${_USER}']
+- name: gcr.io/cloud-builders/docker
+  args:
+  - build
+  - --pull
+  - --label=gcb-id=${BUILD_ID}
+  - --label=git-short=${SHORT_SHA}
+  - --label=git-full=${COMMIT_SHA}
+  - --tag=${_IMG}:${SHORT_SHA}
+  - --build-arg=NEW_VERSION=$_NEW_VERSION
+  - --build-arg=OLD_VERSION=$_OLD_VERSION
+  - .
+- name: gcr.io/cloud-builders/docker
+  args:
+  - tag
+  - ${_IMG}:${SHORT_SHA}
+  - ${_IMG}:latest
+
+- name: gcr.io/cloud-builders/docker
+  args:
+  - tag
+  - ${_IMG}:${SHORT_SHA}
+  - ${_IMG}:latest-${_USER}
 
 substitutions:
-  _IMG: 'gcr.io/${PROJECT_ID}/gcloud-bazel'
+  _IMG: gcr.io/${PROJECT_ID}/gcloud-bazel
+  _NEW_VERSION: 3.0.0
+  _OLD_VERSION: 2.2.0
 
 images:
-- '${_IMG}:latest'
-- '${_IMG}:latest-${_USER}'
-- '${_IMG}:${SHORT_SHA}'
+- ${_IMG}:latest
+- ${_IMG}:latest-${_USER}
+- ${_IMG}:${SHORT_SHA}

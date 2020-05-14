@@ -2,16 +2,14 @@
 
 # Reviewers may be auto-assigned by blunderbuss
 reviewers:
-- chrislovecnm
 - erain
-- nlopezgi
 - smukherj1
 - alex1545
+- fejta
 
 # Approvers can /approve changes to files within this directory tree.
 approvers:
-- chrislovecnm
 - erain
-- nlopezgi
 - smukherj1
 - alex1545
+- fejta

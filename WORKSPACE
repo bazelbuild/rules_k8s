@@ -45,9 +45,9 @@ git_repository(
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "49c1cca77d07877b878b396b42655c71a412dc14bb95d4f959d6c8971a6bb908",
-    strip_prefix = "grpc-1.27.2",
-    urls = ["https://github.com/grpc/grpc/archive/v1.27.2.tar.gz"],
+    sha256 = "4cbce7f708917b6e58b631c24c59fe720acc8fef5f959df9a58cdf9558d0a79b",
+    strip_prefix = "grpc-1.28.1",
+    urls = ["https://github.com/grpc/grpc/archive/v1.28.1.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -294,8 +294,8 @@ _controller_pip_install()
 
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "b6670f9f43faa66e3009488bbd909bc7bc46a5a9661a33f6bc578068d1837f37",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.3.0/rules_nodejs-1.3.0.tar.gz"],
+    sha256 = "d14076339deb08e5460c221fae5c5e9605d2ef4848eee1f0c81c9ffdc1ab31c1",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/1.6.1/rules_nodejs-1.6.1.tar.gz"],
 )
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
@@ -349,8 +349,8 @@ load("@bazel_gazelle//:deps.bzl", "go_repository")
 go_repository(
     name = "org_golang_google_grpc",
     importpath = "google.golang.org/grpc",
-    sum = "h1:q4XQuHFC6I28BKZpo6IYyb3mNO+l7lSOxRuYTCiDfXk=",
-    version = "v1.23.1",
+    sum = "h1:C1QC6KzgSiLyBabDi87BbjaGreoRgGUF5nOyvfrAZ1k=",
+    version = "v1.28.1",
 )
 
 go_repository(
