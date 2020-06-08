@@ -140,7 +140,7 @@ while [[ -n "${1:-}" ]]; do
 
   apply # apply will handle already created
   set +o xtrace
-  trap "echo FAILED, cleaning up...; delete" EXIT
+  trap "echo hellohttp $LANGUAGE FAILED, cleaning up... >&2; delete" EXIT
   set -o xtrace
   sleep 25
   check_msg ""
@@ -156,4 +156,4 @@ while [[ -n "${1:-}" ]]; do
 done
 
 # Replace the trap with a success message.
-trap "echo PASS" EXIT
+trap "echo hellohttp: PASS" EXIT

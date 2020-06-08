@@ -154,7 +154,7 @@ while [[ -n "${1:-}" ]]; do
   delete &> /dev/null || true
   create
   set +o xtrace
-  trap "echo FAILED, cleaning up...; delete" EXIT
+  trap "echo hellogrpc: $LANGUAGE FAILED, cleaning up... >&2; delete" EXIT
   set -o xtrace
   sleep 25
   check_msg ""
@@ -170,4 +170,4 @@ while [[ -n "${1:-}" ]]; do
 done
 
 # Replace the trap with a success message.
-trap "echo PASS" EXIT
+trap "echo hellogrpc: PASS" EXIT

@@ -274,6 +274,7 @@ git_repository(
     name = "io_bazel_rules_jsonnet",
     commit = "12979862ab51358a8a5753f5a4aa0658fec9d4af",
     remote = "https://github.com/bazelbuild/rules_jsonnet.git",
+    shallow_since = "1574670556 +0100",
 )
 
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_repositories")
