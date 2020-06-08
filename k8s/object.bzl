@@ -27,6 +27,8 @@ load(
     _get_runfile_path = "runfile",
 )
 
+SubFileInfo = provider(fields = ["file"])
+
 def _runfiles(ctx, f):
     return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
 
@@ -137,6 +139,7 @@ def _impl(ctx):
     )
 
     return [
+        SubFileInfo(file = ctx.outputs.substituted),
         DefaultInfo(
             runfiles = ctx.runfiles(
                 files = [
@@ -290,11 +293,13 @@ _common_attrs = {
 
 def _reverse(ctx):
     """Implementation of _reversed."""
+    substituted = ctx.attr.substituted[SubFileInfo].file
+
     ctx.actions.expand_template(
         template = ctx.file._template,
         substitutions = {
             "%{reverser}": _runfiles(ctx, ctx.executable.reverser),
-            "%{yaml}": _runfiles(ctx, ctx.file.template),
+            "%{yaml}": _runfiles(ctx, substituted),
         },
         output = ctx.outputs.executable,
     )
@@ -304,7 +309,7 @@ def _reverse(ctx):
             runfiles = ctx.runfiles(
                 files = [
                     ctx.executable.reverser,
-                    ctx.file.template,
+                    substituted,
                 ],
                 transitive_files = ctx.attr.reverser[DefaultInfo].default_runfiles.files,
             ),
@@ -320,12 +325,10 @@ _reversed = rule(
                 executable = True,
                 allow_files = True,
             ),
-            "template": attr.label(
-                allow_single_file = [
-                    ".yaml",
-                    ".json",
-                ],
-                mandatory = True,
+            "substituted": attr.label(
+                cfg = "target",
+                executable = True,
+                allow_files = True,
             ),
             "_template": attr.label(
                 default = Label("//k8s:reverse.sh.tpl"),
@@ -516,7 +519,7 @@ def k8s_object(name, **kwargs):
     _k8s_object(name = name, **kwargs)
     _reversed(
         name = name + ".reversed",
-        template = kwargs.get("template"),
+        substituted = name,
         **implicit_args
     )
 
