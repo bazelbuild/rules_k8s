@@ -306,9 +306,9 @@ k8s_deploy(
 )
 ```
 
-This script may need to invoke the default resolver (`//k8s:resolver`) with all
+This script may need to invoke the default resolver (`//k8s/go/cmd/resolver`) with all
 its arguments. It may capture the default resolver's output and apply additional
-modifications to the YAML.
+modifications to the YAML, printing the final YAML to stdout.
 
 
 ## Usage
