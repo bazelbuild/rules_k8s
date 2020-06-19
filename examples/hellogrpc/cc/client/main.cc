@@ -30,7 +30,12 @@ int main(int argc, char** argv) {
   SimpleClient simple(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
   std::string user("world");
 
-  std::cout << "Foo(" << user << "): " << simple.Foo(user) << std::endl;
+  std::string resp(simple.Foo(user));
+  if (resp == "RPC failed") {
+      std::cerr << resp << std::endl;
+      return 1;
+  } 
 
+  std::cout << "Foo(" << user << "): " << resp << std::endl;
   return 0;
 }
