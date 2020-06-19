@@ -19,8 +19,8 @@ licenses(["notice"])  # Apache 2.0
 py_binary(
     name = "client",
     srcs = ["client.py"],
-    python_version = "PY2",
+    python_version = "PY3",
     deps = [
-        "//examples/hellogrpc/proto:simple_python_grpc",
+        "//examples/hellogrpc/proto:simple_py_pb2_grpc",
     ],
 )

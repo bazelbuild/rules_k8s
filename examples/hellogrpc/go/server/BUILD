@@ -20,7 +20,10 @@ package(default_visibility = ["//visibility:public"])
 go_image(
     name = "server",
     srcs = ["main.go"],
+    goarch = "amd64",
+    goos = "linux",
     importpath = "github.com/bazelbuild/not-my-project/examples/hellogrpc/go/server",
+    pure = "on",
     deps = [
         "//examples/hellogrpc/proto:simple_go_grpc",
         "@org_golang_google_grpc//:go_default_library",

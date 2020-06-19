@@ -33,5 +33,5 @@ par_binary(
     name = "e2e_gc",
     srcs = ["e2e_gc.py"],
     main = "e2e_gc.py",
-    python_version = "PY2",
+    python_version = "PY3",
 )

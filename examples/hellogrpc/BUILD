@@ -17,6 +17,7 @@ load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
 load("@io_bazel_rules_k8s//k8s:objects.bzl", "k8s_objects")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
 load("@k8s_service//:defaults.bzl", "k8s_service")
+load("@py_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -109,8 +110,7 @@ py_test(
         ":deployment.json",
         ":deployment.yaml",
     ],
-    python_version = "PY2",
     deps = [
-        "@com_github_yaml_pyyaml//:yaml",
+        requirement("PyYAML"),
     ],
 )

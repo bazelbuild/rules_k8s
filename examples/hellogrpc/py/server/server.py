@@ -25,7 +25,7 @@ class _SimpleService(simple_pb2_grpc.SimpleServicer):
 
     def Foo(self, foo_request, context):
         foo_reply = simple_pb2.FooReply()
-        foo_reply.message = 'DEMO {name}'.format(name=foo_request.name)
+        foo_reply.message = 'DEMO11532 {name}'.format(name=foo_request.name)
         return foo_reply
 
 

@@ -19,6 +19,10 @@ load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
 k8s_repositories()
 
+load("@io_bazel_rules_docker//repositories:repositories.bzl", _rules_docker_repos = "repositories")
+
+_rules_docker_repos()
+
 load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
 
 k8s_go_deps()
@@ -44,6 +48,31 @@ git_repository(
 )
 
 http_archive(
+    name = "rules_python",
+    sha256 = "b5668cde8bb6e3515057ef465a35ad712214962f0b3a314e551204266c7be90c",
+    strip_prefix = "rules_python-0.0.2",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.0.2/rules_python-0.0.2.tar.gz",
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+# Only needed if using the packaging rules.
+load("@rules_python//python:pip.bzl", "pip3_import", "pip_repositories")
+
+pip_repositories()
+
+pip3_import(
+    name = "py_deps",
+    requirements = "//:requirements.txt",
+)
+
+load("@py_deps//:requirements.bzl", "pip_install")
+
+pip_install()
+
+http_archive(
     name = "com_github_grpc_grpc",
     sha256 = "0343e6dbde66e9a31c691f2f61e98d79f3584e03a11511fad3f10e3667832a45",
     strip_prefix = "grpc-1.29.1",
@@ -53,6 +82,19 @@ http_archive(
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
+
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+
+grpc_extra_deps()
+
+pip3_import(
+    name = "grpc_python_dependencies",
+    requirements = "@com_github_grpc_grpc//:requirements.bazel.txt",
+)
+
+load("@grpc_python_dependencies//:requirements.bzl", _grpc_pip_install = "pip_install")
+
+_grpc_pip_install()
 
 # upb_deps and apple_rules_dependencies are needed for grpc
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
@@ -74,6 +116,13 @@ container_pull(
     repository = "google/bazel",
 )
 
+container_pull(
+    name = "py3_image_base",
+    digest = "sha256:025b77e95e701917434c478e7fd267f3d894db5ca74e5b2362fe37ebe63bbeb0",
+    registry = "gcr.io",
+    repository = "distroless/python3-debian10",
+)
+
 # Gcloud installer
 http_file(
     name = "gcloud_archive",
@@ -88,7 +137,7 @@ _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
 _CONTEXT = _CLUSTER
 
-_NAMESPACE = "{E2E_NAMESPACE}"
+_NAMESPACE = "{STABLE_E2E_NAMESPACE}"
 
 k8s_defaults(
     name = "k8s_object",
@@ -147,20 +196,6 @@ py_library(
 # rules_python is a transitive dep of build_stack_rules_proto, so place it
 # first if we're going to explicitly mention it at all
 
-git_repository(
-    name = "rules_python",
-    commit = "dd7f9c5f01bafbfea08c44092b6b0c8fc8fcb77f",  # 2019-03-07
-    remote = "https://github.com/bazelbuild/rules_python.git",
-)
-
-load(
-    "@rules_python//python:pip.bzl",
-    "pip_import",
-    "pip_repositories",
-)
-
-pip_repositories()
-
 http_archive(
     name = "build_stack_rules_proto",
     patch_args = ["-p1"],
@@ -192,10 +227,6 @@ load("@build_stack_rules_proto//go:deps.bzl", "go_grpc_library")
 
 go_grpc_library()
 
-load("@build_stack_rules_proto//python:deps.bzl", "python_grpc_library")
-
-python_grpc_library()
-
 # We use cc_image to build a sample service
 load(
     "@io_bazel_rules_docker//cc:image.bzl",
@@ -220,55 +251,13 @@ load(
 
 _go_image_repos()
 
-pip_import(
-    name = "protobuf_py_deps",
-    requirements = "@build_stack_rules_proto//python/requirements:protobuf.txt",
-)
-
-load("@protobuf_py_deps//:requirements.bzl", protobuf_pip_install = "pip_install")
-
-protobuf_pip_install()
-
-pip_import(
-    name = "grpc_py_deps",
-    requirements = "@build_stack_rules_proto//python:requirements.txt",
-)
-
-load("@grpc_py_deps//:requirements.bzl", grpc_pip_install = "pip_install")
-
-grpc_pip_install()
-
-pip_import(
-    name = "examples_helloworld_pip",
-    requirements = "//examples/hellogrpc/py:requirements.txt",
-)
-
-load(
-    "@examples_helloworld_pip//:requirements.bzl",
-    setuptools_pip_install = "pip_install",
-)
-
-setuptools_pip_install()
-
-pip_import(
-    name = "examples_hellohttp_pip",
-    requirements = "//examples/hellohttp/py:requirements.txt",
-)
-
-load(
-    "@examples_hellohttp_pip//:requirements.bzl",
-    httppip_install = "pip_install",
-)
-
-httppip_install()
-
 # We use py_image to build a sample service
 load(
-    "@io_bazel_rules_docker//python:image.bzl",
-    _py_image_repos = "repositories",
+    "@io_bazel_rules_docker//python3:image.bzl",
+    _py3_image_repos = "repositories",
 )
 
-_py_image_repos()
+_py3_image_repos()
 
 git_repository(
     name = "io_bazel_rules_jsonnet",
@@ -280,18 +269,6 @@ git_repository(
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_repositories")
 
 jsonnet_repositories()
-
-pip_import(
-    name = "examples_todocontroller_pip",
-    requirements = "//examples/todocontroller/py:requirements.txt",
-)
-
-load(
-    "@examples_todocontroller_pip//:requirements.bzl",
-    _controller_pip_install = "pip_install",
-)
-
-_controller_pip_install()
 
 http_archive(
     name = "build_bazel_rules_nodejs",
@@ -366,4 +343,11 @@ go_repository(
     importpath = "golang.org/x/text",
     sum = "h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=",
     version = "v0.3.2",
+)
+
+go_repository(
+    name = "org_golang_x_sys",
+    importpath = "golang.org/x/sys",
+    sum = "h1:uYVVQ9WP/Ds2ROhcaGPeIdVq0RIXVLwsHlnvJ+cT1So=",
+    version = "v0.0.0-20200302150141-5c8b2ff67527",
 )

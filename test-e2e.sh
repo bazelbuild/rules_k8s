@@ -16,114 +16,105 @@
 
 set -o errexit
 set -o nounset
-set -o xtrace
+set -o pipefail
 
-# Helper command for local debugging.
-# Note: prow jobs already run inside a container
-run-in-container() {
-  cd "$(dirname "${BASH_SOURCE}")"
-  echo "startup --host_jvm_args=-Duser.name=$USER" > /tmp/test-e2e.bazelrc
-  args=(
-    # Ensure we do not deploy to namespace root
-    # But don't use -u $(id -u) as this is a pain
-    -e "USER=$USER"
-    -v /tmp/test-e2e.bazelrc:/root/.bazelrc
-    # Map rules_k8s repo into /workspace
-    -v "$PWD":/workspace
-    -w /workspace
-    # Map in credentials
-    -v "$HOME/.kube":/root/.kube
-    -v "$HOME/.config/gcloud":/root/.config/gcloud
-    # Remove image after completion
-    --rm=true gcr.io/rules-k8s/gcloud-bazel:latest-"$USER"
-    # Run this script
-    "./$(basename "${BASH_SOURCE}")"
-  )
-
-  docker run "${args[@]}" "$@"
-  exit 0
+delete-all() {
+    # Delete the namespace
+    log kubectl delete all -n "$E2E_NAMESPACE" --all
+    log kubectl delete namespaces/$E2E_NAMESPACE
 }
 
-if [[ "${1:-}" == "--container" ]]; then
-  shift
-  run-in-container "$@"
-fi
+log() {
+    (
+        set -o xtrace
+        "$@"
+    )
+}
 
-check-plat() {
-  local plat="$(uname -s)"
-  if [[ $plat != Linux ]]; then
-    echo "Consider using --container" >&2
-    echo "System must be Linux, found: $plat" >&2
-    return 1
+ensure-docker() {
+  if grep gcr.io "$HOME/.docker/config.json" &>/dev/null; then
+      echo "docker: already configured"
+  else
+      gcloud auth configure-docker --quiet
   fi
 }
 
-check-plat
+ensure-gcloud() {
+    if [[ -n "${GOOGLE_JSON_KEY:-}" ]]; then
+      # Log into gcloud
+      echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
+      gcloud auth activate-service-account --key-file keyfile.json >/dev/null
+      rm -f keyfile.json
+    fi
 
-set +o xtrace
-if [[ -n "${GOOGLE_JSON_KEY:-}" ]]; then
-  # Log into gcloud
-  echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
-  gcloud auth activate-service-account --key-file keyfile.json
-  rm -f keyfile.json
-fi
-set -o xtrace
-
-# Setup our credentials
-gcloud container clusters get-credentials testing --project=rules-k8s --zone=us-central1-f
-gcloud auth configure-docker --quiet
-
-# Check our installs.
-bazel version
-gcloud version
-kubectl version
-
-# Don't build/test the prow image as it requires Docker
-EXCLUDED_TARGETS="-//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push"
-
-# copt flag is needed to compila a gRPC dependency (@udp)
-# verbose_failures is added for better error debugging
-BAZEL_FLAGS="--copt=-Wno-c99-extensions --verbose_failures"
-
-# Install buildifier 0.22.0 and run lint checks
-wget -q https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier
-chmod +x ./buildifier
-
-# Check that all of our tools and samples build
-bazel build $BAZEL_FLAGS -- //... $EXCLUDED_TARGETS
-bazel test  $BAZEL_FLAGS -- //... $EXCLUDED_TARGETS
-
-# Run the garbage collection script to delete old namespaces.
-bazel run $BAZEL_FLAGS -- //examples:e2e_gc
-
-# Create a unique namespace for this job using the repo name and the build id
-E2E_NAMESPACE="build-${BUILD_ID:-0}"
-
-kubectl get "namespaces/${E2E_NAMESPACE}" &> /dev/null || kubectl create namespace "${E2E_NAMESPACE}"
-
-delete() {
-    # Delete the namespace
-    echo "Deleting kubernetes namespace ${E2E_NAMESPACE}"
-    # Delete the namespace
-    kubectl delete namespaces/$E2E_NAMESPACE
+    # Setup our credentials
+    logfail gcloud container clusters get-credentials testing --project=rules-k8s --zone=us-central1-f
 }
 
-# Setup a trap to delete the namespace on error
-set +o xtrace
-trap "echo FAILED, cleaning up...; delete" EXIT
-set -o xtrace
+fail() {
+    echo "test-e2e.sh: FAIL, cleaning up..." >&2
+    echo "=============== VERSION INFO ===========" >&2
+    log bazel version >&2
+    log gcloud version >&2
+    log kubectl version >&2
 
-# Run end-to-end integration testing.
-# First, GRPC.
-./examples/hellogrpc/e2e-test.sh remote $E2E_NAMESPACE cc java go py
-# Second, HTTP.
-./examples/hellohttp/e2e-test.sh remote $E2E_NAMESPACE py java go nodejs
-# Third, TODO Controller.
-# chrislovecnm - disabled till this is less flakey
-# ./examples/todocontroller/e2e-test.sh remote $E2E_NAMESPACE py
+    echo "========== CLEAN UP ==========="
+    delete-all || echo "cleanup failed" >&2
+    echo "test-e2e.sh: FAIL" >&2
+    return 1
+}
 
-# Delete everything as we are now done
-delete
 
-# Replace the exit trap with a pass message
-trap "echo PASS" EXIT
+logfail() {
+    echo "+ $@" >&2
+    local out
+    local code
+    out=$("$@" 2>&1) && return 0 || code=$?
+    echo "$out"
+    return $code
+}
+
+main() {
+    echo "Test languages: $@" >&2
+
+    ensure-docker
+    ensure-gcloud
+
+    # Check that all of our tools and samples build and pass unit test.
+    logfail bazel test -- //... -//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push
+
+    # Run the garbage collection script to delete old namespaces.
+    logfail bazel run -- //examples:e2e_gc
+
+    # Create a unique namespace for this job using the repo name and the build id
+    export E2E_NAMESPACE="build-${BUILD_ID:-$USER}"
+    if kubectl get "namespaces/${E2E_NAMESPACE}" &> /dev/null; then
+        echo "$E2E_NAMESPACE already exists"
+    else
+        log kubectl create namespace "${E2E_NAMESPACE}" >/dev/null
+    fi
+
+    trap fail EXIT
+    local failed=()
+    log ./examples/hellogrpc/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellogrpc)
+    log ./examples/hellohttp/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellohttp)
+    if [[ "${#failed[@]}" -gt 0 ]]; then
+        echo "FAIL: test-e2e.sh: ${failed[@]}"
+        return 1
+    fi
+    trap - EXIT
+    echo "Tests pass, cleaning up..."
+    delete-all || (echo "test-e2e.sh: cleanup failed" >&2; return 1)
+}
+
+if [[ $# == 0 ]]; then
+    echo "Usage: $(basename "$0") go [cc java nodejs py]"
+    # go: pass
+    # java: pass
+    # py: fail
+    # nodejs: skip grpc
+    main go java nodejs cc py
+else
+    main "$@"
+fi
+echo "test-e2e.sh: PASS"

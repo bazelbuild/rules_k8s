@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
-# Copyright 2017 The Bazel Authors. All rights reserved.
+# Copyright 2018 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +14,10 @@ set -e
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SUFFIX="$1"
+set -o errexit
+set -o nounset
+set -o pipefail
 
-sed -i "s/DEMO *[a-z0-9_-]* */DEMO${SUFFIX} /g" ./examples/todocontroller/py/controller.py
+cat <<EOF
+STABLE_E2E_NAMESPACE ${E2E_NAMESPACE:-build-${BUILD_ID:-${USER:-0}}}
+EOF

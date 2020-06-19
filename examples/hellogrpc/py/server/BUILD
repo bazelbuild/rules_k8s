@@ -12,15 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@examples_helloworld_pip//:requirements.bzl", "requirement")
-load("@io_bazel_rules_docker//python:image.bzl", "py_image")
+load("@io_bazel_rules_docker//python3:image.bzl", "py3_image")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+load("@py_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-py_image(
+py_binary(
+    name = "bin",
+    srcs = ["server.py"],
+    main = "server.py",
+    deps = [
+        requirement("setuptools"),
+        "//examples/hellogrpc/proto:simple_py_pb2_grpc",
+    ],
+)
+
+py3_image(
     name = "server",
     srcs = ["server.py"],
     # "layers" is just like "deps", but it also moves the dependencies each into
@@ -30,7 +40,7 @@ py_image(
     # unchanging and we can reduce the amount of image data we repush by ~99%!
     layers = [
         requirement("setuptools"),
-        "//examples/hellogrpc/proto:simple_python_grpc",
+        "//examples/hellogrpc/proto:simple_py_pb2_grpc",
     ],
     main = "server.py",
 )

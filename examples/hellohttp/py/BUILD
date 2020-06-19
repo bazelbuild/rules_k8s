@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@examples_hellohttp_pip//:requirements.bzl", "all_requirements")
-load("@io_bazel_rules_docker//python:image.bzl", "py_image")
+load("@io_bazel_rules_docker//python3:image.bzl", "py3_image")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
+load("@py_deps//:requirements.bzl", "all_requirements")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-py_image(
+py3_image(
     name = "server",
     srcs = ["server.py"],
     main = "server.py",

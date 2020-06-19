@@ -44,3 +44,6 @@ bazel-testlogs
 
 # Npm packages
 node_modules 
+
+# Test binary
+hellogrpc_*_client

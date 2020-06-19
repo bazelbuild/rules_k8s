@@ -14,8 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+SED=sed
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    SED=gsed
+fi
+export SED
+
 # Function to validate the input args for the e2e-test.sh scripts.
-function validate_args() {
+validate_args() {
   if [[ -z "${1:-}" ]]; then
     echo "ERROR: None of execution type, kubernetes namspace and languages is provided!"
     echo "Usage: $(basename $0) <'remote' or 'local' run> <kubernetes namespace> <language ...>"
@@ -51,7 +57,7 @@ function validate_args() {
 #   get_lb_ip true <service name>
 # Usage when running a cluster on GKE:
 #   get_lb_ip false <service name>
-function get_lb_ip() {
+get_lb_ip() {
   # Determine the location of variable to retrieve the service IP address
   # based on execution type
   ip_var='{.status.loadBalancer.ingress[0].ip}'

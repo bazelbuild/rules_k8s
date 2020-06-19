@@ -20,7 +20,10 @@ package(default_visibility = ["//visibility:public"])
 go_image(
     name = "server",
     srcs = ["main.go"],
+    goarch = "amd64",
+    goos = "linux",
     importpath = "github.com/bazelbuild/not-my-project/examples/hellohttp/go",
+    pure = "on",
 )
 
 k8s_deploy(

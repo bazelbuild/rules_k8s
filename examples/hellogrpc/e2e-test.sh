@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 # Copyright 2017 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,156 +16,189 @@ set -e
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
 
 source ./examples/util.sh
 
-# copt flag is needed to compila a gRPC dependency (@udp)
-# verbose_failures is added for better error debugging
-BAZEL_FLAGS="--copt=-Wno-c99-extensions --verbose_failures"
-
-validate_args $@
+validate_args "$@"
 shift 2
 
 function fail() {
-  echo "FAILURE: $1"
-  exit 1
+    echo "FAILURE: $@"
+    exit 1
 }
 
 function CONTAINS() {
-  local complete="${1}"
-  local substring="${2}"
+    local complete=$1
+    local substring=$2
 
-  echo "${complete}" | grep -Fsq -- "${substring}"
+    echo "$complete" | grep -Fsq -- "$substring" >/dev/null
 }
 
 function EXPECT_CONTAINS() {
-  local complete="${1}"
-  local substring="${2}"
-  local message="${3:-Expected '${substring}' not found in '${complete}'}"
+    local complete="$1"
+    local substring="$2"
+    local message="${3:-Expected '$substring' not found in '$complete'}"
 
-  echo Checking "$1" contains "$2"
-  CONTAINS "${complete}" "${substring}" || fail "$message"
+    CONTAINS "$complete" "$substring" || fail "$message"
 }
 
 function CONTAINS_PATTERN() {
-  local complete="${1}"
-  local substring="${2}"
+    local complete=$1
+    local substring=$2
 
-  echo "${complete}" | grep -Esq -- "${substring}"
+    echo "$complete" | grep -Esq -- "$substring" >/dev/null
 }
 
 function EXPECT_CONTAINS_PATTERN() {
-  local complete="${1}"
-  local substring="${2}"
-  local message="${3:-Expected '${substring}' not found in '${complete}'}"
+    local complete=$1
+    local substring=$2
+    local message="${3:-Expected '$substring' not found in '$complete'}"
 
-  echo Checking "$1" contains pattern "$2"
-  CONTAINS_PATTERN "${complete}" "${substring}" || fail "$message"
+    CONTAINS_PATTERN "$complete" "$substring" || fail "$message"
 }
 
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
-  echo Applying service...
-  bazel build $BAZEL_FLAGS examples/hellogrpc:staging-service.apply
-  bazel-bin/examples/hellogrpc/staging-service.apply
+    logfail bazel build examples/hellogrpc:staging-service.apply
+    logfail bazel-bin/examples/hellogrpc/staging-service.apply
 }
 
 create() {
-  echo Creating $LANGUAGE...
-  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.create
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.create
+    logfail bazel build "examples/hellogrpc/$1/server:staging.create"
+    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.create"
 }
 
 check_msg() {
-  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/client
+    logfail bazel build "examples/hellogrpc/$1/client"
 
-  while [[ -z $(get_lb_ip $local hello-grpc-staging) ]]; do
-    echo "service has not yet received an IP address, sleeping for 5s..."
-    sleep 10
-  done
+    echo -n "IP: "
+    local ip
+    while true; do
+        ip=$(get_lb_ip $local hello-grpc-staging)
+        if [[ -n "$ip" ]]; then
+            echo "$ip"
+            break
+        fi
+        echo -n .
+        sleep 5
+    done
 
-  # Wait some more for after IP address allocation for the service to come
-  # alive
-  echo "Got IP Adress! Sleeping 30s more for service to come alive..."
-  sleep 30
+    # Make Bazel generate a temporary script that runs the client executable
+    # This will only generate the temp executable. It won't actually run it.
+    local output
+    local tmp_exec=hellogrpc_$1_client
+    logfail bazel run "//examples/hellogrpc/$1/client" "--script_path=$tmp_exec"
 
-  # Make Bazel generate a temporary script that runs the client executable.
-  tmp_exec=hellogrpc_${LANGUAGE}_client
-  # This will only generate the temp executable. It won't actually run it.
-  bazel run $BAZEL_FLAGS //examples/hellogrpc/${LANGUAGE}/client --script_path=${tmp_exec}
-  OUTPUT=$(./${tmp_exec} $(get_lb_ip $local hello-grpc-staging))
-  rm ${tmp_exec}
-  echo Checking response from service: "${OUTPUT}" matches: "DEMO$1<space>"
-  echo "${OUTPUT}" | grep "DEMO$1[ ]"
+    echo -n "$tmp_exec: "
+    # the service may not be up immediately after ip allocation so retry a few times
+    for i in {1..5}; do
+        if output=$("./$tmp_exec" "$ip" 2>/dev/null); then
+            echo "got: $output"
+            break
+        fi
+        echo -n "."
+        sleep 10
+    done
+
+    if [[ -z "$output" ]]; then
+        output=$(./${tmp_exec} "$ip")
+    fi
+
+    rm "$tmp_exec"
+    want=$2
+    if ! echo "$output" | grep "DEMO${want}[ ]" &>/dev/null; then
+        echo "wanted DEMO${want}[ ], not in $output" >&2
+        return 1
+    fi
 }
 
 edit() {
-  echo Setting $LANGUAGE to "$1"
-  ./examples/hellogrpc/${LANGUAGE}/server/edit.sh "$1"
+    logfail "./examples/hellogrpc/$1/server/edit.sh" "$2"
 }
 
 update() {
-  echo Updating $LANGUAGE...
-  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.replace
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.replace
+    logfail bazel build "examples/hellogrpc/$1/server:staging.replace"
+    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.replace"
 }
 
 delete() {
-  echo Deleting $LANGUAGE...
-  kubectl get all --namespace="${namespace}" --selector=app=hello-grpc-staging
-  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.describe
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.describe || echo "Resource didn't exist!"
-  bazel build $BAZEL_FLAGS examples/hellogrpc/${LANGUAGE}/server:staging.delete
-  bazel-bin/examples/hellogrpc/${LANGUAGE}/server/staging.delete
+    logfail kubectl get all --namespace="${namespace}" --selector=app=hello-grpc-staging
+    logfail bazel build "examples/hellogrpc/$1/server:staging.describe"
+    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.describe" || echo "$1 describe: hellogrpc server not found" >&2
+    logfail bazel build "examples/hellogrpc/$1/server:staging.delete"
+    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.delete"
 }
 
 check_kubeconfig_args() {
-  for cmd in apply delete; do
-    bazel build $BAZEL_FLAGS examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
-    OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.${cmd})"
-    EXPECT_CONTAINS_PATTERN "${OUTPUT}" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
-  done
+    for cmd in apply delete; do
+        logfail bazel build examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
+        OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.${cmd})"
+        EXPECT_CONTAINS_PATTERN "$OUTPUT" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
+    done
 }
 
 # e2e test that checks that args are added to the kubectl apply command
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
     # passes it to the execution of the template
-    EXPECT_CONTAINS "$(bazel run $BAZEL_FLAGS examples/hellogrpc:staging.apply)" "apply --v=2"
+    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply 2>/dev/null)" "apply --v=2"
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$(bazel run $BAZEL_FLAGS examples/hellogrpc:staging.apply -- --v=1)" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
 }
 
-check_kubeconfig_args
+logfail() {
+    echo "++ $@"
+    local out
+    local code
+    out=$("$@" 2>&1) && return 0 || code=$?
+    echo "++ FAIL: $code=$@" >&2
+    echo "$out"
+    return $code
+}
 
-check_kubectl_args
+main() {
+    echo "hellogrpc: setup"
+    trap "echo hellogrpc: FAILED" EXIT
+    local failed=()
+    check_kubeconfig_args
+    check_kubectl_args
+    apply-lb
 
-apply-lb
+    while [[ -n "${1:-}" ]]; do
+        lang=$1
+        shift
+        case "$lang" in
+          cc|py)
+            echo "hellogprc/$lang: skip (broken)"
+            continue
+            ;;
+          nodejs)
+            echo "hellogrpc/$lang: skip (not implemented)"
+            continue
+            ;;
+        esac
+        echo "hellogrpc/$lang: start"
 
-while [[ -n "${1:-}" ]]; do
-  LANGUAGE="$1"
-  shift
+        delete "$lang" &> /dev/null || true
+        trap "echo hellogrpc/$lang: FAIL >&2" EXIT
+        local want
+        want="$RANDOM"
+        edit "$lang" "$want"
+        create "$lang"
+        sleep 25
+        check_msg "$lang" "$want"
+        want="$RANDOM"
+        edit "$lang" "$want"
+        update "$lang"
+        sleep 25 # Mitigate against slow startup
+        check_msg "$lang" "$want"
+        delete "$lang"
+        echo "hellogrpc/$lang: PASS"
+    done
+    trap - EXIT
+}
 
-  delete &> /dev/null || true
-  create
-  set +o xtrace
-  trap "echo hellogrpc: $LANGUAGE FAILED, cleaning up... >&2; delete" EXIT
-  set -o xtrace
-  sleep 25
-  check_msg ""
-
-  for i in $RANDOM $RANDOM; do
-    edit "$i"
-    update
-    # Don't let K8s slowness cause flakes.
-    sleep 25
-    check_msg "$i"
-  done
-  delete
-done
-
-# Replace the trap with a success message.
-trap "echo hellogrpc: PASS" EXIT
+main "$@"
+echo "hellogrpc: PASS"
