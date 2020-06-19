@@ -19,5 +19,5 @@ set -o nounset
 set -o pipefail
 
 cat <<EOF
-E2E_NAMESPACE build-${BUILD_ID:-0}
+STABLE_E2E_NAMESPACE ${E2E_NAMESPACE:-build-${BUILD_ID:-$USER}}
 EOF
