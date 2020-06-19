@@ -30,11 +30,3 @@ gazelle(
 
 # Make Gazelle ignore Go files in the examples directory used in e2e tests.
 # gazelle:exclude examples
-
-platform(
-    name = "linux_x86",
-    constraint_values = [
-        "@platforms//os:linux",
-        "@platforms//cpu:x86_64",
-    ],
-)
