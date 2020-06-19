@@ -19,3 +19,7 @@ build --define=TAG=staging
 run --workspace_status_command=./hack/print-workspace-status.sh
 
 test --test_output=errors
+
+# Taken from https://github.com/grpc/grpc/blob/66b045636018505dfa2654e62003d9596733076b/tools/bazel.rc
+# Builds fail on MacOS otherwise
+build --copt=-DGRPC_BAZEL_BUILD
