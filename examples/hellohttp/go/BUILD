@@ -22,8 +22,8 @@ go_image(
     srcs = ["main.go"],
     goarch = "amd64",
     goos = "linux",
-    pure = "on",
     importpath = "github.com/bazelbuild/not-my-project/examples/hellohttp/go",
+    pure = "on",
 )
 
 k8s_deploy(

@@ -22,8 +22,8 @@ go_image(
     srcs = ["main.go"],
     goarch = "amd64",
     goos = "linux",
-    pure = "on",
     importpath = "github.com/bazelbuild/not-my-project/examples/hellogrpc/go/server",
+    pure = "on",
     deps = [
         "//examples/hellogrpc/proto:simple_go_grpc",
         "@org_golang_google_grpc//:go_default_library",
