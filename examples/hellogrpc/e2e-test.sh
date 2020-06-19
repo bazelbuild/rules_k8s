@@ -83,6 +83,8 @@ check_msg() {
         sleep 5
     done
 
+    # Make Bazel generate a temporary script that runs the client executable
+    # This will only generate the temp executable. It won't actually run it.
     local output
     local tmp_exec=hellogrpc_$1_client
     logfail bazel run "//examples/hellogrpc/$1/client" "--script_path=$tmp_exec"
