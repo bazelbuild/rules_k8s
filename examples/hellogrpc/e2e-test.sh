@@ -90,6 +90,7 @@ check_msg() {
     logfail bazel run "//examples/hellogrpc/$1/client" "--script_path=$tmp_exec"
 
     echo -n "$tmp_exec: "
+    # the service may not be up immediately after ip allocation so retry a few times
     for i in {1..5}; do
         if output=$("./$tmp_exec" "$ip" 2>/dev/null); then
             echo "got: $output"
@@ -103,9 +104,6 @@ check_msg() {
         output=$(./${tmp_exec} "$ip")
     fi
 
-
-    # Make Bazel generate a temporary script that runs the client executable.
-    # This will only generate the temp executable. It won't actually run it.
     rm "$tmp_exec"
     want=$2
     if ! echo "$output" | grep "DEMO${want}[ ]" &>/dev/null; then
