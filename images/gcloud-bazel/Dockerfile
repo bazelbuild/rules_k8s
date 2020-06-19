@@ -43,7 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     kubectl \
     python-pip \
     && apt-get clean \
-    && python -m pip install --upgrade pip setuptools wheel
+    && pip install pip setuptools wheel
 
 ARG OLD_VERSION
 COPY --from=old \
