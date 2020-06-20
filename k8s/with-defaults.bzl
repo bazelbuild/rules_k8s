@@ -54,59 +54,59 @@ def _impl(repository_ctx):
 
     overrides = []
     if repository_ctx.attr.cluster:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "cluster",
             repository_ctx.attr.cluster,
-        )]
+        ))
 
     if repository_ctx.attr.context:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "context",
             repository_ctx.attr.context,
-        )]
+        ))
     if repository_ctx.attr.user:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "user",
             repository_ctx.attr.user,
-        )]
+        ))
 
     if repository_ctx.attr.namespace:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "namespace",
             repository_ctx.attr.namespace,
-        )]
+        ))
 
     if repository_ctx.attr.kind:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "kind",
             repository_ctx.attr.kind,
-        )]
+        ))
 
     if repository_ctx.attr.kubeconfig:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "kubeconfig",
             repository_ctx.attr.kubeconfig,
-        )]
+        ))
 
     if repository_ctx.attr.image_chroot:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "image_chroot",
             repository_ctx.attr.image_chroot,
-        )]
+        ))
 
     if repository_ctx.attr.resolver:
-        overrides += [_override(
+        overrides.append(_override(
             repository_ctx.attr.name,
             "resolver",
             repository_ctx.attr.resolver,
-        )]
+        ))
 
     repository_ctx.file("defaults.bzl", """
 load(
