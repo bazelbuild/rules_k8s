@@ -72,38 +72,38 @@ def _impl(ctx):
             image_spec = {"name": resolved_tag}
             if image.get("legacy"):
                 image_spec["tarball"] = _runfiles(ctx, image["legacy"])
-                all_inputs += [image["legacy"]]
+                all_inputs.append(image["legacy"])
 
             blobsums = image.get("blobsum", [])
             image_spec["digest"] = ",".join([_runfiles(ctx, f) for f in blobsums])
-            all_inputs += blobsums
+            all_inputs.extend(blobsums)
 
             diff_ids = image.get("diff_id", [])
             image_spec["diff_id"] = ",".join([_runfiles(ctx, f) for f in diff_ids])
-            all_inputs += diff_ids
+            all_inputs.extend(diff_ids)
 
             blobs = image.get("zipped_layer", [])
             image_spec["compressed_layer"] = ",".join([_runfiles(ctx, f) for f in blobs])
-            all_inputs += blobs
+            all_inputs.extend(blobs)
 
             uncompressed_blobs = image.get("unzipped_layer", [])
             image_spec["uncompressed_layer"] = ",".join([_runfiles(ctx, f) for f in uncompressed_blobs])
-            all_inputs += uncompressed_blobs
+            all_inputs.extend(uncompressed_blobs)
 
             image_spec["config"] = _runfiles(ctx, image["config"])
-            all_inputs += [image["config"]]
+            all_inputs.append(image["config"])
 
             # Quote the semi-colons so they don't complete the command.
-            image_specs += ["';'".join([
+            image_specs.append("';'".join([
                 "%s=%s" % (k, v)
                 for (k, v) in image_spec.items()
-            ])]
+            ]))
 
     # Add workspace_status_command files to the args that are pushed to the resolver and adds the
     # files to the runfiles so they are available to the resolver executable.
     stamp_inputs = [ctx.info_file, ctx.version_file]
     stamp_args = " ".join(["--stamp-info-file=%s" % _runfiles(ctx, f) for f in stamp_inputs])
-    all_inputs += stamp_inputs
+    all_inputs.extend(stamp_inputs)
 
     image_chroot_arg = ctx.attr.image_chroot
     image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
@@ -111,7 +111,7 @@ def _impl(ctx):
         image_chroot_file = ctx.actions.declare_file(ctx.label.name + ".image-chroot-name")
         _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
         image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
-        all_inputs += [image_chroot_file]
+        all_inputs.append(image_chroot_file)
 
     ctx.actions.expand_template(
         template = ctx.file.template,
@@ -175,7 +175,7 @@ def _common_impl(ctx):
         cluster_file = ctx.actions.declare_file(ctx.label.name + ".cluster-name")
         _resolve(ctx, ctx.attr.cluster, cluster_file)
         cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
-        files += [cluster_file]
+        files.append(cluster_file)
 
     context_arg = ctx.attr.context
     context_arg = ctx.expand_make_variables("context", context_arg, {})
@@ -183,7 +183,7 @@ def _common_impl(ctx):
         context_file = ctx.actions.declare_file(ctx.label.name + ".context-name")
         _resolve(ctx, ctx.attr.context, context_file)
         context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
-        files += [context_file]
+        files.append(context_file)
 
     user_arg = ctx.attr.user
     user_arg = ctx.expand_make_variables("user", user_arg, {})
@@ -191,7 +191,7 @@ def _common_impl(ctx):
         user_file = ctx.actions.declare_file(ctx.label.name + ".user-name")
         _resolve(ctx, ctx.attr.user, user_file)
         user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
-        files += [user_file]
+        files.append(user_file)
 
     namespace_arg = ctx.attr.namespace
     namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
@@ -199,14 +199,14 @@ def _common_impl(ctx):
         namespace_file = ctx.actions.declare_file(ctx.label.name + ".namespace-name")
         _resolve(ctx, ctx.attr.namespace, namespace_file)
         namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
-        files += [namespace_file]
+        files.append(namespace_file)
 
     if namespace_arg:
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
     if ctx.file.kubeconfig:
         kubeconfig_arg = _runfiles(ctx, ctx.file.kubeconfig)
-        files += [ctx.file.kubeconfig]
+        files.append(ctx.file.kubeconfig)
     else:
         kubeconfig_arg = ""
 
@@ -238,17 +238,17 @@ def _common_impl(ctx):
 
         if hasattr(ctx.executable, "resolved"):
             substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
-            files += [ctx.executable.resolved]
+            files.append(ctx.executable.resolved)
             extrafiles = depset(transitive = [ctx.attr.resolved[DefaultInfo].default_runfiles.files, extrafiles])
 
         if hasattr(ctx.executable, "reversed"):
             substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
-            files += [ctx.executable.reversed]
+            files.append(ctx.executable.reversed)
             extrafiles = depset(transitive = [ctx.attr.reversed[DefaultInfo].default_runfiles.files, extrafiles])
 
         if hasattr(ctx.files, "unresolved"):
             substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
-            files += ctx.files.unresolved
+            files.extend(ctx.files.unresolved)
 
         ctx.actions.expand_template(
             template = ctx.file._template,
