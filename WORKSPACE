@@ -198,21 +198,9 @@ load("@build_stack_rules_proto//java:deps.bzl", "java_grpc_library")
 
 java_grpc_library()
 
-load("@build_stack_rules_proto//cpp:deps.bzl", "cpp_grpc_library")
-
-cpp_grpc_library()
-
 load("@build_stack_rules_proto//go:deps.bzl", "go_grpc_library")
 
 go_grpc_library()
-
-# We use cc_image to build a sample service
-load(
-    "@io_bazel_rules_docker//cc:image.bzl",
-    _cc_image_repos = "repositories",
-)
-
-_cc_image_repos()
 
 # We use java_image to build a sample service
 load(
