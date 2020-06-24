@@ -1,15 +1,14 @@
 # See Config struct in https://github.com/kubernetes/test-infra/blob/master/prow/repoowners/repoowners.go
 
-# Reviewers may be auto-assigned by blunderbuss
-reviewers:
-- erain
-- smukherj1
-- alex1545
-- fejta
-
-# Approvers can /approve changes to files within this directory tree.
 approvers:
-- erain
-- smukherj1
-- alex1545
+- chases2
+- chizhg
 - fejta
+- michelle192837
+
+# People who have moved off this project
+emeritus_approvers:
+- alex1545
+- erain
+- nlopezgi
+- smukherj1
