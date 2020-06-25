@@ -113,7 +113,7 @@ if [[ $# == 0 ]]; then
     # java: pass
     # py: fail
     # nodejs: skip grpc
-    main go java nodejs cc py
+    main go java nodejs cc
 else
     main "$@"
 fi

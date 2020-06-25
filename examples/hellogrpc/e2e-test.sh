@@ -170,7 +170,7 @@ main() {
         lang=$1
         shift
         case "$lang" in
-          cc|py)
+          cc)
             echo "hellogprc/$lang: skip (broken)"
             continue
             ;;
