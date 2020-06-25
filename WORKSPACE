@@ -23,6 +23,14 @@ load("@io_bazel_rules_docker//repositories:repositories.bzl", _rules_docker_repo
 
 _rules_docker_repos()
 
+load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+
+container_deps()
+
+load("@io_bazel_rules_docker//repositories:pip_repositories.bzl", "pip_deps")
+
+pip_deps()
+
 load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
 
 k8s_go_deps()
