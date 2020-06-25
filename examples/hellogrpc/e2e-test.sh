@@ -170,10 +170,6 @@ main() {
         lang=$1
         shift
         case "$lang" in
-          cc)
-            echo "hellogprc/$lang: skip (broken)"
-            continue
-            ;;
           nodejs)
             echo "hellogrpc/$lang: skip (not implemented)"
             continue

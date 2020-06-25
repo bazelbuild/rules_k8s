@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@build_stack_rules_proto//cpp:cpp_grpc_library.bzl", "cpp_grpc_library")
 load("@build_stack_rules_proto//go:go_grpc_library.bzl", "go_grpc_library")
 load("@build_stack_rules_proto//java:java_grpc_library.bzl", "java_grpc_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
@@ -21,12 +20,6 @@ proto_library(
     name = "simple_proto",
     srcs = ["simple.proto"],
     visibility = ["//visibility:public"],
-)
-
-cpp_grpc_library(
-    name = "simple_cc_grpc",
-    visibility = ["//examples/hellogrpc/cc:__subpackages__"],
-    deps = [":simple_proto"],
 )
 
 java_grpc_library(

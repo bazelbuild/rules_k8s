@@ -143,12 +143,6 @@ main() {
     while [[ -n "${1:-}" ]]; do
         local lang=$1
         shift
-        case "$lang" in
-          cc)
-            echo "hellohttp/$lang: skip (not implemented)"
-            continue
-            ;;
-        esac
         echo "hellohttp/$lang: start"
 
         trap "echo hellohttp/$lang: FAIL >&2" EXIT

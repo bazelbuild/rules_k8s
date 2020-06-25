@@ -108,12 +108,8 @@ main() {
 }
 
 if [[ $# == 0 ]]; then
-    echo "Usage: $(basename "$0") go [cc java nodejs py]"
-    # go: pass
-    # java: pass
-    # py: fail
-    # nodejs: skip grpc
-    main go java nodejs cc
+    echo "Usage: $(basename "$0") go [java nodejs]"
+    main go java nodejs
 else
     main "$@"
 fi
