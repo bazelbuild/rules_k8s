@@ -85,6 +85,10 @@ edit() {
     logfail "./examples/hellohttp/$1/edit.sh" "$2"
 }
 
+resolve() {
+    logfail bazel run "examples/hellohttp/$1:staging.resolve"
+}
+
 apply() {
     logfail bazel run "examples/hellohttp/$1:staging.apply"
 }
@@ -148,6 +152,7 @@ main() {
         trap "echo hellohttp/$lang: FAIL >&2" EXIT
         for want in $RANDOM $RANDOM; do
           edit "$lang" "$want"
+          resolve "$lang"
           apply "$lang"
           sleep 25s
           check_msg "$want"

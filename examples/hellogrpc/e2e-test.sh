@@ -63,6 +63,11 @@ apply-lb() {
     logfail bazel-bin/examples/hellogrpc/staging-service.apply
 }
 
+resolve() {
+    logfail bazel build "examples/hellogrpc/$1/server:staging.resolve"
+    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.resolve"
+}
+
 create() {
     logfail bazel build "examples/hellogrpc/$1/server:staging.create"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.create"
@@ -182,6 +187,7 @@ main() {
         local want
         want="$RANDOM"
         edit "$lang" "$want"
+        resolve "$lang"
         create "$lang"
         sleep 25
         check_msg "$lang" "$want"
