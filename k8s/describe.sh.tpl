@@ -28,5 +28,5 @@ RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 RESOURCE_NAME=$(kubectl create --dry-run -f "%{unresolved}" -o name | cut -d'"' -f 2)
 
 exe %{kubectl_tool} \
-  --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
+  --kubeconfig="%{kubeconfig}" --cluster="%{cluster}" --context="%{context}" --user="%{user}" \
   %{namespace_arg} describe $@ "${RESOURCE_NAME}"
