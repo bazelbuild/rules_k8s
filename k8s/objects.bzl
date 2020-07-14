@@ -95,6 +95,7 @@ def k8s_objects(name, objects, **kwargs):
     # TODO(mattmoor): We may have to normalize the labels that come
     # in through objects.
     _run_all(name = name, objects = _cmd_objects("", objects), delimiter = "echo ---\n", **kwargs)
+    _run_all(name = name + ".resolve", objects = _cmd_objects("", objects), delimiter = "echo ---\n", **kwargs)
     _run_all(name = name + ".create", objects = _cmd_objects(".create", objects), **kwargs)
     _run_all(name = name + ".delete", objects = _cmd_objects(".delete", objects, True), **kwargs)
     _run_all(name = name + ".replace", objects = _cmd_objects(".replace", objects), **kwargs)

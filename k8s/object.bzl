@@ -517,6 +517,7 @@ def k8s_object(name, **kwargs):
     kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
     _k8s_object(name = name, **kwargs)
+    _k8s_object(name = name + ".resolve", **kwargs)
     _reversed(
         name = name + ".reversed",
         substituted = name,
