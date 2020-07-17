@@ -11,33 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Reverses the object order in a multi-document yaml."""
+"""Reads a multi-document yaml from standard in and writes to standard out in reverse object order."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import argparse
+import sys
 import yaml
-
-parser = argparse.ArgumentParser(
-    description='Reverse a potential multi-document input.')
-
-parser.add_argument(
-  '--template', action='store',
-  help='The template file to resolve.')
 
 
 def main():
-  args = parser.parse_args()
 
-  with open(args.template, 'r', encoding='utf-8') as f:
-    inputs = f.read()
+    inputs = sys.stdin.read()
 
-  content = yaml.dump_all(reversed([x for x in yaml.load_all(inputs, Loader=yaml.SafeLoader)]))
+    content = yaml.dump_all(
+        reversed([x for x in yaml.load_all(inputs, Loader=yaml.SafeLoader)]))
 
-  print(content)
+    print(content)
 
 
 if __name__ == '__main__':
-  main()
+    main()

@@ -241,10 +241,10 @@ def _common_impl(ctx):
             files.append(ctx.executable.resolved)
             extrafiles = depset(transitive = [ctx.attr.resolved[DefaultInfo].default_runfiles.files, extrafiles])
 
-        if hasattr(ctx.executable, "reversed"):
-            substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
-            files.append(ctx.executable.reversed)
-            extrafiles = depset(transitive = [ctx.attr.reversed[DefaultInfo].default_runfiles.files, extrafiles])
+        if hasattr(ctx.executable, "reverser"):
+            substitutions["%{reverser}"] = _runfiles(ctx, ctx.executable.reverser)
+            files.append(ctx.executable.reverser)
+            extrafiles = depset(transitive = [ctx.attr.reverser[DefaultInfo].default_runfiles.files, extrafiles])
 
         if hasattr(ctx.files, "unresolved"):
             substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
@@ -290,57 +290,6 @@ _common_attrs = {
         allow_files = True,
     ),
 }
-
-def _reverse(ctx):
-    """Implementation of _reversed."""
-    substituted = ctx.attr.substituted[SubFileInfo].file
-
-    ctx.actions.expand_template(
-        template = ctx.file._template,
-        substitutions = {
-            "%{reverser}": _runfiles(ctx, ctx.executable.reverser),
-            "%{yaml}": _runfiles(ctx, substituted),
-        },
-        output = ctx.outputs.executable,
-    )
-
-    return [
-        DefaultInfo(
-            runfiles = ctx.runfiles(
-                files = [
-                    ctx.executable.reverser,
-                    substituted,
-                ],
-                transitive_files = ctx.attr.reverser[DefaultInfo].default_runfiles.files,
-            ),
-        ),
-    ]
-
-_reversed = rule(
-    attrs = _add_dicts(
-        {
-            "reverser": attr.label(
-                default = Label("//k8s:reverser"),
-                cfg = "host",
-                executable = True,
-                allow_files = True,
-            ),
-            "substituted": attr.label(
-                cfg = "target",
-                executable = True,
-                allow_files = True,
-            ),
-            "_template": attr.label(
-                default = Label("//k8s:reverse.sh.tpl"),
-                allow_single_file = True,
-            ),
-        },
-        _common_attrs,
-        _layer_tools,
-    ),
-    executable = True,
-    implementation = _reverse,
-)
 
 _k8s_object = rule(
     attrs = _add_dicts(
@@ -457,7 +406,13 @@ _k8s_object_describe = rule(
 _k8s_object_delete = rule(
     attrs = _add_dicts(
         {
-            "reversed": attr.label(
+            "resolved": attr.label(
+                cfg = "target",
+                executable = True,
+                allow_files = True,
+            ),
+            "reverser": attr.label(
+                default = Label("//k8s:reverser"),
                 cfg = "target",
                 executable = True,
                 allow_files = True,
@@ -518,11 +473,6 @@ def k8s_object(name, **kwargs):
 
     _k8s_object(name = name, **kwargs)
     _k8s_object(name = name + ".resolve", **kwargs)
-    _reversed(
-        name = name + ".reversed",
-        substituted = name,
-        **implicit_args
-    )
 
     if "cluster" in kwargs or "context" in kwargs:
         _k8s_object_create(
@@ -539,7 +489,7 @@ def k8s_object(name, **kwargs):
         )
         _k8s_object_delete(
             name = name + ".delete",
-            reversed = name + ".reversed",
+            resolved = name,
             kind = kwargs.get("kind"),
             cluster = kwargs.get("cluster"),
             context = kwargs.get("context"),
