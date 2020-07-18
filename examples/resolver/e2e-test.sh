@@ -9,28 +9,8 @@ source ./examples/util.sh
 validate_args $@
 shift 2
 
-fail() {
-    echo "FAILURE: $1"
-    exit 1
-}
-
-CONTAINS() {
-    local complete="$1"
-    local substring="$2"
-
-    echo "$complete" | grep -Fsq -- "$substring" >/dev/null
-}
-
-EXPECT_CONTAINS() {
-    local complete="$1"
-    local substring="$2"
-    local message="${3:-Expected '$substring' not found in '$complete'}"
-
-    CONTAINS "$complete" "$substring" || fail "$message"
-}
-
 apply() {
-    logfail bazel run "examples/resolver/:example.apply"
+    logfail bazel run "examples/resolver:example.apply"
 }
 
 check_object_exists() {
@@ -39,7 +19,7 @@ check_object_exists() {
 }
 
 delete() {
-    logfail bazel run "examples/resolver/:example.delete"
+    logfail bazel run "examples/resolver:example.delete"
 }
 
 check_object_deleted() {
