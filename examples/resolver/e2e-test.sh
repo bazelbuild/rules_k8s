@@ -47,10 +47,10 @@ main() {
 
     apply
     sleep 3s
-    check_objects_exist
+    check_object_exists
     delete
     sleep 3s
-    check_objects_deleted
+    check_object_deleted
     
     trap - EXIT
 }
