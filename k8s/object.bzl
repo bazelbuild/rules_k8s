@@ -286,11 +286,11 @@ _common_attrs = {
         executable = True,
         allow_files = True,
     ),
+    # Extra arguments to pass to the resolver.
+    "resolver_args": attr.string_list(),
     # Custom stamp input files. Default to stable-status.txt and volatile-status.txt
     # emitted by the workspace_status command.
     "stamp_srcs": attr.label_list(),
-    # Extra arguments to pass to the resolver.
-    "resolver_args": attr.string_list(),
     "user": attr.string(),
     "_stamper": attr.label(
         default = Label("//k8s:stamper"),
