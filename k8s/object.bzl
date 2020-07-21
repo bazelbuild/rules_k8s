@@ -241,10 +241,10 @@ def _common_impl(ctx):
             files.append(ctx.executable.resolved)
             extrafiles = depset(transitive = [ctx.attr.resolved[DefaultInfo].default_runfiles.files, extrafiles])
 
-        if hasattr(ctx.executable, "reversed"):
-            substitutions["%{reverse_script}"] = _runfiles(ctx, ctx.executable.reversed)
-            files.append(ctx.executable.reversed)
-            extrafiles = depset(transitive = [ctx.attr.reversed[DefaultInfo].default_runfiles.files, extrafiles])
+        if hasattr(ctx.executable, "reverser"):
+            substitutions["%{reverser}"] = _runfiles(ctx, ctx.executable.reverser)
+            files.append(ctx.executable.reverser)
+            extrafiles = depset(transitive = [ctx.attr.reverser[DefaultInfo].default_runfiles.files, extrafiles])
 
         if hasattr(ctx.files, "unresolved"):
             substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
@@ -290,57 +290,6 @@ _common_attrs = {
         allow_files = True,
     ),
 }
-
-def _reverse(ctx):
-    """Implementation of _reversed."""
-    substituted = ctx.attr.substituted[SubFileInfo].file
-
-    ctx.actions.expand_template(
-        template = ctx.file._template,
-        substitutions = {
-            "%{reverser}": _runfiles(ctx, ctx.executable.reverser),
-            "%{yaml}": _runfiles(ctx, substituted),
-        },
-        output = ctx.outputs.executable,
-    )
-
-    return [
-        DefaultInfo(
-            runfiles = ctx.runfiles(
-                files = [
-                    ctx.executable.reverser,
-                    substituted,
-                ],
-                transitive_files = ctx.attr.reverser[DefaultInfo].default_runfiles.files,
-            ),
-        ),
-    ]
-
-_reversed = rule(
-    attrs = _add_dicts(
-        {
-            "reverser": attr.label(
-                default = Label("//k8s:reverser"),
-                cfg = "host",
-                executable = True,
-                allow_files = True,
-            ),
-            "substituted": attr.label(
-                cfg = "target",
-                executable = True,
-                allow_files = True,
-            ),
-            "_template": attr.label(
-                default = Label("//k8s:reverse.sh.tpl"),
-                allow_single_file = True,
-            ),
-        },
-        _common_attrs,
-        _layer_tools,
-    ),
-    executable = True,
-    implementation = _reverse,
-)
 
 _k8s_object = rule(
     attrs = _add_dicts(
@@ -457,7 +406,13 @@ _k8s_object_describe = rule(
 _k8s_object_delete = rule(
     attrs = _add_dicts(
         {
-            "reversed": attr.label(
+            "resolved": attr.label(
+                cfg = "target",
+                executable = True,
+                allow_files = True,
+            ),
+            "reverser": attr.label(
+                default = Label("//k8s:reverser"),
                 cfg = "target",
                 executable = True,
                 allow_files = True,
@@ -516,73 +471,44 @@ def k8s_object(name, **kwargs):
     kwargs["image_targets"] = _deduplicate(kwargs.get("images", {}).values())
     kwargs["image_target_strings"] = _deduplicate(kwargs.get("images", {}).values())
 
-    _k8s_object(name = name, **kwargs)
-    _k8s_object(name = name + ".resolve", **kwargs)
-    _reversed(
-        name = name + ".reversed",
-        substituted = name,
+    common_args = dict(
+        kind = kwargs.get("kind"),
+        cluster = kwargs.get("cluster"),
+        context = kwargs.get("context"),
+        kubeconfig = kwargs.get("kubeconfig"),
+        user = kwargs.get("user"),
+        namespace = kwargs.get("namespace"),
+        args = kwargs.get("args"),
         **implicit_args
     )
+
+    _k8s_object(name = name, **kwargs)
+    _k8s_object(name = name + ".resolve", **kwargs)
 
     if "cluster" in kwargs or "context" in kwargs:
         _k8s_object_create(
             name = name + ".create",
             resolved = name,
-            kind = kwargs.get("kind"),
-            cluster = kwargs.get("cluster"),
-            context = kwargs.get("context"),
-            kubeconfig = kwargs.get("kubeconfig"),
-            user = kwargs.get("user"),
-            namespace = kwargs.get("namespace"),
-            args = kwargs.get("args"),
-            **implicit_args
+            **common_args
         )
         _k8s_object_delete(
             name = name + ".delete",
-            reversed = name + ".reversed",
-            kind = kwargs.get("kind"),
-            cluster = kwargs.get("cluster"),
-            context = kwargs.get("context"),
-            kubeconfig = kwargs.get("kubeconfig"),
-            user = kwargs.get("user"),
-            namespace = kwargs.get("namespace"),
-            args = kwargs.get("args"),
-            **implicit_args
+            resolved = name,
+            **common_args
         )
         _k8s_object_replace(
             name = name + ".replace",
             resolved = name,
-            kind = kwargs.get("kind"),
-            cluster = kwargs.get("cluster"),
-            context = kwargs.get("context"),
-            kubeconfig = kwargs.get("kubeconfig"),
-            user = kwargs.get("user"),
-            namespace = kwargs.get("namespace"),
-            args = kwargs.get("args"),
-            **implicit_args
+            **common_args
         )
         _k8s_object_apply(
             name = name + ".apply",
             resolved = name,
-            kind = kwargs.get("kind"),
-            cluster = kwargs.get("cluster"),
-            context = kwargs.get("context"),
-            kubeconfig = kwargs.get("kubeconfig"),
-            user = kwargs.get("user"),
-            namespace = kwargs.get("namespace"),
-            args = kwargs.get("args"),
-            **implicit_args
+            **common_args
         )
         if "kind" in kwargs:
             _k8s_object_describe(
                 name = name + ".describe",
                 unresolved = kwargs.get("template"),
-                kind = kwargs.get("kind"),
-                cluster = kwargs.get("cluster"),
-                context = kwargs.get("context"),
-                kubeconfig = kwargs.get("kubeconfig"),
-                user = kwargs.get("user"),
-                namespace = kwargs.get("namespace"),
-                args = kwargs.get("args"),
-                **implicit_args
+                **common_args
             )
