@@ -101,7 +101,10 @@ def _impl(ctx):
 
     # Add workspace_status_command files to the args that are pushed to the resolver and adds the
     # files to the runfiles so they are available to the resolver executable.
-    stamp_inputs = [ctx.info_file, ctx.version_file]
+    if len(ctx.attr.stamp_srcs):
+        stamp_inputs = ctx.files.stamp_srcs
+    else:
+        stamp_inputs = [ctx.info_file, ctx.version_file]
     stamp_args = " ".join(["--stamp-info-file=%s" % _runfiles(ctx, f) for f in stamp_inputs])
     all_inputs.extend(stamp_inputs)
 
@@ -152,7 +155,10 @@ def _impl(ctx):
     ]
 
 def _resolve(ctx, string, output):
-    stamps = [ctx.info_file, ctx.version_file]
+    if len(ctx.attr.stamp_srcs):
+        stamps = ctx.files.stamp_srcs
+    else:
+        stamps = [ctx.info_file, ctx.version_file]
     args = ctx.actions.args()
     args.add_all(stamps, format_each = "--stamp-info-file=%s")
     args.add(string, format = "--format=%s")
@@ -282,6 +288,9 @@ _common_attrs = {
     ),
     # Extra arguments to pass to the resolver.
     "resolver_args": attr.string_list(),
+    # Custom stamp input files. Default to stable-status.txt and volatile-status.txt
+    # emitted by the workspace_status command.
+    "stamp_srcs": attr.label_list(),
     "user": attr.string(),
     "_stamper": attr.label(
         default = Label("//k8s:stamper"),
