@@ -15,11 +15,12 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
-	"os"
 	"path"
 	"strings"
 
@@ -34,6 +35,7 @@ import (
 var (
 	imgChroot         = flag.String("image_chroot", "", "The repository under which to chroot image references when publishing them.")
 	k8sTemplate       = flag.String("template", "", "The k8s YAML template file to resolve.")
+	substitutionsFile = flag.String("substitutions", "", "A file with a list of substitutions that were made in the YAML template. Any stamp values that appear are stamped by the resolver.")
 	allowUnusedImages = flag.Bool("allow_unused_images", false, "Allow images that don't appear in the JSON. This is useful when generating multiple SKUs of a k8s_object, only some of which use a particular image.")
 	stampInfoFile     utils.ArrayStringFlags
 	imgSpecs          utils.ArrayStringFlags
@@ -118,6 +120,29 @@ func parseImageSpec(spec string) (imageSpec, error) {
 		}
 	}
 	return result, nil
+}
+
+// parseSubsitutions parses a substitution file, which should be a JSON object
+// with strings to search for and values to replace them with. The replacement values
+// are stamped using the provided stamper.
+func parseSubstitutions(file string, stamper *compat.Stamper) (map[string]string, error) {
+	b, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read file: %v", err)
+	}
+
+	result := struct {
+		Substitutions map[string]string
+	}{}
+	if err := json.Unmarshal(b, &result); err != nil {
+		return nil, fmt.Errorf("unmarshaling as JSON: %v", err)
+	}
+
+	for k, v := range result.Substitutions {
+		result.Substitutions[k] = stamper.Stamp(v)
+	}
+
+	return result.Substitutions, nil
 }
 
 // publishSingle publishes a docker image with the given spec to the remote
@@ -390,13 +415,17 @@ func (r *resolver) resolveYAML(t io.Reader) ([]byte, error) {
 // resolveTemplate resolves the given YAML template using the given mapping from
 // tagged to fully qualified image names referenced by their digest and the
 // set of image names that haven't been seen yet. The given set of unseen images
-// is updated to exclude the image names encountered in the given template.
-func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool) error {
-	t, err := os.Open(templateFile)
+// is updated to exclude the image names encountered in the given template. The
+// given substitutions are made in the template.
+func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool, substitutions map[string]string) error {
+	t, err := ioutil.ReadFile(templateFile)
 	if err != nil {
-		return fmt.Errorf("unable to open template file %q: %v", templateFile, err)
+		return fmt.Errorf("unable to read template file %q: %v", templateFile, err)
 	}
-	defer t.Close()
+
+	for k, v := range substitutions {
+		t = bytes.ReplaceAll(t, []byte(k), []byte(v))
+	}
 
 	r := resolver{
 		resolvedImages: resolvedImages,
@@ -404,7 +433,7 @@ func resolveTemplate(templateFile string, resolvedImages map[string]string, unse
 		strResolver:    resolveString,
 	}
 
-	resolved, err := r.resolveYAML(t)
+	resolved, err := r.resolveYAML(bytes.NewReader(t))
 	if err != nil {
 		return fmt.Errorf("unable to resolve YAML template %q: %v", templateFile, err)
 	}
@@ -430,11 +459,20 @@ func main() {
 		}
 		specs = append(specs, spec)
 	}
+
+	substitutions := map[string]string{}
+	if *substitutionsFile != "" {
+		substitutions, err = parseSubstitutions(*substitutionsFile, stamper)
+		if err != nil {
+			log.Fatalf("Unable to parse substitutions file %s: %v", *substitutionsFile, err)
+		}
+	}
+
 	resolvedImages, unseen, err := publish(specs, stamper)
 	if err != nil {
 		log.Fatalf("Unable to publish images: %v", err)
 	}
-	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen); err != nil {
+	if err := resolveTemplate(*k8sTemplate, resolvedImages, unseen, substitutions); err != nil {
 		log.Fatalf("Unable to resolve template file %q: %v", *k8sTemplate, err)
 	}
 	if len(unseen) > 0 && !*allowUnusedImages {

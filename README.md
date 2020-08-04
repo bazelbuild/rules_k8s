@@ -520,8 +520,10 @@ A rule for interacting with Kubernetes objects.
         <p>Which is then invoked with <code>bazel run --define make_expanded_variable=value :target</code>
         and will replace any occurrences of the literal token <code>%{expand_template_variable}</code> in your
         template with the value "value" by way of first make variable
-        substitution and then expand_template replacement.
+        substitution and then string replacement.
         </p>
+        <p>Any stamp variables are also replaced with their values. This is done
+        after make variable substitution.</p>
       </td>
     </tr>
     <tr>

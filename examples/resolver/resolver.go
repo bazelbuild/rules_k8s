@@ -18,9 +18,12 @@ import (
 )
 
 // Flags that the resolver will be passed
-var stampInfoFile = flag.String("stamp-info-file", "", "One or more Bazel stamp info files.")
-var imgChroot = flag.String("image_chroot", "", "The repository under which to chroot image references when publishing them.")
-var templateFile = flag.String("template", "", "The k8s YAML template file to resolve.")
+var (
+	stampInfoFile     = flag.String("stamp-info-file", "", "One or more Bazel stamp info files.")
+	imgChroot         = flag.String("image_chroot", "", "The repository under which to chroot image references when publishing them.")
+	templateFile      = flag.String("template", "", "The k8s YAML template file to resolve.")
+	substitutionsFile = flag.String("substitutions", "", "A file with a list of substitutions that were made in the YAML template. Any stamp values that appear are stamped by the resolver.")
+)
 
 func readTemplate(templateFile string) string {
 	content, err := ioutil.ReadFile(templateFile)

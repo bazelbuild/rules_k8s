@@ -19,5 +19,5 @@ package(default_visibility = ["//visibility:public"])
 go_image(
     name = "go-container",
     srcs = ["main.go"],
-    importpath = "github.com/bazelbuild/not-my-project/examples/imagestamping/go",
+    importpath = "github.com/bazelbuild/not-my-project/examples/stamping/go",
 )

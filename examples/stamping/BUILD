@@ -19,11 +19,32 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])  # Apache 2.0
 
 k8s_object(
-    name = "imagestamping-image",
+    name = "image_stamping",
     # Build images with the same container
     images = {
-        "index.docker.io/parsec86/{REPOSITORY}:{STABLE_GIT_COMMIT}": "//examples/imagestamping/go:go-container",
+        "index.docker.io/parsec86/{REPOSITORY}:{STABLE_GIT_COMMIT}": "//examples/stamping/go:go-container",
     },
     # K8s deployment template with a stamping variable to replace
     template = ":deployment.yaml",
+)
+
+k8s_object(
+    name = "substitution_stamping",
+    # Stamp values can also be used in substitutions
+    substitutions = {
+        "%{e2e_namespace}": "{STABLE_E2E_NAMESPACE}",
+        "%{key}": "foo",
+    },
+    # K8s deployment template with a stamping variable to replace
+    template = ":configmap.yaml",
+)
+
+py_test(
+    name = "substitution_test",
+    srcs = ["substitution_test.py"],
+    data = [":substitution_stamping"],
+    python_version = "PY2",
+    deps = [
+        "@com_github_yaml_pyyaml//:yaml",
+    ],
 )

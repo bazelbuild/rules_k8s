@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: substitution-stamping
+data:
+  e2e_namespace: "%{e2e_namespace}"
+  %{key}: "bar"
