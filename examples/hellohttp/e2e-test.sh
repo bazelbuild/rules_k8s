@@ -89,6 +89,10 @@ resolve() {
     logfail bazel run "examples/hellohttp/$1:staging.resolve"
 }
 
+diff() {
+    logfail bazel run "examples/hellohttp/$1:staging.diff"
+}
+
 apply() {
     logfail bazel run "examples/hellohttp/$1:staging.apply"
 }
@@ -153,6 +157,7 @@ main() {
         for want in $RANDOM $RANDOM; do
           edit "$lang" "$want"
           resolve "$lang"
+          diff "$lang"
           apply "$lang"
           sleep 25s
           check_msg "$want"

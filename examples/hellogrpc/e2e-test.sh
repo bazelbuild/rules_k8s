@@ -121,6 +121,11 @@ edit() {
     logfail "./examples/hellogrpc/$1/server/edit.sh" "$2"
 }
 
+diff() {
+    logfail bazel build "examples/hellogrpc/$1/server:staging.diff"
+    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.diff"
+}
+
 update() {
     logfail bazel build "examples/hellogrpc/$1/server:staging.replace"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.replace"
@@ -193,6 +198,7 @@ main() {
         check_msg "$lang" "$want"
         want="$RANDOM"
         edit "$lang" "$want"
+        diff "$lang"
         update "$lang"
         sleep 25 # Mitigate against slow startup
         check_msg "$lang" "$want"
