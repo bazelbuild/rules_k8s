@@ -126,7 +126,24 @@ edit() {
 
 diff() {
     logfail bazel build "examples/hellogrpc/$1/server:staging.diff"
-    logfail "bazel-bin/examples/hellogrpc/$1/server/staging.diff"
+    # We want diff to return 1 so we can't use logfail here
+    cmd="bazel-bin/examples/hellogrpc/$1/server/staging.diff"
+    echo "++ $cmd"
+    local out
+    local code
+    out=$("$cmd" 2>&1) && code=0 || code=$?
+    if [ $code -eq 1 ]; then
+        return 0
+    elif [ $code -eq 0 ]; then
+        echo "++ DIFF FOUND NO CHANGES: $cmd" >&2
+        echo "$out"
+        # We can't just return $code here, since it would be a "success"
+        return 1
+    else
+    echo "++ FAIL: $code=$cmd" >&2
+    echo "$out"
+    return $code
+    logfail
 }
 
 update() {
