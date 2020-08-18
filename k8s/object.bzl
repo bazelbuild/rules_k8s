@@ -509,7 +509,8 @@ def k8s_object(name, **kwargs):
     )
 
     resolve_args = dict(**kwargs)
-    resolve_args.pop("args")
+    if "args" in resolve_args:
+        resolve_args.pop("args")
 
     _k8s_object(name = name, **resolve_args)
     _k8s_object(name = name + ".resolve", **resolve_args)
