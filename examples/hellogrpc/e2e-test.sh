@@ -143,7 +143,6 @@ diff() {
     echo "++ FAIL: $code=$cmd" >&2
     echo "$out"
     return $code
-    logfail
 }
 
 update() {

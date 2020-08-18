@@ -90,9 +90,6 @@ resolve() {
 }
 
 diff() {
-    logfail bazel run "examples/hellohttp/$1:staging.diff"
-}
-diff() {
     # We don't want to confuse bazel build failures with diff output so we
     # need to build first
     logfail bazel build "examples/hellohttp/$1:staging.diff"
@@ -113,7 +110,6 @@ diff() {
     echo "++ FAIL: $code=$cmd" >&2
     echo "$out"
     return $code
-    logfail
 }
 
 apply() {
