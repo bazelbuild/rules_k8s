@@ -508,8 +508,11 @@ def k8s_object(name, **kwargs):
         **implicit_args
     )
 
-    _k8s_object(name = name, **kwargs)
-    _k8s_object(name = name + ".resolve", **kwargs)
+    resolve_args = dict(**kwargs)
+    resolve_args.pop("args")
+
+    _k8s_object(name = name, **resolve_args)
+    _k8s_object(name = name + ".resolve", **resolve_args)
 
     if "cluster" in kwargs or "context" in kwargs:
         _k8s_object_create(
