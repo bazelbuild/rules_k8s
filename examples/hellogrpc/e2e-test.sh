@@ -59,6 +59,9 @@ function EXPECT_CONTAINS_PATTERN() {
 
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
+    # We use `bazel build ... && bazel-bin/...` here in this file instead of
+    # `bazel run` directly in order to make sure that direct execution of the
+    # built output works as well
     logfail bazel build examples/hellogrpc:staging-service.apply
     logfail bazel-bin/examples/hellogrpc/staging-service.apply
 }
