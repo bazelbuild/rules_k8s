@@ -107,9 +107,10 @@ diff() {
         # We can't just return $code here, since it would be a "success"
         return 1
     else
-    echo "++ FAIL: $code=$cmd" >&2
-    echo "$out"
-    return $code
+        echo "++ FAIL: $code=$cmd" >&2
+        echo "$out"
+        return $code
+    fi
 }
 
 apply() {
