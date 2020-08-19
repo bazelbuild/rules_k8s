@@ -19,17 +19,20 @@ configurations / clusters.
 
 Add the following to your `WORKSPACE` file to add the necessary external dependencies:
 
+* Info for [rules_docker](https://github.com/bazelbuild/rules_docker/#setup)
+
+
 ```python
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# This requires rules_docker to be fully instantiated before
-# it is pulled in.
-# Download the rules_k8s repository at release v0.4
+# https://github.com/bazelbuild/rules_docker/#setup
+# http_archive("io_bazel_rules_docker", ...)
+
 http_archive(
     name = "io_bazel_rules_k8s",
-    sha256 = "d91aeb17bbc619e649f8d32b65d9a8327e5404f451be196990e13f5b7e2d17bb",
-    strip_prefix = "rules_k8s-0.4",
-    urls = ["https://github.com/bazelbuild/rules_k8s/releases/download/v0.4/rules_k8s-v0.4.tar.gz"],
+    strip_prefix = "rules_k8s-0.5",
+    urls = ["https://github.com/bazelbuild/rules_k8s/archive/v0.5.tar.gz"],
+    sha256 = "773aa45f2421a66c8aa651b8cecb8ea51db91799a405bd7b913d77052ac7261a",
 )
 
 load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_repositories")
