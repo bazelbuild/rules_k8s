@@ -59,6 +59,9 @@ function EXPECT_CONTAINS_PATTERN() {
 
 # Ensure there is an ip address for hell-grpc-staging:50051
 apply-lb() {
+    # We use `bazel build ... && bazel-bin/...` here in this file instead of
+    # `bazel run` directly in order to make sure that direct execution of the
+    # built output works as well
     logfail bazel build examples/hellogrpc:staging-service.apply
     logfail bazel-bin/examples/hellogrpc/staging-service.apply
 }
@@ -119,6 +122,28 @@ check_msg() {
 
 edit() {
     logfail "./examples/hellogrpc/$1/server/edit.sh" "$2"
+}
+
+diff() {
+    logfail bazel build "examples/hellogrpc/$1/server:staging.diff"
+    # We want diff to return 1 so we can't use logfail here
+    cmd="bazel-bin/examples/hellogrpc/$1/server/staging.diff"
+    echo "++ $cmd"
+    local out
+    local code
+    out=$("$cmd" 2>&1) && code=0 || code=$?
+    if [ $code -eq 1 ]; then
+        return 0
+    elif [ $code -eq 0 ]; then
+        echo "++ DIFF FOUND NO CHANGES: $cmd" >&2
+        echo "$out"
+        # We can't just return $code here, since it would be a "success"
+        return 1
+    else
+        echo "++ FAIL: $code=$cmd" >&2
+        echo "$out"
+        return $code
+    fi
 }
 
 update() {
@@ -193,6 +218,7 @@ main() {
         check_msg "$lang" "$want"
         want="$RANDOM"
         edit "$lang" "$want"
+        diff "$lang"
         update "$lang"
         sleep 25 # Mitigate against slow startup
         check_msg "$lang" "$want"

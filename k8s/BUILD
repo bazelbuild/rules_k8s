@@ -27,6 +27,7 @@ exports_files([
     "reverse.sh.tpl",
     "delete.sh.tpl",
     "describe.sh.tpl",
+    "diff.sh.tpl",
 ])
 
 par_binary(

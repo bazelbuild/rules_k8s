@@ -435,6 +435,26 @@ _k8s_object_delete = rule(
     implementation = _common_impl,
 )
 
+_k8s_object_diff = rule(
+    attrs = _add_dicts(
+        {
+            "resolved": attr.label(
+                cfg = "target",
+                executable = True,
+                allow_files = True,
+            ),
+            "_template": attr.label(
+                default = Label("//k8s:diff.sh.tpl"),
+                allow_single_file = True,
+            ),
+        },
+        _common_attrs,
+    ),
+    executable = True,
+    toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
+    implementation = _common_impl,
+)
+
 # See "attrs" parameter at https://docs.bazel.build/versions/master/skylark/lib/globals.html#parameters-26
 _implicit_attrs = [
     "visibility",
@@ -488,8 +508,12 @@ def k8s_object(name, **kwargs):
         **implicit_args
     )
 
-    _k8s_object(name = name, **kwargs)
-    _k8s_object(name = name + ".resolve", **kwargs)
+    resolve_args = dict(kwargs)
+    if "args" in resolve_args:
+        resolve_args.pop("args")
+
+    _k8s_object(name = name, **resolve_args)
+    _k8s_object(name = name + ".resolve", **resolve_args)
 
     if "cluster" in kwargs or "context" in kwargs:
         _k8s_object_create(
@@ -511,6 +535,18 @@ def k8s_object(name, **kwargs):
             name = name + ".apply",
             resolved = name,
             **common_args
+        )
+        _k8s_object_diff(
+            name = name + ".diff",
+            resolved = name,
+            kind = kwargs.get("kind"),
+            cluster = kwargs.get("cluster"),
+            context = kwargs.get("context"),
+            kubeconfig = kwargs.get("kubeconfig"),
+            user = kwargs.get("user"),
+            namespace = kwargs.get("namespace"),
+            args = kwargs.get("args"),
+            **implicit_args
         )
         if "kind" in kwargs:
             _k8s_object_describe(

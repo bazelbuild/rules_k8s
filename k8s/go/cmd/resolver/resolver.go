@@ -37,6 +37,7 @@ var (
 	k8sTemplate       = flag.String("template", "", "The k8s YAML template file to resolve.")
 	substitutionsFile = flag.String("substitutions", "", "A file with a list of substitutions that were made in the YAML template. Any stamp values that appear are stamped by the resolver.")
 	allowUnusedImages = flag.Bool("allow_unused_images", false, "Allow images that don't appear in the JSON. This is useful when generating multiple SKUs of a k8s_object, only some of which use a particular image.")
+	noPush            = flag.Bool("no_push", false, "Don't push images after resolving digests.")
 	stampInfoFile     utils.ArrayStringFlags
 	imgSpecs          utils.ArrayStringFlags
 )
@@ -185,8 +186,10 @@ func publishSingle(spec imageSpec, stamper *compat.Stamper) (string, error) {
 		return "", fmt.Errorf("unable to get authenticator for image %v", ref.Name())
 	}
 
-	if err := remote.Write(ref, img, remote.WithAuth(auth)); err != nil {
-		return "", fmt.Errorf("unable to push image %v: %v", ref.Name(), err)
+	if !*noPush {
+		if err := remote.Write(ref, img, remote.WithAuth(auth)); err != nil {
+			return "", fmt.Errorf("unable to push image %v: %v", ref.Name(), err)
+		}
 	}
 
 	d, err := img.Digest()
