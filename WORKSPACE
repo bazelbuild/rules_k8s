@@ -74,9 +74,9 @@ pip_install()
 
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "f20f92a09f7245e2c437fbd729849ffe3b2dd39a46c9378d201f8f95cc9f12ea",
-    strip_prefix = "grpc-1.31.1",
-    urls = ["https://github.com/grpc/grpc/archive/v1.31.1.tar.gz"],
+    sha256 = "f880ebeb2ccf0e47721526c10dd97469200e40b5f101a0d9774eb69efa0bd07a",
+    strip_prefix = "grpc-1.32.0",
+    urls = ["https://github.com/grpc/grpc/archive/v1.32.0.tar.gz"],
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
