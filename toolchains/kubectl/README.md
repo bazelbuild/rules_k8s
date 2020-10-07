@@ -173,7 +173,8 @@ Register the toolchains exported by this repository in your WORKSPACE and add a
 `kubectl_configure` target called "local_k8s_config".
 ```python
 register_toolchains(
-    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_toolchain",
+    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_amd64_toolchain",
+    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_s390x_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
 )
