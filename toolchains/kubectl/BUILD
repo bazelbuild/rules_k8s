@@ -30,10 +30,20 @@ kubectl_toolchain(
 )
 
 toolchain(
-    name = "kubectl_linux_toolchain",
+    name = "kubectl_linux_amd64_toolchain",
     target_compatible_with = [
         "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:x86_64",
+    ],
+    toolchain = "@k8s_config//:toolchain",
+    toolchain_type = ":toolchain_type",
+)
+
+toolchain(
+    name = "kubectl_linux_s390x_toolchain",
+    target_compatible_with = [
+        "@bazel_tools//platforms:linux",
+        "@bazel_tools//platforms:s390x",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
