@@ -1,4 +1,4 @@
-package main
+package resolver
 
 import (
 	"bytes"
@@ -30,11 +30,11 @@ val8:
       - val25: val26
 `)
 	got := make(map[string]bool)
-	sr := func(r *resolver, s string) (string, error) {
+	sr := func(r *yamlResolver, s string) (string, error) {
 		got[s] = true
 		return s, nil
 	}
-	r := &resolver{
+	r := &yamlResolver{
 		strResolver: sr,
 	}
 	if _, err := r.resolveYAML(bytes.NewBuffer(y)); err != nil {
@@ -133,11 +133,11 @@ val4: val5
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			got := make(map[string]bool)
-			sr := func(r *resolver, s string) (string, error) {
+			sr := func(r *yamlResolver, s string) (string, error) {
 				got[s] = true
 				return s, nil
 			}
-			r := &resolver{
+			r := &yamlResolver{
 				strResolver: sr,
 			}
 			if _, err := r.resolveYAML(bytes.NewBufferString(tc.yamlDocs)); err != nil {
