@@ -24,12 +24,12 @@ go_library(
     importpath = "github.com/bazelbuild/rules_k8s/k8s/go/cmd/resolver",
     visibility = ["//visibility:private"],
     deps = [
+        "//k8s/go/pkg/resolver",
         "@com_github_google_go_containerregistry//pkg/authn:go_default_library",
         "@com_github_google_go_containerregistry//pkg/name:go_default_library",
         "@com_github_google_go_containerregistry//pkg/v1/remote:go_default_library",
         "@in_gopkg_yaml_v2//:go_default_library",
         "@io_bazel_rules_docker//container/go/pkg/compat:go_default_library",
-        "@io_bazel_rules_docker//container/go/pkg/utils:go_default_library",
     ],
 )
 
