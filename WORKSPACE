@@ -17,6 +17,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
+# Tell Gazelle to use @io_bazel_rules_docker as the external repository for rules_docker go packages
+# gazelle:repository go_repository name=io_bazel_rules_docker importpath=github.com/bazelbuild/rules_docker
+
 k8s_repositories()
 
 load("@io_bazel_rules_docker//repositories:repositories.bzl", _rules_docker_repos = "repositories")

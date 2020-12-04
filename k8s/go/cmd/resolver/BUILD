@@ -19,7 +19,7 @@ package(default_visibility = ["//visibility:private"])
 licenses(["notice"])  # Apache 2.0
 
 go_library(
-    name = "go_default_library",
+    name = "resolver_lib",
     srcs = ["resolver.go"],
     importpath = "github.com/bazelbuild/rules_k8s/k8s/go/cmd/resolver",
     visibility = ["//visibility:private"],
@@ -35,13 +35,13 @@ go_library(
 
 go_binary(
     name = "resolver",
-    embed = [":go_default_library"],
+    embed = [":resolver_lib"],
     visibility = ["//visibility:public"],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "resolver_test",
     srcs = ["resolver_test.go"],
-    embed = [":go_default_library"],
+    embed = [":resolver_lib"],
     deps = ["@com_github_google_go_cmp//cmp:go_default_library"],
 )
