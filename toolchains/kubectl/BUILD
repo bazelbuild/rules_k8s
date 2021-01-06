@@ -19,7 +19,10 @@ package(default_visibility = ["//visibility:private"])
 licenses(["notice"])  # Apache 2.0
 
 # kubectl toolchain type
-toolchain_type(name = "toolchain_type")
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
 
 # Default kubectl toolchain that expects the 'kubectl' executable
 # to be in the PATH
