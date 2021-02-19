@@ -21,7 +21,18 @@ function guess_runfiles() {
     popd > /dev/null 2>&1
 }
 
-function exe() { echo "\$ ${@/eval/}" ; "$@" ; }
+function exe() {
+    echo "\$ ${@/eval/}"
+    EXIT_CODE=0
+    "$@" || EXIT_CODE=$?
+    # kubectl diff exits with 1 if diffs were found. If multiple files
+    # are being diffed, the action will exit early without printing
+    # remaining files' diffs unless this code is handled.
+    # diff uses exit codes > 1 for real errors.
+    if [[ $EXIT_CODE -gt 1 ]]; then
+        exit $EXIT_CODE
+    fi
+}
 
 RUNFILES="${PYTHON_RUNFILES:-$(guess_runfiles)}"
 
