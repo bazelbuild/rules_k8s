@@ -4,6 +4,9 @@ metadata:
   name: hello-http-static
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-http-static
   template:
     metadata:
       labels:

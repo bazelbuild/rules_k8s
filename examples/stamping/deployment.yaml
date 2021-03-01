@@ -4,6 +4,9 @@ metadata:
   name: image-stamping
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: image-stamping
   template:
     metadata:
       labels:
