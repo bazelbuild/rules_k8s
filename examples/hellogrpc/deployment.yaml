@@ -4,6 +4,9 @@ metadata:
   name: hello-grpc-staging
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: hello-grpc-staging
   template:
     metadata:
       labels:

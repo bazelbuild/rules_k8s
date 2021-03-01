@@ -21,6 +21,11 @@
       },
       "spec": {
          "replicas": 1,
+         "selector": {
+            "matchLabels": {
+               "app": name,
+            },
+         },
          "template": {
             "metadata": {
                "labels": {
