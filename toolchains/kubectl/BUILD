@@ -53,6 +53,16 @@ toolchain(
 )
 
 toolchain(
+    name = "kubectl_linux_arm64_toolchain",
+    target_compatible_with = [
+        "@bazel_tools//platforms:linux",
+        "@bazel_tools//platforms:aarch64",
+    ],
+    toolchain = "@k8s_config//:toolchain",
+    toolchain_type = ":toolchain_type",
+)
+
+toolchain(
     name = "kubectl_osx_toolchain",
     target_compatible_with = [
         "@bazel_tools//platforms:osx",
