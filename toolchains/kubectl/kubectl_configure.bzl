@@ -163,6 +163,8 @@ def kubectl_configure(name, **kwargs):
                 kwargs,
             )
 
+            k8s_release = kwargs.get("k8s_release", _k8s_release)
+
             k8s_url = "https://github.com/{}/{}/releases/download/{}/{}.tar.gz".format(
                 _k8s_org,
                 _k8s_repo,
