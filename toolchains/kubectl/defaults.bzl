@@ -24,15 +24,15 @@ k8s_org = "kubernetes"
 # The kubernetes repository.
 k8s_repo = "kubernetes"
 
-# The release commit/tag to for the kubernetes repo.
-k8s_commit = "v1.13.0-beta.1"
+# The release for the kubernetes repo.
+k8s_release = "v1.13.0-beta.1"
 
 # The archive prefix. This is the name of the top level directory in the
 # downloaded repository archive tarball.
-k8s_prefix = "kubernetes-1.13.0-beta.1"
+k8s_prefix = "kubernetes"
 
-# The SHA256 of the k8s repo.
-k8s_sha256 = "dfb39ce36284c1ce228954ca12bf016c09be61e40a875e8af4fff84e116bd3a7"
+# The SHA256 of the k8s release.
+k8s_sha256 = "90edefe1bb5925492579dc77191c8d039b040fa76bd62c93313f0c92082b7031"
 
 # The kubernetes repository infrastructure tools repository.
 # https://github.com/kubernetes/repo-infra

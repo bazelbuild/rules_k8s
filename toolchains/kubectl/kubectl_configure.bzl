@@ -18,7 +18,7 @@ Defines a repository rule for configuring the kubectl tool.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load(
     ":defaults.bzl",
-    _k8s_commit = "k8s_commit",
+    _k8s_release = "k8s_release",
     _k8s_org = "k8s_org",
     _k8s_prefix = "k8s_prefix",
     _k8s_repo = "k8s_repo",
@@ -113,12 +113,21 @@ def kubectl_configure(name, **kwargs):
                             Default: False. Can't be specified if kubectl_path
                             is specified.
                 k8s_commit: Optional. Commit / release tag at which to build
-                            kubectl from. Default is defined as k8s_tag in
-                            :defaults.bzl.
+                            kubectl from. This can't be used with 'k8s_release'.
+                k8s_release: Optional. Release tag at which to build kubectl
+                             from. Can be used instead of k8s_commit to pull the
+                             specific release archive instead of the
+                             auto-generated github archive for the commit, which
+                             can change if Github's archiving system changes.
+                             Default is defined as k8s_release in :defaults.bzl.
+                             This can't be used with 'k8s_commit'.
+                k8s_prefix: Optional. Prefix to strip from the source archive.
+                            Default is defined as k8s_prefix in :defaults.bzl.
                 k8s_sha256: Optional. sha256 of commit at which to build kubectl
-                from. Default is defined as k8s_sha256 in :defaults.bzl.
+                            from. Default is defined as k8s_sha256 in
+                            :defaults.bzl.
                 kubectl_path: Optional. Use the kubectl binary at the given path
-                or label. This can't be used with 'build_srcs'.
+                              or label. This can't be used with 'build_srcs'.
     """
     build_srcs = False
     if "build_srcs" in kwargs and "kubectl_path" in kwargs:
@@ -126,14 +135,40 @@ def kubectl_configure(name, **kwargs):
              " the same time")
     if "build_srcs" in kwargs and kwargs["build_srcs"]:
         build_srcs = True
-        _ensure_all_provided(
-            "kubectl_configure",
-            ["k8s_commit", "k8s_sha256", "k8s_prefix"],
-            kwargs,
-        )
-        k8s_commit = kwargs["k8s_commit"] if "k8s_commit" in kwargs else _k8s_commit
-        k8s_sha256 = kwargs["k8s_sha256"] if "k8s_sha256" in kwargs else _k8s_sha256
-        k8s_prefix = kwargs["k8s_prefix"] if "k8s_prefix" in kwargs else _k8s_prefix
+        if "k8s_commit" in kwargs and "k8s_release" in kwargs:
+            fail("Attributes 'k8s_commit' and 'k8s_release' can't be specified at the same time")
+
+        k8s_sha256 = kwargs.get("k8s_sha256", _k8s_sha256)
+        k8s_prefix = kwargs.get("k8s_prefix", _k8s_prefix)
+        # Get commit archive URL if specified otherwise get release url
+        if "k8s_commit" in kwargs:
+            _ensure_all_provided(
+                "kubectl_configure",
+                ["k8s_commit", "k8s_sha256", "k8s_prefix"],
+                kwargs,
+            )
+
+            k8s_commit = kwargs["k8s_commit"]
+
+            k8s_url = "https://github.com/{}/{}/archive/{}.tar.gz".format(
+                _k8s_org,
+                _k8s_repo,
+                k8s_commit,
+            )
+        else:
+            # The releases have the same default prefix, so we don't require specifying it here
+            _ensure_all_provided(
+                "kubectl_configure",
+                ["k8s_release", "k8s_sha256"],
+                kwargs,
+            )
+
+            k8s_url = "https://github.com/{}/{}/releases/download/{}/{}.tar.gz".format(
+                _k8s_org,
+                _k8s_repo,
+                k8s_release,
+                _k8s_repo,
+            )
 
         _ensure_all_provided(
             "kubectl_configure",
@@ -148,11 +183,7 @@ def kubectl_configure(name, **kwargs):
             name = "io_kubernetes",
             sha256 = k8s_sha256,
             strip_prefix = k8s_prefix,
-            urls = [("https://github.com/{}/{}/archive/{}.tar.gz".format(
-                _k8s_org,
-                _k8s_repo,
-                k8s_commit,
-            ))],
+            urls = [k8s_url],
         )
         http_archive(
             name = "io_k8s_repo_infra",
