@@ -27,6 +27,25 @@ load(
     _get_runfile_path = "runfile",
 )
 
+load (
+  ":flags.bzl",
+  "cluster_flag",
+  "namespace_flag",
+  "ClusterFlagProvider",
+  "NamespaceFlagProvider",
+)
+load (
+  ":cluster.bzl",
+  "cluster",
+  "ClusterProvider",
+)
+load (
+  ":clusters.bzl",
+  "clusters",
+  "ClustersProvider",
+)
+
+
 def _runfiles(ctx, f):
     return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
 
@@ -106,21 +125,24 @@ def _impl(ctx):
     stamp_args = " ".join(["--stamp-info-file=%s" % _runfiles(ctx, f) for f in stamp_inputs])
     all_inputs.extend(stamp_inputs)
 
-    image_chroot_arg = ctx.attr.image_chroot
+    image_chroot_arg = ctx.attr.clusters[ClusterAspectProvider].image_chroot
     image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
-    if "{" in ctx.attr.image_chroot:
+    if "{" in ctx.attr.clusters[ClusterAspectProvider].image_chroot:
         image_chroot_file = ctx.actions.declare_file(ctx.label.name + ".image-chroot-name")
-        _resolve(ctx, ctx.attr.image_chroot, image_chroot_file)
+        _resolve(ctx, ctx.attr.clusters[ClusterAspectProvider].image_chroot, image_chroot_file)
         image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
         all_inputs.append(image_chroot_file)
 
     substitutions_file = ctx.actions.declare_file(ctx.label.name + ".substitutions.json")
+    _substitutions = {}
+    _substitutions.update(ctx.attr.substitutions)
+    _substitutions.update(ctx.attr.clusters[ClusterAspectProvider].substitutions)
     ctx.actions.write(
         output = substitutions_file,
         content = struct(
             substitutions = {
                 key: ctx.expand_make_variables(key, value, {})
-                for (key, value) in ctx.attr.substitutions.items()
+                for (key, value) in _substitutions.items()
             },
         ).to_json(),
     )
@@ -175,19 +197,21 @@ def _resolve(ctx, string, output):
 def _common_impl(ctx):
     files = [ctx.executable.resolver]
 
-    cluster_arg = ctx.attr.cluster
+    cluster_arg = ctx.attr.clusters[ClusterAspectProvider].cluster
     cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
-    if "{" in ctx.attr.cluster:
+    if "{" in ctx.attr.clusters[ClusterAspectProvider].cluster:
         cluster_file = ctx.actions.declare_file(ctx.label.name + ".cluster-name")
-        _resolve(ctx, ctx.attr.cluster, cluster_file)
+        _resolve(ctx, ctx.attr.clusters[ClusterAspectProvider].cluster, cluster_file)
         cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
         files.append(cluster_file)
 
-    context_arg = ctx.attr.context
+    context_arg = ctx.attr.clusters[ClusterAspectProvider].context
+    if context_arg == "":
+      context_arg = ctx.attr.clusters[ClusterAspectProvider].cluster
     context_arg = ctx.expand_make_variables("context", context_arg, {})
-    if "{" in ctx.attr.context:
+    if "{" in ctx.attr.clusters[ClusterAspectProvider].context:
         context_file = ctx.actions.declare_file(ctx.label.name + ".context-name")
-        _resolve(ctx, ctx.attr.context, context_file)
+        _resolve(ctx, ctx.attr.clusters[ClusterAspectProvider].context, context_file)
         context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
         files.append(context_file)
 
@@ -199,9 +223,9 @@ def _common_impl(ctx):
         user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
         files.append(user_file)
 
-    namespace_arg = ctx.attr.namespace
+    namespace_arg = ctx.attr.namespace[NamespaceFlagProvider].namespace
     namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
-    if "{" in ctx.attr.namespace:
+    if "{" in ctx.attr.namespace[NamespaceFlagProvider].namespace:
         namespace_file = ctx.actions.declare_file(ctx.label.name + ".namespace-name")
         _resolve(ctx, ctx.attr.namespace, namespace_file)
         namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
@@ -210,9 +234,9 @@ def _common_impl(ctx):
     if namespace_arg:
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
-    if ctx.file.kubeconfig:
-        kubeconfig_arg = _runfiles(ctx, ctx.file.kubeconfig)
-        files.append(ctx.file.kubeconfig)
+    if ctx.attr.clusters[ClusterAspectProvider].kubeconfig:
+        kubeconfig_arg = _runfiles(ctx, ctx.attr.clusters[ClusterAspectProvider].kubeconfig.files.to_list()[0])
+        files.append(ctx.attr.clusters[ClusterAspectProvider].kubeconfig.files.to_list()[0])
     else:
         kubeconfig_arg = ""
 
@@ -268,18 +292,44 @@ def _common_impl(ctx):
         ),
     ]
 
+ClusterAspectProvider = provider(fields = ['cluster', 'image_chroot', 'context', 'kubeconfig', 'substitutions'])
+
+def _aspect_impl(target, ctx):
+    cluster_aspect = None
+    context_aspect = None
+    image_chroot_aspect = None
+    kubeconfig_aspect = None
+    substitutions_aspect = {}
+    if hasattr(ctx.rule.attr, 'clusters'):
+        for cluster in ctx.rule.attr.clusters:
+          if cluster[ClusterProvider].name == ctx.attr._cluster[ClusterFlagProvider].cluster:
+            cluster_aspect = cluster[ClusterProvider].cluster
+            image_chroot_aspect = cluster[ClusterProvider].image_chroot
+            context_aspect = cluster[ClusterProvider].context
+            kubeconfig_aspect = cluster[ClusterProvider].kubeconfig
+            substitutions_aspect = cluster[ClusterProvider].substitutions
+    return [ClusterAspectProvider(
+              cluster = cluster_aspect,
+              image_chroot = image_chroot_aspect,
+              context = context_aspect,
+              kubeconfig = kubeconfig_aspect,
+              substitutions = substitutions_aspect)]
+
+_k8s_cluster_aspect = aspect(
+    implementation = _aspect_impl,
+    attr_aspects = ["clusters"],
+    attrs = {
+      "_cluster": attr.label(default = ":cluster_flag")
+    }
+)
+
 _common_attrs = {
     # We allow cluster to be omitted, and we just
     # don't expose the extra actions.
-    "cluster": attr.string(),
-    "context": attr.string(),
-    "image_chroot": attr.string(),
+    "clusters": attr.label(aspects = [_k8s_cluster_aspect]),
     # This is only needed for describe.
     "kind": attr.string(),
-    "kubeconfig": attr.label(
-        allow_single_file = True,
-    ),
-    "namespace": attr.string(),
+    "namespace": attr.label(default = ":namespace_flag"),
     "resolver": attr.label(
         default = Label("//k8s/go/cmd/resolver"),
         cfg = "host",
@@ -499,9 +549,7 @@ def k8s_object(name, **kwargs):
 
     common_args = dict(
         kind = kwargs.get("kind"),
-        cluster = kwargs.get("cluster"),
-        context = kwargs.get("context"),
-        kubeconfig = kwargs.get("kubeconfig"),
+        clusters = kwargs.get("clusters"),
         user = kwargs.get("user"),
         namespace = kwargs.get("namespace"),
         args = kwargs.get("args"),
@@ -515,42 +563,41 @@ def k8s_object(name, **kwargs):
     _k8s_object(name = name, **resolve_args)
     _k8s_object(name = name + ".resolve", **resolve_args)
 
-    if "cluster" in kwargs or "context" in kwargs:
-        _k8s_object_create(
-            name = name + ".create",
-            resolved = name,
+    # Need to rework this logic to enable the check again
+    # if kwargs["clusters"][ClusterAspectProvider].cluster != None or kwargs["clusters"][ClusterAspectProvider].context != None:
+    _k8s_object_create(
+        name = name + ".create",
+        resolved = name,
+        **common_args
+    )
+    _k8s_object_delete(
+        name = name + ".delete",
+        resolved = name,
+        **common_args
+    )
+    _k8s_object_replace(
+        name = name + ".replace",
+        resolved = name,
+        **common_args
+    )
+    _k8s_object_apply(
+        name = name + ".apply",
+        resolved = name,
+        **common_args
+    )
+    _k8s_object_diff(
+        name = name + ".diff",
+        resolved = name,
+        kind = kwargs.get("kind"),
+        clusters = kwargs.get("clusters"),
+        user = kwargs.get("user"),
+        namespace = kwargs.get("namespace"),
+        args = kwargs.get("args"),
+        **implicit_args
+    )
+    if "kind" in kwargs:
+        _k8s_object_describe(
+            name = name + ".describe",
+            unresolved = kwargs.get("template"),
             **common_args
         )
-        _k8s_object_delete(
-            name = name + ".delete",
-            resolved = name,
-            **common_args
-        )
-        _k8s_object_replace(
-            name = name + ".replace",
-            resolved = name,
-            **common_args
-        )
-        _k8s_object_apply(
-            name = name + ".apply",
-            resolved = name,
-            **common_args
-        )
-        _k8s_object_diff(
-            name = name + ".diff",
-            resolved = name,
-            kind = kwargs.get("kind"),
-            cluster = kwargs.get("cluster"),
-            context = kwargs.get("context"),
-            kubeconfig = kwargs.get("kubeconfig"),
-            user = kwargs.get("user"),
-            namespace = kwargs.get("namespace"),
-            args = kwargs.get("args"),
-            **implicit_args
-        )
-        if "kind" in kwargs:
-            _k8s_object_describe(
-                name = name + ".describe",
-                unresolved = kwargs.get("template"),
-                **common_args
-            )
