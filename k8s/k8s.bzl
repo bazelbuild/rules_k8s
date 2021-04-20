@@ -47,6 +47,20 @@ py_library(
     visibility = ["//visibility:public"],
 )
 """,
+            sha256 = "3f11e50a10e70d481fc4c16880a605ee5f955e17eba2673a0bf15f4f40e3f7ef",
+            strip_prefix = "pyyaml-5.4.1",
+            urls = ["https://github.com/yaml/pyyaml/archive/5.4.1.zip"],
+        )
+
+py_library(
+    name = "yaml3",
+    srcs = glob(["lib3/yaml/*.py"]),
+    imports = [
+        "lib3",
+    ],
+    visibility = ["//visibility:public"],
+)
+""",
             sha256 = "e9df8412ddabc9c21b4437ee138875b95ebb32c25f07f962439e16005152e00e",
             strip_prefix = "pyyaml-5.1.2",
             urls = ["https://github.com/yaml/pyyaml/archive/5.1.2.zip"],
