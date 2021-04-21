@@ -30,7 +30,7 @@ def _run_all_impl(ctx):
                 for exe in ctx.attr.objects
             ]),
         },
-        output = ctx.outputs.executable,
+        output = ctx.outputs.script,
     )
 
     runfiles = [obj.files_to_run.executable for obj in ctx.attr.objects]
@@ -43,7 +43,7 @@ def _run_all_impl(ctx):
         ),
     ]
 
-_run_all = rule(
+_run_all_script = rule(
     attrs = {
         "delimiter": attr.string(default = ""),
         "objects": attr.label_list(
@@ -54,9 +54,13 @@ _run_all = rule(
             allow_single_file = True,
         ),
     },
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     implementation = _run_all_impl,
 )
+
+def _run_all(name, **kwargs):
+    _run_all_script(name="{}.script".format(name), **kwargs)
+    native.sh_binary(name = name, srcs = ["{}.script.sh".format(name)], data = [":{}.script".format(name)])
 
 def _reverse(lis, reverse = False):
     """Returns a reversed list if if reverse is true

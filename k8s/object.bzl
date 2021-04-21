@@ -140,15 +140,15 @@ def _impl(ctx):
             "%{substitutions}": _runfiles(ctx, substitutions_file),
             "%{yaml}": _runfiles(ctx, ctx.file.template),
         },
-        output = ctx.outputs.executable,
+        output = ctx.outputs.script,
     )
 
     return [
         DefaultInfo(
             runfiles = ctx.runfiles(
                 files = [
-                    ctx.executable.resolver,
-                ] + all_inputs,
+                            ctx.executable.resolver,
+                        ] + all_inputs,
                 transitive_files = ctx.attr.resolver[DefaultInfo].default_runfiles.files,
             ),
         ),
@@ -224,7 +224,7 @@ def _common_impl(ctx):
         # attempts to do bazel run
         ctx.actions.write(
             content = ("echo kubectl toolchain was not properly configured so %s cannot be executed." % ctx.attr.name),
-            output = ctx.outputs.executable,
+            output = ctx.outputs.script,
         )
     else:
         kubectl_tool = kubectl_tool_info.tool_path
@@ -242,24 +242,24 @@ def _common_impl(ctx):
             "%{user}": user_arg,
         }
 
-        if hasattr(ctx.executable, "resolved"):
+        if hasattr(ctx.executable, "resolved") and ctx.executable.resolved != None:
             substitutions["%{resolve_script}"] = _runfiles(ctx, ctx.executable.resolved)
             files.append(ctx.executable.resolved)
             extrafiles = depset(transitive = [ctx.attr.resolved[DefaultInfo].default_runfiles.files, extrafiles])
 
-        if hasattr(ctx.executable, "reverser"):
+        if hasattr(ctx.executable, "reverser") and ctx.executable.reverser != None:
             substitutions["%{reverser}"] = _runfiles(ctx, ctx.executable.reverser)
             files.append(ctx.executable.reverser)
             extrafiles = depset(transitive = [ctx.attr.reverser[DefaultInfo].default_runfiles.files, extrafiles])
 
-        if hasattr(ctx.files, "unresolved"):
+        if hasattr(ctx.files, "unresolved") and ctx.files.unresolved != None:
             substitutions["%{unresolved}"] = _runfiles(ctx, ctx.file.unresolved)
             files.extend(ctx.files.unresolved)
 
         ctx.actions.expand_template(
             template = ctx.file._template,
             substitutions = substitutions,
-            output = ctx.outputs.executable,
+            output = ctx.outputs.script,
         )
 
     return [
@@ -323,7 +323,7 @@ _k8s_object = rule(
         _common_attrs,
         _layer_tools,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     implementation = _impl,
 )
 
@@ -342,7 +342,7 @@ _k8s_object_apply = rule(
         },
         _common_attrs,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
     implementation = _common_impl,
 )
@@ -362,7 +362,7 @@ _k8s_object_create = rule(
         },
         _common_attrs,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
     implementation = _common_impl,
 )
@@ -382,7 +382,7 @@ _k8s_object_replace = rule(
         },
         _common_attrs,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
     implementation = _common_impl,
 )
@@ -404,7 +404,7 @@ _k8s_object_describe = rule(
         },
         _common_attrs,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
     implementation = _common_impl,
 )
@@ -430,7 +430,7 @@ _k8s_object_delete = rule(
         },
         _common_attrs,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
     implementation = _common_impl,
 )
@@ -450,7 +450,7 @@ _k8s_object_diff = rule(
         },
         _common_attrs,
     ),
-    executable = True,
+    outputs = {"script": "%{name}.sh"},
     toolchains = ["@io_bazel_rules_k8s//toolchains/kubectl:toolchain_type"],
     implementation = _common_impl,
 )
@@ -473,6 +473,10 @@ def _implicit_args_as_dict(**kwargs):
             implicit_args[attr_name] = kwargs[attr_name]
 
     return implicit_args
+
+def _sh_wrapper(f, name,  **kwargs):
+    f(name="{}.script".format(name), **kwargs)
+    native.sh_binary(name = name, srcs = ["{}.script.sh".format(name)], data = [":{}.script".format(name)])
 
 def k8s_object(name, **kwargs):
     """Interact with a K8s object.
@@ -512,31 +516,32 @@ def k8s_object(name, **kwargs):
     if "args" in resolve_args:
         resolve_args.pop("args")
 
-    _k8s_object(name = name, **resolve_args)
-    _k8s_object(name = name + ".resolve", **resolve_args)
+    _sh_wrapper(_k8s_object, name=name, **resolve_args)
+    _sh_wrapper(_k8s_object, name=name + ".resolve", **resolve_args)
 
     if "cluster" in kwargs or "context" in kwargs:
-        _k8s_object_create(
+        _sh_wrapper(_k8s_object_create,
             name = name + ".create",
             resolved = name,
             **common_args
         )
-        _k8s_object_delete(
+        _sh_wrapper(_k8s_object_delete,
             name = name + ".delete",
             resolved = name,
             **common_args
         )
-        _k8s_object_replace(
+        _sh_wrapper(_k8s_object_replace,
             name = name + ".replace",
             resolved = name,
             **common_args
         )
-        _k8s_object_apply(
+        _sh_wrapper(_k8s_object_apply,
             name = name + ".apply",
             resolved = name,
             **common_args
         )
-        _k8s_object_diff(
+
+        _sh_wrapper(_k8s_object_diff,
             name = name + ".diff",
             resolved = name,
             kind = kwargs.get("kind"),
@@ -548,8 +553,9 @@ def k8s_object(name, **kwargs):
             args = kwargs.get("args"),
             **implicit_args
         )
+
         if "kind" in kwargs:
-            _k8s_object_describe(
+            _sh_wrapper(_k8s_object_describe,
                 name = name + ".describe",
                 unresolved = kwargs.get("template"),
                 **common_args
