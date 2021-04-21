@@ -57,7 +57,7 @@ function EXPECT_CONTAINS_PATTERN() {
     CONTAINS_PATTERN "$complete" "$substring" || fail "$message"
 }
 
-# Ensure there is an ip address for hell-grpc-staging:50051
+# Ensure there is an ip address for hello-grpc-staging:50051
 apply-lb() {
     # We use `bazel build ... && bazel-bin/...` here in this file instead of
     # `bazel run` directly in order to make sure that direct execution of the

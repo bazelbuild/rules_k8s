@@ -97,8 +97,8 @@ main() {
     trap fail EXIT
     local failed=()
     log ./examples/resolver/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(resolver)
+    log ./examples/hellogrpc/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellogrpc)
     # TODO: https://github.com/bazelbuild/rules_k8s/issues/642
-    # log ./examples/hellogrpc/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellogrpc)
     # log ./examples/hellohttp/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellohttp)
     if [[ "${#failed[@]}" -gt 0 ]]; then
         echo "FAIL: test-e2e.sh: ${failed[@]}"

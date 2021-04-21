@@ -65,6 +65,7 @@ get_lb_ip() {
     ip_var='{.spec.clusterIP}'
   fi
 
-  kubectl --namespace="${namespace}" get service $2 \
-    -o jsonpath=$ip_var
+  kubectl --namespace="${namespace}" port-forward $2 :50000 &
+
+  echo "50000"
 }
