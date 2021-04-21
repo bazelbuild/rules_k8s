@@ -476,7 +476,7 @@ def _implicit_args_as_dict(**kwargs):
 
 def _sh_wrapper(f, name, **kwargs):
     f(name = "{}.script".format(name), **kwargs)
-    native.sh_binary(name = name, srcs = ["{}.script.sh".format(name)], data = [":{}.script".format(name)])
+    native.sh_binary(name = name, srcs = ["{}.script.sh".format(name)], data = [":{}.script".format(name)], **_implicit_args_as_dict(**kwargs))
 
 def k8s_object(name, **kwargs):
     """Interact with a K8s object.
