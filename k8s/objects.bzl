@@ -59,7 +59,7 @@ _run_all_script = rule(
 )
 
 def _run_all(name, **kwargs):
-    _run_all_script(name="{}.script".format(name), **kwargs)
+    _run_all_script(name = "{}.script".format(name), **kwargs)
     native.sh_binary(name = name, srcs = ["{}.script.sh".format(name)], data = [":{}.script".format(name)])
 
 def _reverse(lis, reverse = False):

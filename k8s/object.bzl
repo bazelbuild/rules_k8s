@@ -147,8 +147,8 @@ def _impl(ctx):
         DefaultInfo(
             runfiles = ctx.runfiles(
                 files = [
-                            ctx.executable.resolver,
-                        ] + all_inputs,
+                    ctx.executable.resolver,
+                ] + all_inputs,
                 transitive_files = ctx.attr.resolver[DefaultInfo].default_runfiles.files,
             ),
         ),
@@ -474,8 +474,8 @@ def _implicit_args_as_dict(**kwargs):
 
     return implicit_args
 
-def _sh_wrapper(f, name,  **kwargs):
-    f(name="{}.script".format(name), **kwargs)
+def _sh_wrapper(f, name, **kwargs):
+    f(name = "{}.script".format(name), **kwargs)
     native.sh_binary(name = name, srcs = ["{}.script.sh".format(name)], data = [":{}.script".format(name)])
 
 def k8s_object(name, **kwargs):
@@ -516,32 +516,37 @@ def k8s_object(name, **kwargs):
     if "args" in resolve_args:
         resolve_args.pop("args")
 
-    _sh_wrapper(_k8s_object, name=name, **resolve_args)
-    _sh_wrapper(_k8s_object, name=name + ".resolve", **resolve_args)
+    _sh_wrapper(_k8s_object, name = name, **resolve_args)
+    _sh_wrapper(_k8s_object, name = name + ".resolve", **resolve_args)
 
     if "cluster" in kwargs or "context" in kwargs:
-        _sh_wrapper(_k8s_object_create,
+        _sh_wrapper(
+            _k8s_object_create,
             name = name + ".create",
             resolved = name,
             **common_args
         )
-        _sh_wrapper(_k8s_object_delete,
+        _sh_wrapper(
+            _k8s_object_delete,
             name = name + ".delete",
             resolved = name,
             **common_args
         )
-        _sh_wrapper(_k8s_object_replace,
+        _sh_wrapper(
+            _k8s_object_replace,
             name = name + ".replace",
             resolved = name,
             **common_args
         )
-        _sh_wrapper(_k8s_object_apply,
+        _sh_wrapper(
+            _k8s_object_apply,
             name = name + ".apply",
             resolved = name,
             **common_args
         )
 
-        _sh_wrapper(_k8s_object_diff,
+        _sh_wrapper(
+            _k8s_object_diff,
             name = name + ".diff",
             resolved = name,
             kind = kwargs.get("kind"),
@@ -555,7 +560,8 @@ def k8s_object(name, **kwargs):
         )
 
         if "kind" in kwargs:
-            _sh_wrapper(_k8s_object_describe,
+            _sh_wrapper(
+                _k8s_object_describe,
                 name = name + ".describe",
                 unresolved = kwargs.get("template"),
                 **common_args
