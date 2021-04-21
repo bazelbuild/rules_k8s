@@ -59,18 +59,12 @@ load("@rules_python//python:repositories.bzl", "py_repositories")
 py_repositories()
 
 # Only needed if using the packaging rules.
-load("@rules_python//python:pip.bzl", "pip3_import", "pip_repositories")
+load("@rules_python//python:pip.bzl", "pip_install")
 
-pip_repositories()
-
-pip3_import(
+pip_install(
     name = "py_deps",
     requirements = "//:requirements.txt",
 )
-
-load("@py_deps//:requirements.bzl", "pip_install")
-
-pip_install()
 
 http_archive(
     name = "com_github_grpc_grpc",
@@ -87,14 +81,10 @@ load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
 
-pip3_import(
+pip_install(
     name = "grpc_python_dependencies",
     requirements = "@com_github_grpc_grpc//:requirements.bazel.txt",
 )
-
-load("@grpc_python_dependencies//:requirements.bzl", _grpc_pip_install = "pip_install")
-
-_grpc_pip_install()
 
 # upb_deps and apple_rules_dependencies are needed for grpc
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
