@@ -88,11 +88,11 @@ def k8s_repositories():
     maybe(
         http_archive,
         name = "io_bazel_rules_docker",
-        sha256 = "f4a39a410da7e497a7ccd19e28c69c93a851d6adb76798355a0c8ba9855e9b75",
-        strip_prefix = "rules_docker-e15c9ebf203b7fa708e69ff5f1cdcf427d7edf6f",
-        # `master` as of 2021-02-04
+        sha256 = "efda18e39a63ee3c1b187b1349f61c48c31322bf84227d319b5dece994380bb6",
+        strip_prefix = "rules_docker-f929d80c5a4363994968248d87a892b1c2ef61d4",
+        # `master` as of 2021-04-25
         urls = [
-            "https://github.com/bazelbuild/rules_docker/archive/e15c9ebf203b7fa708e69ff5f1cdcf427d7edf6f.zip",
+            "https://github.com/bazelbuild/rules_docker/archive/f929d80c5a4363994968248d87a892b1c2ef61d4.tar.gz",
         ],
     )
 
