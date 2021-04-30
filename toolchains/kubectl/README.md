@@ -174,6 +174,7 @@ Register the toolchains exported by this repository in your WORKSPACE and add a
 ```python
 register_toolchains(
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_amd64_toolchain",
+    "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_arm64_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_s390x_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_toolchain",
     "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
