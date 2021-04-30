@@ -18,6 +18,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+bazel=$(command -v bazelisk || command -v bazel)
+export bazel
+
 delete-all() {
     # Delete the namespace
     log kubectl delete all -n "$E2E_NAMESPACE" --all
@@ -54,7 +57,7 @@ ensure-gcloud() {
 fail() {
     echo "test-e2e.sh: FAIL, cleaning up..." >&2
     echo "=============== VERSION INFO ===========" >&2
-    log bazel version >&2
+    log "$bazel" version >&2
     log gcloud version >&2
     log kubectl version >&2
 
@@ -81,10 +84,10 @@ main() {
     ensure-gcloud
 
     # Check that all of our tools and samples build and pass unit test.
-    logfail bazel test -- //... -//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push
+    logfail "$bazel" test -- //... -//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push
 
     # Run the garbage collection script to delete old namespaces.
-    logfail bazel run -- //examples:e2e_gc
+    logfail "$bazel" run -- //examples:e2e_gc
 
     # Create a unique namespace for this job using the repo name and the build id
     export E2E_NAMESPACE="build-${BUILD_ID:-$USER}"
@@ -96,10 +99,9 @@ main() {
 
     trap fail EXIT
     local failed=()
-    log ./examples/resolver/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(resolver)
-    # TODO: https://github.com/bazelbuild/rules_k8s/issues/642
-    # log ./examples/hellogrpc/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellogrpc)
-    # log ./examples/hellohttp/e2e-test.sh remote "$E2E_NAMESPACE" "$@" || failed+=(hellohttp)
+    log ./examples/resolver/e2e-test.sh "$E2E_NAMESPACE" "$@" || failed+=(resolver)
+    log ./examples/hellogrpc/e2e-test.sh "$E2E_NAMESPACE" "$@" || failed+=(hellogrpc)
+    log ./examples/hellohttp/e2e-test.sh "$E2E_NAMESPACE" "$@" || failed+=(hellohttp)
     if [[ "${#failed[@]}" -gt 0 ]]; then
         echo "FAIL: test-e2e.sh: ${failed[@]}"
         return 1

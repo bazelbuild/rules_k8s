@@ -22,19 +22,19 @@ source ./examples/util.sh
 validate_args "$@"
 shift 2
 
-function fail() {
+fail() {
     echo "FAILURE: $@"
     exit 1
 }
 
-function CONTAINS() {
+CONTAINS() {
     local complete=$1
     local substring=$2
 
     echo "$complete" | grep -Fsq -- "$substring" >/dev/null
 }
 
-function EXPECT_CONTAINS() {
+EXPECT_CONTAINS() {
     local complete="$1"
     local substring="$2"
     local message="${3:-Expected '$substring' not found in '$complete'}"
@@ -42,14 +42,14 @@ function EXPECT_CONTAINS() {
     CONTAINS "$complete" "$substring" || fail "$message"
 }
 
-function CONTAINS_PATTERN() {
+CONTAINS_PATTERN() {
     local complete=$1
     local substring=$2
 
     echo "$complete" | grep -Esq -- "$substring" >/dev/null
 }
 
-function EXPECT_CONTAINS_PATTERN() {
+EXPECT_CONTAINS_PATTERN() {
     local complete=$1
     local substring=$2
     local message="${3:-Expected '$substring' not found in '$complete'}"
@@ -62,40 +62,33 @@ apply-lb() {
     # We use `bazel build ... && bazel-bin/...` here in this file instead of
     # `bazel run` directly in order to make sure that direct execution of the
     # built output works as well
-    logfail bazel build examples/hellogrpc:staging-service.apply
+    logfail "$bazel" build examples/hellogrpc:staging-service.apply
     logfail bazel-bin/examples/hellogrpc/staging-service.apply
 }
 
 resolve() {
-    logfail bazel build "examples/hellogrpc/$1/server:staging.resolve"
+    logfail "$bazel" build "examples/hellogrpc/$1/server:staging.resolve"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.resolve"
 }
 
 create() {
-    logfail bazel build "examples/hellogrpc/$1/server:staging.create"
+    logfail "$bazel" build "examples/hellogrpc/$1/server:staging.create"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.create"
 }
 
 check_msg() {
-    logfail bazel build "examples/hellogrpc/$1/client"
+    logfail "$bazel" build "examples/hellogrpc/$1/client"
 
-    echo -n "IP: "
-    local ip
-    while true; do
-        ip=$(get_lb_ip $local hello-grpc-staging)
-        if [[ -n "$ip" ]]; then
-            echo "$ip"
-            break
-        fi
-        echo -n .
-        sleep 5
-    done
+    stop-port-forwarding
+    port-forward hello-grpc-staging 50051
+    local ip="localhost"
+    echo "IP: $ip"
 
     # Make Bazel generate a temporary script that runs the client executable
     # This will only generate the temp executable. It won't actually run it.
     local output
     local tmp_exec=hellogrpc_$1_client
-    logfail bazel run "//examples/hellogrpc/$1/client" "--script_path=$tmp_exec"
+    logfail "$bazel" run "//examples/hellogrpc/$1/client" "--script_path=$tmp_exec"
 
     echo -n "$tmp_exec: "
     # the service may not be up immediately after ip allocation so retry a few times
@@ -125,7 +118,7 @@ edit() {
 }
 
 diff() {
-    logfail bazel build "examples/hellogrpc/$1/server:staging.diff"
+    logfail "$bazel" build "examples/hellogrpc/$1/server:staging.diff"
     # We want diff to return 1 so we can't use logfail here
     cmd="bazel-bin/examples/hellogrpc/$1/server/staging.diff"
     echo "++ $cmd"
@@ -147,21 +140,21 @@ diff() {
 }
 
 update() {
-    logfail bazel build "examples/hellogrpc/$1/server:staging.replace"
+    logfail "$bazel" build "examples/hellogrpc/$1/server:staging.replace"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.replace"
 }
 
 delete() {
     logfail kubectl get all --namespace="${namespace}" --selector=app=hello-grpc-staging
-    logfail bazel build "examples/hellogrpc/$1/server:staging.describe"
+    logfail "$bazel" build "examples/hellogrpc/$1/server:staging.describe"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.describe" || echo "$1 describe: hellogrpc server not found" >&2
-    logfail bazel build "examples/hellogrpc/$1/server:staging.delete"
+    logfail "$bazel" build "examples/hellogrpc/$1/server:staging.delete"
     logfail "bazel-bin/examples/hellogrpc/$1/server/staging.delete"
 }
 
 check_kubeconfig_args() {
     for cmd in apply delete; do
-        logfail bazel build examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
+        logfail "$bazel" build examples/hellogrpc:staging-deployment-with-kubeconfig.${cmd}
         OUTPUT="$(cat ./bazel-bin/examples/hellogrpc/staging-deployment-with-kubeconfig.${cmd})"
         EXPECT_CONTAINS_PATTERN "$OUTPUT" "--kubeconfig=\S*/examples/hellogrpc/kubeconfig.out"
     done
@@ -171,11 +164,11 @@ check_kubeconfig_args() {
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
     # passes it to the execution of the template
-    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply 2>/dev/null)" "apply --v=2"
+    EXPECT_CONTAINS "$("$bazel" run examples/hellogrpc:staging.apply 2>/dev/null)" "apply --v=2"
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$(bazel run examples/hellogrpc:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$("$bazel" run examples/hellogrpc:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
 }
 
 logfail() {
@@ -188,6 +181,11 @@ logfail() {
     return $code
 }
 
+fail-lang() {
+    stop-port-forwarding
+    echo "hellogrpc/$lang: FAIL" >&2
+}
+
 main() {
     echo "hellogrpc: setup"
     trap "echo hellogrpc: FAILED" EXIT
@@ -195,6 +193,7 @@ main() {
     check_kubeconfig_args
     check_kubectl_args
     apply-lb
+    trap stop-port-forwarding EXIT
 
     while [[ -n "${1:-}" ]]; do
         lang=$1
@@ -208,7 +207,7 @@ main() {
         echo "hellogrpc/$lang: start"
 
         delete "$lang" &> /dev/null || true
-        trap "echo hellogrpc/$lang: FAIL >&2" EXIT
+        trap "fail-lang $lang" EXIT
         local want
         want="$RANDOM"
         edit "$lang" "$want"
@@ -225,7 +224,7 @@ main() {
         delete "$lang"
         echo "hellogrpc/$lang: PASS"
     done
-    trap - EXIT
+    trap stop-port-forwarding EXIT
 }
 
 main "$@"
