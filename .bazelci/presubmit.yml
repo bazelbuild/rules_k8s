@@ -8,16 +8,6 @@ buildifier:
   # TODO (suvanjan): Re-enable once issues are fixed.
   warnings: "attr-cfg,attr-license,attr-non-empty,attr-output-default,attr-single-file,confusing-name,constant-glob,ctx-actions,ctx-args,depset-iteration,depset-union,dict-concatenation,duplicated-name,filetype,function-docstring,git-repository,http-archive,integer-division,load,load-on-top,module-docstring,name-conventions,native-build,native-package,no-effect,out-of-order-load,output-group,package-name,package-on-top,positional-args,redefined-variable,repository-name,same-origin-load,string-iteration,unreachable,unsorted-dict-items,unused-variable"
 platforms:
-  ubuntu1604:
-    build_targets:
-    - "--"
-    - "..."
-    - "-//images/gcloud-bazel:gcloud_push"
-    - "-//images/gcloud-bazel:gcloud_installer"
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud-layer"
-    test_targets:
-    - "..."
   ubuntu1804:
     build_targets:
     - "--"
@@ -28,13 +18,17 @@ platforms:
     - "-//images/gcloud-bazel:gcloud-layer"
     test_targets:
     - "..."
+  ubuntu2004:
+    build_targets:
+    - "--"
+    - "..."
+    - "-//images/gcloud-bazel:gcloud_push"
+    - "-//images/gcloud-bazel:gcloud_installer"
+    - "-//images/gcloud-bazel:gcloud_install"
+    - "-//images/gcloud-bazel:gcloud-layer"
+    test_targets:
+    - "..."
   macos:
-    shell_commands:
-    # create a python2 symlink
-    # see https://github.com/bazelbuild/continuous-integration/issues/854
-    # TODO(nlopezgi): remove once issue above is fixed
-    - mkdir /tmp/bin
-    - ln -s /usr/bin/python2.7 /tmp/bin/python2
     build_targets:
     - "--"
     - "..."
@@ -44,15 +38,16 @@ platforms:
     - "-//images/gcloud-bazel:gcloud-layer"
     build_flags:
     - "--verbose_failures"
-    # add the python2 symlink to the PATH
-    # see https://github.com/bazelbuild/continuous-integration/issues/854
-    # TODO(nlopezgi): remove once issue above is fixed
-    - "--action_env=PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/tmp/bin/"
     test_targets:
     - "..."
     test_flags:
     - "--verbose_failures"
-    # add the python2 symlink to the PATH
-    # see https://github.com/bazelbuild/continuous-integration/issues/854
-    # TODO(nlopezgi): remove once issue above is fixed
-    - "--action_env=PATH=/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/tmp/bin/"
+  min_supported_version:
+    name: "Minimum Supported Version"
+    bazel: "2.2.0"
+    platform: ubuntu1604
+    build_targets:
+    - "--"
+    - "..."
+    test_targets:
+    - "..."
