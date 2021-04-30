@@ -768,3 +768,4 @@ Here's a (non-exhaustive) list of companies that use `rules_k8s` in production. 
   * [Etsy](https://www.etsy.com)
   * [Jetstack](https://www.jetstack.io/)
   * [Prow](https://github.com/kubernetes/test-infra/tree/master/prow)
+  * [Tink](https://tink.com/)

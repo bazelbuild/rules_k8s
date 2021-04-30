@@ -31,3 +31,10 @@ go_binary(
     embed = [":resolver_lib"],
     visibility = ["//visibility:public"],
 )
+
+go_test(
+    name = "resolver_test",
+    srcs = ["resolver_test.go"],
+    embed = [":resolver_lib"],
+    deps = ["@com_github_google_go_cmp//cmp:go_default_library"],
+)

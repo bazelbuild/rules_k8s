@@ -44,22 +44,13 @@ EXPECT_CONTAINS() {
 
 # Ensure there is an ip address for hello-http-staging:8080
 apply-lb() {
-    logfail bazel run examples/hellohttp:staging-service.apply
+    logfail "$bazel" run examples/hellohttp:staging-service.apply
 }
 
 check_msg() {
-    echo -n "IP: "
-    local ip
-    while true; do
-        ip=$(get_lb_ip $local hello-http-staging)
-        if [[ -n "$ip" ]]; then
-            echo "$ip"
-            break
-        fi
-        echo -n .
-        sleep 5
-    done
-
+    stop-port-forwarding
+    port-forward hello-http-staging 8080
+    local ip=localhost
     local output
     local url="http://$ip:8080"
     echo -n "curl $url: "
@@ -86,13 +77,13 @@ edit() {
 }
 
 resolve() {
-    logfail bazel run "examples/hellohttp/$1:staging.resolve"
+    logfail "$bazel" run "examples/hellohttp/$1:staging.resolve"
 }
 
 diff() {
     # We don't want to confuse bazel build failures with diff output so we
     # need to build first
-    logfail bazel build "examples/hellohttp/$1:staging.diff"
+    logfail "$bazel" build "examples/hellohttp/$1:staging.diff"
     # We want diff to return 1 so we can't use logfail here
     cmd="bazel-bin/examples/hellohttp/$1/staging.diff"
     echo "++ $cmd"
@@ -114,17 +105,17 @@ diff() {
 }
 
 apply() {
-    logfail bazel run "examples/hellohttp/$1:staging.apply"
+    logfail "$bazel" run "examples/hellohttp/$1:staging.apply"
 }
 
 delete() {
     logfail kubectl get all --namespace="${namespace}" --selector=app=hello-http-staging
-    logfail bazel run "examples/hellohttp/$1:staging.describe"
-    logfail bazel run "examples/hellohttp/$1:staging.delete"
+    logfail "$bazel" run "examples/hellohttp/$1:staging.describe"
+    logfail "$bazel" run "examples/hellohttp/$1:staging.delete"
 }
 
 check_bad_substitution() {
-    if ! bazel run examples/hellohttp:error-on-run &>/dev/null; then
+    if ! "$bazel" run examples/hellohttp:error-on-run &>/dev/null; then
       return 0
     else
       echo "Bad substitution should fail!"
@@ -133,7 +124,7 @@ check_bad_substitution() {
 }
 
 check_no_images_resolution() {
-    logfail bazel build examples/hellohttp:resolve-external
+    logfail "$bazel" build examples/hellohttp:resolve-external
     bazel-bin/examples/hellohttp/resolve-external 2>/dev/null | grep "[/]pause[@]" >/dev/null
 }
 
@@ -141,11 +132,11 @@ check_no_images_resolution() {
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
     # passes it to the execution of the template
-    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply 2>/dev/null)" "apply --v=2"
+    EXPECT_CONTAINS "$("$bazel" run examples/hellohttp/java:staging.apply 2>/dev/null)" "apply --v=2"
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$(bazel run examples/hellohttp/java:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$("$bazel" run examples/hellohttp/java:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
 }
 
 logfail() {
@@ -158,6 +149,12 @@ logfail() {
     return $code
 }
 
+
+fail-lang() {
+    stop-port-forwarding
+    echo "hellohttp/$1: FAIL" >&2
+}
+
 main() {
     echo "hellohttp: setup"
     trap "echo FAILED: hellohttp >&2" EXIT
@@ -166,6 +163,7 @@ main() {
     check_no_images_resolution
     check_kubectl_args
     apply-lb
+    trap stop-port-forwarding EXIT
 
     # Test each requested language
     while [[ -n "${1:-}" ]]; do
@@ -173,7 +171,7 @@ main() {
         shift
         echo "hellohttp/$lang: start"
 
-        trap "echo hellohttp/$lang: FAIL >&2" EXIT
+        trap "fail-lang $lang" EXIT
         for want in $RANDOM $RANDOM; do
           edit "$lang" "$want"
           resolve "$lang"
@@ -185,7 +183,7 @@ main() {
         delete "$lang"
         echo "hellohttp/$lang: PASS"
     done
-    trap - EXIT
+    trap stop-port-forwarding EXIT
 }
 
 main "$@"
