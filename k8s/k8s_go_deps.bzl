@@ -14,6 +14,7 @@
 """Macro to load Go package dependencies of Go binaries in this repository."""
 
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load(
     "@io_bazel_rules_docker//repositories:go_repositories.bzl",
     rules_docker_go_deps = "go_deps",
@@ -36,12 +37,10 @@ def deps():
     rules_docker_repositories()
     rules_docker_go_deps()
 
-    excludes = native.existing_rules().keys()
-
-    if "com_github_google_go_cmp" not in excludes:
-        go_repository(
-            name = "com_github_google_go_cmp",
-            importpath = "github.com/google/go-cmp",
-            sum = "h1:Xye71clBPdm5HgqGwUkwhbynsUJZhDbS20FvLhQ2izg=",
-            version = "v0.3.1",
-        )
+    maybe(
+        go_repository,
+        name = "com_github_google_go_cmp",
+        importpath = "github.com/google/go-cmp",
+        sum = "h1:Xye71clBPdm5HgqGwUkwhbynsUJZhDbS20FvLhQ2izg=",
+        version = "v0.3.1",
+    )
