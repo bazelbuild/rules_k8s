@@ -49,9 +49,5 @@ platforms:
     build_targets:
     - "--"
     - "..."
-    - "-//images/gcloud-bazel:gcloud_push"
-    - "-//images/gcloud-bazel:gcloud_installer"
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud-layer"
     test_targets:
     - "..."
