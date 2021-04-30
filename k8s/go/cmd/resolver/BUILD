@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
 package(default_visibility = ["//visibility:private"])
 
@@ -23,25 +23,11 @@ go_library(
     srcs = ["resolver.go"],
     importpath = "github.com/bazelbuild/rules_k8s/k8s/go/cmd/resolver",
     visibility = ["//visibility:private"],
-    deps = [
-        "@com_github_google_go_containerregistry//pkg/authn:go_default_library",
-        "@com_github_google_go_containerregistry//pkg/name:go_default_library",
-        "@com_github_google_go_containerregistry//pkg/v1/remote:go_default_library",
-        "@in_gopkg_yaml_v2//:go_default_library",
-        "@io_bazel_rules_docker//container/go/pkg/compat:go_default_library",
-        "@io_bazel_rules_docker//container/go/pkg/utils:go_default_library",
-    ],
+    deps = ["//k8s/go/pkg/resolver"],
 )
 
 go_binary(
     name = "resolver",
     embed = [":resolver_lib"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "resolver_test",
-    srcs = ["resolver_test.go"],
-    embed = [":resolver_lib"],
-    deps = ["@com_github_google_go_cmp//cmp:go_default_library"],
 )
