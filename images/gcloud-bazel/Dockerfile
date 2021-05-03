@@ -22,26 +22,26 @@ FROM launcher.gcr.io/google/bazel:${NEW_VERSION}
 LABEL maintainer="fejta@google.com"
 
 # See the following docs:
-# * https://docs.bazel.build/versions/master/install-ubuntu.html
-# * https://cloud.google.com/sdk/docs/downloads-apt-get
+# * https://cloud.google.com/sdk/docs/install#deb
 
 # Ensure new repos aren't compromised.
 COPY gcloud.pub.gpg /
-RUN apt-key add /gcloud.pub.gpg \
+RUN apt-key --keyring /usr/share/keyrings/cloud.google.gpg add /gcloud.pub.gpg \
     && rm /gcloud.pub.gpg
 
-# Add new repos to install bazel and google-cloud-sdk (including kubectl)
-COPY sources.list /etc/apt/sources.list.d/gcloud.list
+# Add new repos to install google-cloud-sdk (including kubectl)
+COPY sources.list /etc/apt/sources.list.d/google-cloud-sdk.list
 
 # Install necessary dependencies:
 # * gcloud: needed by rules_go and test-e2e.sh
 # * kubectl: needed by rules_k8s
 # * pip setuptools wheel: needed by python rules
 # * python-pip: needed by python rules
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    google-cloud-sdk \
-    kubectl \
-    python-pip \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      google-cloud-sdk \
+      kubectl \
+      python-pip \
     && apt-get clean \
     && pip install pip setuptools wheel
 
