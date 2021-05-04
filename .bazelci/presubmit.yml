@@ -45,7 +45,7 @@ platforms:
   min_supported_version:
     name: "Minimum Supported Version"
     bazel: "2.2.0"
-    platform: ubuntu1604
+    platform: ubuntu1804
     build_targets:
     - "--"
     - "..."
