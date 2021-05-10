@@ -36,12 +36,12 @@ load (
 )
 load (
   ":cluster.bzl",
-  "cluster",
+  "k8s_cluster",
   "ClusterProvider",
 )
 load (
   ":clusters.bzl",
-  "clusters",
+  "k8s_clusters",
   "ClustersProvider",
 )
 

@@ -15,6 +15,7 @@
 build --workspace_status_command=./hack/print-workspace-status.sh
 build --verbose_failures
 build --define=TAG=staging
+build --@io_bazel_rules_k8s//k8s:cluster_flag=minikube
 
 run --workspace_status_command=./hack/print-workspace-status.sh
 

@@ -29,7 +29,6 @@ k8s_deploy(
 
 k8s_deploy(
     name = "staging-deployment-with-kubeconfig",
-    kubeconfig = ":kubeconfig",
     template = "deployment.yaml",
 )
 
@@ -66,14 +65,6 @@ jsonnet_to_json(
         "//examples:container_lib",
         "//examples:deploy_lib",
     ],
-)
-
-# Generate an empty kubeconfig for testing
-genrule(
-    name = "kubeconfig",
-    srcs = [],
-    outs = ["kubeconfig.out"],
-    cmd = "touch $@",
 )
 
 # Verify that deployment.json == deployment.yaml

@@ -53,19 +53,13 @@ def _impl(repository_ctx):
     repository_ctx.file("BUILD", "")
 
     overrides = []
-    if repository_ctx.attr.cluster:
+    if repository_ctx.attr.clusters:
         overrides.append(_override(
             repository_ctx.attr.name,
-            "cluster",
-            repository_ctx.attr.cluster,
+            "clusters",
+            repository_ctx.attr.clusters,
         ))
 
-    if repository_ctx.attr.context:
-        overrides.append(_override(
-            repository_ctx.attr.name,
-            "context",
-            repository_ctx.attr.context,
-        ))
     if repository_ctx.attr.user:
         overrides.append(_override(
             repository_ctx.attr.name,
@@ -85,20 +79,6 @@ def _impl(repository_ctx):
             repository_ctx.attr.name,
             "kind",
             repository_ctx.attr.kind,
-        ))
-
-    if repository_ctx.attr.kubeconfig:
-        overrides.append(_override(
-            repository_ctx.attr.name,
-            "kubeconfig",
-            repository_ctx.attr.kubeconfig,
-        ))
-
-    if repository_ctx.attr.image_chroot:
-        overrides.append(_override(
-            repository_ctx.attr.name,
-            "image_chroot",
-            repository_ctx.attr.image_chroot,
         ))
 
     if repository_ctx.attr.resolver:
@@ -123,11 +103,8 @@ def {name}(**kwargs):
 
 k8s_defaults = repository_rule(
     attrs = {
-        "cluster": attr.string(mandatory = False),
-        "context": attr.string(mandatory = False),
-        "image_chroot": attr.string(mandatory = False),
+        "clusters": attr.string(mandatory = False),
         "kind": attr.string(mandatory = False),
-        "kubeconfig": attr.string(mandatory = False),
         "namespace": attr.string(mandatory = False),
         "resolver": attr.string(mandatory = False),
         "user": attr.string(mandatory = False),

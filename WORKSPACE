@@ -126,33 +126,24 @@ http_file(
     ],
 )
 
-_CLUSTER = "gke_rules-k8s_us-central1-f_testing"
-
-_CONTEXT = _CLUSTER
-
 _NAMESPACE = "{STABLE_E2E_NAMESPACE}"
 
 k8s_defaults(
     name = "k8s_object",
-    cluster = _CLUSTER,
-    context = _CONTEXT,
-    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
     namespace = _NAMESPACE,
+    clusters = "//examples:clusters",
 )
 
 k8s_defaults(
     name = "k8s_deploy",
-    cluster = _CLUSTER,
-    context = _CONTEXT,
-    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
     kind = "deployment",
     namespace = _NAMESPACE,
+    clusters = "//examples:clusters",
 )
 
 [k8s_defaults(
     name = "k8s_" + kind,
-    cluster = _CLUSTER,
-    context = _CONTEXT,
+    clusters = "//examples:clusters",
     kind = kind,
     namespace = _NAMESPACE,
 ) for kind in [

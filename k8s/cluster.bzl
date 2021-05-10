@@ -10,7 +10,7 @@ def _cluster_impl(ctx):
       substitutions = ctx.attr.substitutions,
     )
 
-cluster = rule(
+k8s_cluster = rule(
     implementation = _cluster_impl,
     attrs = {
       "cluster": attr.string(),

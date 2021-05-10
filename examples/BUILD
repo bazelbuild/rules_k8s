@@ -13,6 +13,8 @@
 # limitations under the License.
 
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_library")
+load("@io_bazel_rules_k8s//k8s:cluster.bzl", "k8s_cluster")
+load("@io_bazel_rules_k8s//k8s:clusters.bzl", "k8s_clusters")
 load("@subpar//:subpar.bzl", "par_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -34,4 +36,35 @@ par_binary(
     srcs = ["e2e_gc.py"],
     main = "e2e_gc.py",
     python_version = "PY3",
+)
+
+k8s_clusters(
+    name = "clusters",
+    clusters = [
+      ":gke_rules-k8s_us-central1-f_testing",
+      ":minikube",
+    ],
+)
+
+k8s_cluster(
+    name = "gke_rules-k8s_us-central1-f_testing",
+    cluster = "gke_rules-k8s_us-central1-f_testing",
+    context = "gke_rules-k8s_us-central1-f_testing",
+    kubeconfig = ":kubeconfig",
+    image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
+)
+
+k8s_cluster(
+    name = "minikube",
+    cluster = "minikube",
+    context = "minikube",
+    image_chroot = "localhost:5000/rules_k8s",
+)
+
+# Generate an empty kubeconfig for testing
+genrule(
+    name = "kubeconfig",
+    srcs = [],
+    outs = ["kubeconfig.out"],
+    cmd = "touch $@",
 )
