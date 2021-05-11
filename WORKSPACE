@@ -105,8 +105,8 @@ load(
 
 container_pull(
     name = "bazel_image",
-    registry = "launcher.gcr.io",
-    repository = "google/bazel",
+    registry = "gcr.io",
+    repository = "bazel-public/debian10-java11",
 )
 
 container_pull(
