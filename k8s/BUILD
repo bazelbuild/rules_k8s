@@ -13,11 +13,12 @@
 # limitations under the License.
 
 load("@subpar//:subpar.bzl", "par_binary")
+load(":flags.bzl", "cluster_flag")
 
-load (":flags.bzl", "cluster_flag", "namespace_flag")
-cluster_flag(name = "cluster_flag", build_setting_default = "minikube")
-namespace_flag(name = "namespace_flag", build_setting_default = "default")
-
+cluster_flag(
+    name = "cluster_flag",
+    build_setting_default = "minikube",
+)
 
 package(default_visibility = ["//visibility:public"])
 

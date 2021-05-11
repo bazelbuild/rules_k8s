@@ -26,25 +26,14 @@ load(
     "@io_bazel_rules_docker//skylib:path.bzl",
     _get_runfile_path = "runfile",
 )
-
-load (
-  ":flags.bzl",
-  "cluster_flag",
-  "namespace_flag",
-  "ClusterFlagProvider",
-  "NamespaceFlagProvider",
+load(
+    ":flags.bzl",
+    "ClusterFlagInfo",
 )
-load (
-  ":cluster.bzl",
-  "k8s_cluster",
-  "ClusterProvider",
+load(
+    ":cluster.bzl",
+    "ClusterInfo",
 )
-load (
-  ":clusters.bzl",
-  "k8s_clusters",
-  "ClustersProvider",
-)
-
 
 def _runfiles(ctx, f):
     return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
@@ -52,7 +41,7 @@ def _runfiles(ctx, f):
 def _deduplicate(iterable):
     """Performs a deduplication (similar to `list(set(...))`)
 
-    This is necessary because `set` is not available in Skylark.
+    This is necessary because `set` is not available in starlark.
     """
     return {k: None for k in iterable}.keys()
 
@@ -125,18 +114,18 @@ def _impl(ctx):
     stamp_args = " ".join(["--stamp-info-file=%s" % _runfiles(ctx, f) for f in stamp_inputs])
     all_inputs.extend(stamp_inputs)
 
-    image_chroot_arg = ctx.attr.clusters[ClusterAspectProvider].image_chroot
+    image_chroot_arg = ctx.attr.clusters[ClusterAspectInfo].image_chroot
     image_chroot_arg = ctx.expand_make_variables("image_chroot", image_chroot_arg, {})
-    if "{" in ctx.attr.clusters[ClusterAspectProvider].image_chroot:
+    if "{" in ctx.attr.clusters[ClusterAspectInfo].image_chroot:
         image_chroot_file = ctx.actions.declare_file(ctx.label.name + ".image-chroot-name")
-        _resolve(ctx, ctx.attr.clusters[ClusterAspectProvider].image_chroot, image_chroot_file)
+        _resolve(ctx, ctx.attr.clusters[ClusterAspectInfo].image_chroot, image_chroot_file)
         image_chroot_arg = "$(cat %s)" % _runfiles(ctx, image_chroot_file)
         all_inputs.append(image_chroot_file)
 
     substitutions_file = ctx.actions.declare_file(ctx.label.name + ".substitutions.json")
     _substitutions = {}
     _substitutions.update(ctx.attr.substitutions)
-    _substitutions.update(ctx.attr.clusters[ClusterAspectProvider].substitutions)
+    _substitutions.update(ctx.attr.clusters[ClusterAspectInfo].substitutions)
     ctx.actions.write(
         output = substitutions_file,
         content = struct(
@@ -146,7 +135,7 @@ def _impl(ctx):
             },
         ).to_json(),
     )
-    all_inputs += [substitutions_file]
+    all_inputs.append(substitutions_file)
 
     ctx.actions.expand_template(
         template = ctx.file._template,
@@ -197,21 +186,21 @@ def _resolve(ctx, string, output):
 def _common_impl(ctx):
     files = [ctx.executable.resolver]
 
-    cluster_arg = ctx.attr.clusters[ClusterAspectProvider].cluster
+    cluster_arg = ctx.attr.clusters[ClusterAspectInfo].cluster
     cluster_arg = ctx.expand_make_variables("cluster", cluster_arg, {})
-    if "{" in ctx.attr.clusters[ClusterAspectProvider].cluster:
+    if "{" in ctx.attr.clusters[ClusterAspectInfo].cluster:
         cluster_file = ctx.actions.declare_file(ctx.label.name + ".cluster-name")
-        _resolve(ctx, ctx.attr.clusters[ClusterAspectProvider].cluster, cluster_file)
+        _resolve(ctx, ctx.attr.clusters[ClusterAspectInfo].cluster, cluster_file)
         cluster_arg = "$(cat %s)" % _runfiles(ctx, cluster_file)
         files.append(cluster_file)
 
-    context_arg = ctx.attr.clusters[ClusterAspectProvider].context
+    context_arg = ctx.attr.clusters[ClusterAspectInfo].context
     if context_arg == "":
-      context_arg = ctx.attr.clusters[ClusterAspectProvider].cluster
+        context_arg = ctx.attr.clusters[ClusterAspectInfo].cluster
     context_arg = ctx.expand_make_variables("context", context_arg, {})
-    if "{" in ctx.attr.clusters[ClusterAspectProvider].context:
+    if "{" in ctx.attr.clusters[ClusterAspectInfo].context:
         context_file = ctx.actions.declare_file(ctx.label.name + ".context-name")
-        _resolve(ctx, ctx.attr.clusters[ClusterAspectProvider].context, context_file)
+        _resolve(ctx, ctx.attr.clusters[ClusterAspectInfo].context, context_file)
         context_arg = "$(cat %s)" % _runfiles(ctx, context_file)
         files.append(context_file)
 
@@ -223,9 +212,9 @@ def _common_impl(ctx):
         user_arg = "$(cat %s)" % _runfiles(ctx, user_file)
         files.append(user_file)
 
-    namespace_arg = ctx.attr.namespace[NamespaceFlagProvider].namespace
+    namespace_arg = ctx.attr.namespace
     namespace_arg = ctx.expand_make_variables("namespace", namespace_arg, {})
-    if "{" in ctx.attr.namespace[NamespaceFlagProvider].namespace:
+    if "{" in ctx.attr.namespace:
         namespace_file = ctx.actions.declare_file(ctx.label.name + ".namespace-name")
         _resolve(ctx, ctx.attr.namespace, namespace_file)
         namespace_arg = "$(cat %s)" % _runfiles(ctx, namespace_file)
@@ -234,9 +223,9 @@ def _common_impl(ctx):
     if namespace_arg:
         namespace_arg = "--namespace=\"" + namespace_arg + "\""
 
-    if ctx.attr.clusters[ClusterAspectProvider].kubeconfig:
-        kubeconfig_arg = _runfiles(ctx, ctx.attr.clusters[ClusterAspectProvider].kubeconfig.files.to_list()[0])
-        files.append(ctx.attr.clusters[ClusterAspectProvider].kubeconfig.files.to_list()[0])
+    if ctx.attr.clusters[ClusterAspectInfo].kubeconfig:
+        kubeconfig_arg = _runfiles(ctx, ctx.attr.clusters[ClusterAspectInfo].kubeconfig.files.to_list()[0])
+        files.append(ctx.attr.clusters[ClusterAspectInfo].kubeconfig.files.to_list()[0])
     else:
         kubeconfig_arg = ""
 
@@ -292,7 +281,7 @@ def _common_impl(ctx):
         ),
     ]
 
-ClusterAspectProvider = provider(fields = ['cluster', 'image_chroot', 'context', 'kubeconfig', 'substitutions'])
+ClusterAspectInfo = provider("Provides information from all of the listed clusters", fields = ["cluster", "image_chroot", "context", "kubeconfig", "substitutions"])
 
 def _aspect_impl(target, ctx):
     cluster_aspect = None
@@ -300,27 +289,28 @@ def _aspect_impl(target, ctx):
     image_chroot_aspect = None
     kubeconfig_aspect = None
     substitutions_aspect = {}
-    if hasattr(ctx.rule.attr, 'clusters'):
+    if hasattr(ctx.rule.attr, "clusters"):
         for cluster in ctx.rule.attr.clusters:
-          if cluster[ClusterProvider].name == ctx.attr._cluster[ClusterFlagProvider].cluster:
-            cluster_aspect = cluster[ClusterProvider].cluster
-            image_chroot_aspect = cluster[ClusterProvider].image_chroot
-            context_aspect = cluster[ClusterProvider].context
-            kubeconfig_aspect = cluster[ClusterProvider].kubeconfig
-            substitutions_aspect = cluster[ClusterProvider].substitutions
-    return [ClusterAspectProvider(
-              cluster = cluster_aspect,
-              image_chroot = image_chroot_aspect,
-              context = context_aspect,
-              kubeconfig = kubeconfig_aspect,
-              substitutions = substitutions_aspect)]
+            if cluster[ClusterInfo].name == ctx.attr._cluster[ClusterFlagInfo].cluster:
+                cluster_aspect = cluster[ClusterInfo].cluster
+                image_chroot_aspect = cluster[ClusterInfo].image_chroot
+                context_aspect = cluster[ClusterInfo].context
+                kubeconfig_aspect = cluster[ClusterInfo].kubeconfig
+                substitutions_aspect = cluster[ClusterInfo].substitutions
+    return [ClusterAspectInfo(
+        cluster = cluster_aspect,
+        image_chroot = image_chroot_aspect,
+        context = context_aspect,
+        kubeconfig = kubeconfig_aspect,
+        substitutions = substitutions_aspect,
+    )]
 
 _k8s_cluster_aspect = aspect(
     implementation = _aspect_impl,
     attr_aspects = ["clusters"],
     attrs = {
-      "_cluster": attr.label(default = ":cluster_flag")
-    }
+        "_cluster": attr.label(default = ":cluster_flag"),
+    },
 )
 
 _common_attrs = {
@@ -329,7 +319,7 @@ _common_attrs = {
     "clusters": attr.label(aspects = [_k8s_cluster_aspect]),
     # This is only needed for describe.
     "kind": attr.string(),
-    "namespace": attr.label(default = ":namespace_flag"),
+    "namespace": attr.string(),
     "resolver": attr.label(
         default = Label("//k8s/go/cmd/resolver"),
         cfg = "host",
@@ -564,7 +554,7 @@ def k8s_object(name, **kwargs):
     _k8s_object(name = name + ".resolve", **resolve_args)
 
     # Need to rework this logic to enable the check again
-    # if kwargs["clusters"][ClusterAspectProvider].cluster != None or kwargs["clusters"][ClusterAspectProvider].context != None:
+    # if kwargs["clusters"][ClusterAspectInfo].cluster != None or kwargs["clusters"][ClusterAspectInfo].context != None:
     _k8s_object_create(
         name = name + ".create",
         resolved = name,

@@ -41,8 +41,8 @@ par_binary(
 k8s_clusters(
     name = "clusters",
     clusters = [
-      ":gke_rules-k8s_us-central1-f_testing",
-      ":minikube",
+        ":gke_rules-k8s_us-central1-f_testing",
+        ":minikube",
     ],
 )
 
@@ -50,8 +50,8 @@ k8s_cluster(
     name = "gke_rules-k8s_us-central1-f_testing",
     cluster = "gke_rules-k8s_us-central1-f_testing",
     context = "gke_rules-k8s_us-central1-f_testing",
-    kubeconfig = ":kubeconfig",
     image_chroot = "us.gcr.io/rules_k8s/{BUILD_USER}",
+    kubeconfig = ":kubeconfig",
 )
 
 k8s_cluster(

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@io_bazel_rules_k8s//k8s:object.bzl", "k8s_object")
+load("@k8s_object//:defaults.bzl", "k8s_object")
 
 package(default_visibility = ["//visibility:public"])
 
