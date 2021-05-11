@@ -130,15 +130,15 @@ _NAMESPACE = "{STABLE_E2E_NAMESPACE}"
 
 k8s_defaults(
     name = "k8s_object",
-    namespace = _NAMESPACE,
     clusters = "//examples:clusters",
+    namespace = _NAMESPACE,
 )
 
 k8s_defaults(
     name = "k8s_deploy",
+    clusters = "//examples:clusters",
     kind = "deployment",
     namespace = _NAMESPACE,
-    clusters = "//examples:clusters",
 )
 
 [k8s_defaults(

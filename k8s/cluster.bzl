@@ -28,8 +28,8 @@ k8s_cluster = rule(
     implementation = _cluster_impl,
     attrs = {
         "cluster": attr.string(),
-        "image_chroot": attr.string(),
         "context": attr.string(),
+        "image_chroot": attr.string(),
         "kubeconfig": attr.label(
             allow_single_file = True,
         ),

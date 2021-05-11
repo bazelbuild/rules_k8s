@@ -15,12 +15,12 @@
 load("@subpar//:subpar.bzl", "par_binary")
 load(":flags.bzl", "cluster_flag")
 
+package(default_visibility = ["//visibility:public"])
+
 cluster_flag(
     name = "cluster_flag",
     build_setting_default = "minikube",
 )
-
-package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 

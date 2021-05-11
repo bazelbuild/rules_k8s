@@ -17,7 +17,7 @@
 ARG NEW_VERSION
 ARG OLD_VERSION
 FROM launcher.gcr.io/google/bazel:${OLD_VERSION} as old
-FROM launcher.gcr.io/google/bazel:${NEW_VERSION}
+FROM gcr.io/bazel-public/debian10-java11
 # Based off github.com/kubernetes/test-infra/images/bazelbuild
 LABEL maintainer="fejta@google.com"
 

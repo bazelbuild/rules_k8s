@@ -27,12 +27,12 @@ load(
     _get_runfile_path = "runfile",
 )
 load(
-    ":flags.bzl",
-    "ClusterFlagInfo",
-)
-load(
     ":cluster.bzl",
     "ClusterInfo",
+)
+load(
+    ":flags.bzl",
+    "ClusterFlagInfo",
 )
 
 def _runfiles(ctx, f):
