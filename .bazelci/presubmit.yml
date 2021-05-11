@@ -44,7 +44,7 @@ platforms:
     - "--verbose_failures"
   min_supported_version:
     name: "Minimum Supported Version"
-    bazel: "2.2.0"
+    bazel: "4.0.0"
     platform: ubuntu1804
     build_targets:
     - "--"

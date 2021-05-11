@@ -38,8 +38,8 @@ steps:
 
 substitutions:
   _IMG: gcr.io/${PROJECT_ID}/gcloud-bazel
-  _NEW_VERSION: 3.0.0
-  _OLD_VERSION: 2.2.0
+  _NEW_VERSION: 4.0.0
+  _OLD_VERSION: 3.5.0
 
 images:
 - ${_IMG}:latest

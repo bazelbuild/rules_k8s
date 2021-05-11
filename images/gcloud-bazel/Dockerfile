@@ -16,8 +16,7 @@
 
 ARG NEW_VERSION
 ARG OLD_VERSION
-FROM launcher.gcr.io/google/bazel:${OLD_VERSION} as old
-FROM gcr.io/bazel-public/debian10-java11
+FROM launcher.gcr.io/google/bazel:${OLD_VERSION}
 # Based off github.com/kubernetes/test-infra/images/bazelbuild
 LABEL maintainer="fejta@google.com"
 
@@ -45,6 +44,8 @@ RUN apt-get update \
     && apt-get clean \
     && pip install pip setuptools wheel
 
-ARG OLD_VERSION
-COPY --from=old \
-  /usr/local/lib/bazel/bin/bazel-real /usr/local/lib/bazel/bin/bazel-${OLD_VERSION}
+ARG NEW_VERSION
+
+RUN cd "/usr/local/lib/bazel/bin" \
+    && curl -fLO https://releases.bazel.build/${NEW_VERSION}/release/bazel-${NEW_VERSION}-linux-x86_64 \
+    && chmod +x bazel-${NEW_VERSION}-linux-x86_64

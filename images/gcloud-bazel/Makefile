@@ -15,8 +15,8 @@
 PROJECT ?= rules-k8s
 # gcr.io/rule-k8s/gcloud-bazel by default
 IMG = gcr.io/$(PROJECT)/gcloud-bazel
-OLD ?= 3.0.0
-NEW ?= 3.5.0
+OLD ?= 3.5.0
+NEW ?= 4.0.0
 TAG := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
 
 build:
