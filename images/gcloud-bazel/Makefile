@@ -13,14 +13,13 @@
 # limitations under the License.
 
 PROJECT ?= rules-k8s
-# gcr.io/rule-k8s/gcloud-bazel by default
 IMG = gcr.io/$(PROJECT)/gcloud-bazel
-OLD ?= 3.0.0
-NEW ?= 3.5.0
+OLD ?= 3.5.0
+NEW ?= 4.1.0
 TAG := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
 
 build:
-	docker build --pull -t $(IMG):latest-$(USER) .
+	docker build --pull -t $(IMG):latest-$(USER) --build-arg OLD_VERSION=$(OLD) --build-arg NEW_VERSION=$(NEW) .
 
 push:
 	gcloud builds submit \

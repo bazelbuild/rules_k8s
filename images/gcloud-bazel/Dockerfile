@@ -14,12 +14,27 @@
 
 # Ubuntu with bazel, gcloud and its dependencies preinstalled.
 
-ARG NEW_VERSION
-ARG OLD_VERSION
-FROM launcher.gcr.io/google/bazel:${OLD_VERSION} as old
-FROM launcher.gcr.io/google/bazel:${NEW_VERSION}
+FROM ubuntu:18.04
 # Based off github.com/kubernetes/test-infra/images/bazelbuild
 LABEL maintainer="fejta@google.com"
+
+# See https://docs.bazel.build/versions/main/install-ubuntu.html
+RUN apt update \
+    && apt install -y --no-install-recommends \
+       gnupg \
+       ca-certificates
+COPY bazel.pub.gpg bazel.list /
+RUN gpg -o /etc/apt/trusted.gpg.d/bazel.gpg --dearmor /bazel.pub.gpg \
+    && rm /bazel.pub.gpg \
+    && mv /bazel.list /etc/apt/sources.list.d/bazel.list
+
+ARG NEW_VERSION
+ARG OLD_VERSION
+RUN apt update \
+    && apt install -y --no-install-recommends \
+       "bazel-${NEW_VERSION}" \
+       "bazel-${OLD_VERSION}"
+   
 
 # See the following docs:
 # * https://cloud.google.com/sdk/docs/install#deb
@@ -37,14 +52,10 @@ COPY sources.list /etc/apt/sources.list.d/google-cloud-sdk.list
 # * kubectl: needed by rules_k8s
 # * pip setuptools wheel: needed by python rules
 # * python-pip: needed by python rules
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt update \
+    && apt install -y --no-install-recommends \
       google-cloud-sdk \
       kubectl \
       python-pip \
     && apt-get clean \
     && pip install pip setuptools wheel
-
-ARG OLD_VERSION
-COPY --from=old \
-  /usr/local/lib/bazel/bin/bazel-real /usr/local/lib/bazel/bin/bazel-${OLD_VERSION}
