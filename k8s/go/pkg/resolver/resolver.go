@@ -228,7 +228,8 @@ func (r *Resolver) publishSingle(spec imageSpec, stamper *compat.Stamper) (strin
 	if err != nil {
 		return "", fmt.Errorf("unable to determine parts of the image from the specified arguments: %v", err)
 	}
-	img, err := compat.ReadImage(imgParts)
+	cr := compat.Reader{Parts: imgParts}
+	img, err := cr.ReadImage()
 	if err != nil {
 		return "", fmt.Errorf("error reading image: %v", err)
 	}
