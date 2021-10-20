@@ -51,9 +51,9 @@ def k8s_repositories():
         http_archive,
         name = "com_github_yaml_pyyaml",
         build_file_content = _com_github_yaml_pyyaml_build_file,
-        sha256 = "e9df8412ddabc9c21b4437ee138875b95ebb32c25f07f962439e16005152e00e",
-        strip_prefix = "pyyaml-5.1.2",
-        urls = ["https://github.com/yaml/pyyaml/archive/5.1.2.zip"],
+        sha256 = "ab5a9bc8aa7ffb3bd686cc5480c45d919bc2fa011a0623ca359997a1e7a75fbe",
+        strip_prefix = "pyyaml-6.0",
+        urls = ["https://github.com/yaml/pyyaml/archive/6.0.zip"],
     )
 
     # Register the default kubectl toolchain targets for supported platforms
@@ -80,10 +80,10 @@ def k8s_repositories():
     maybe(
         http_archive,
         name = "bazel_gazelle",
-        sha256 = "222e49f034ca7a1d1231422cdb67066b885819885c356673cb1f72f748a3c9d4",
+        sha256 = "de69a09dc70417580aabf20a28619bb3ef60d038470c7cf8442fafcf627c21cb",
         urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.22.3/bazel-gazelle-v0.22.3.tar.gz",
-            "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.22.3/bazel-gazelle-v0.22.3.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.24.0/bazel-gazelle-v0.24.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.24.0/bazel-gazelle-v0.24.0.tar.gz",
         ],
     )
 
@@ -98,9 +98,11 @@ def k8s_repositories():
     maybe(
         http_archive,
         name = "bazel_skylib",
-        sha256 = "7ac0fa88c0c4ad6f5b9ffb5e09ef81e235492c873659e6bb99efb89d11246bcb",
-        strip_prefix = "bazel-skylib-1.0.3",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/archive/1.0.3.tar.gz"],
+        sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+        urls = [
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+        ],
     )
 
     # WORKSPACE target to configure the kubectl tool
