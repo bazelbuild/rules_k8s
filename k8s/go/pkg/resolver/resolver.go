@@ -21,24 +21,26 @@ import (
 
 // Flags defines the flags that rules_k8s may pass to the resolver
 type Flags struct {
-	ImgChroot         string
-	K8sTemplate       string
-	SubstitutionsFile string
-	AllowUnusedImages bool
-	NoPush            bool
-	StampInfoFile     utils.ArrayStringFlags
-	ImgSpecs          utils.ArrayStringFlags
+	ImgChroot           string
+	K8sTemplate         string
+	SubstitutionsFile   string
+	AllowUnusedImages   bool
+	NoPush              bool
+	StampInfoFile       utils.ArrayStringFlags
+	ImgSpecs            utils.ArrayStringFlags
+	IgnoreImagePrefixes utils.ArrayStringFlags
 }
 
 // Commandline flags
 const (
-	FlagImgChroot         = "image_chroot"
-	FlagK8sTemplate       = "template"
-	FlagSubstitutionsFile = "substitutions"
-	FlagAllowUnusedImages = "allow_unused_images"
-	FlagNoPush            = "no_push"
-	FlagImgSpecs          = "image_spec"
-	FlagStampInfoFile     = "stamp-info-file"
+	FlagImgChroot           = "image_chroot"
+	FlagK8sTemplate         = "template"
+	FlagSubstitutionsFile   = "substitutions"
+	FlagAllowUnusedImages   = "allow_unused_images"
+	FlagNoPush              = "no_push"
+	FlagImgSpecs            = "image_spec"
+	FlagStampInfoFile       = "stamp-info-file"
+	FlagIgnoreImagePrefixes = "ignore_image_prefix"
 )
 
 // RegisterFlags will register the resolvers flags with the provided FlagSet.
@@ -54,6 +56,7 @@ func RegisterFlags(flagset *flag.FlagSet) *Flags {
 	flagset.BoolVar(&flags.NoPush, FlagNoPush, false, "Don't push images after resolving digests.")
 	flagset.Var(&flags.ImgSpecs, FlagImgSpecs, "Associative lists of the constitutent elements of a docker image.")
 	flagset.Var(&flags.StampInfoFile, FlagStampInfoFile, "One or more Bazel stamp info files.")
+	flagset.Var(&flags.IgnoreImagePrefixes, FlagIgnoreImagePrefixes, "Image prefixes to skip digest resolution for")
 
 	return &flags
 }
@@ -96,7 +99,7 @@ func (r *Resolver) Resolve() (resolvedTemplate string, err error) {
 	if err != nil {
 		return "", fmt.Errorf("Unable to publish images: %w", err)
 	}
-	resolvedTemplate, err = resolveTemplate(r.flags.K8sTemplate, resolvedImages, unseen, substitutions)
+	resolvedTemplate, err = resolveTemplate(r.flags.K8sTemplate, r.flags.IgnoreImagePrefixes, resolvedImages, unseen, substitutions)
 	if err != nil {
 		return resolvedTemplate, fmt.Errorf("Unable to resolve template file %q: %w", r.flags.K8sTemplate, err)
 	}
@@ -303,6 +306,9 @@ type yamlResolver struct {
 	// numDocs stores the number of documents the resolver worked on when
 	// resolveYAML was called. This is used for testing only.
 	numDocs int
+	// ignoreImagePrefixes is a list of string prefixes that will be ignored
+	// when running digest resolution
+	ignoreImagePrefixes []string
 }
 
 // resolveString resolves a string found in the k8s YAML template by replacing
@@ -319,6 +325,11 @@ type yamlResolver struct {
 func resolveString(r *yamlResolver, s string) (string, error) {
 	if _, ok := r.unseen[s]; ok {
 		delete(r.unseen, s)
+	}
+	for _, p := range r.ignoreImagePrefixes {
+		if strings.HasPrefix(s, p) {
+			return s, nil
+		}
 	}
 	o, ok := r.resolvedImages[s]
 	if ok {
@@ -489,7 +500,7 @@ func (r *yamlResolver) resolveYAML(t io.Reader) ([]byte, error) {
 // set of image names that haven't been seen yet. The given set of unseen images
 // is updated to exclude the image names encountered in the given template. The
 // given substitutions are made in the template.
-func resolveTemplate(templateFile string, resolvedImages map[string]string, unseen map[string]bool, substitutions map[string]string) (string, error) {
+func resolveTemplate(templateFile string, ignoreImagePrefixes []string, resolvedImages map[string]string, unseen map[string]bool, substitutions map[string]string) (string, error) {
 	t, err := ioutil.ReadFile(templateFile)
 	if err != nil {
 		return "", fmt.Errorf("unable to read template file %q: %v", templateFile, err)
@@ -500,9 +511,10 @@ func resolveTemplate(templateFile string, resolvedImages map[string]string, unse
 	}
 
 	r := yamlResolver{
-		resolvedImages: resolvedImages,
-		unseen:         unseen,
-		strResolver:    resolveString,
+		ignoreImagePrefixes: ignoreImagePrefixes,
+		resolvedImages:      resolvedImages,
+		unseen:              unseen,
+		strResolver:         resolveString,
 	}
 
 	resolved, err := r.resolveYAML(bytes.NewReader(t))
