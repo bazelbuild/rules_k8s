@@ -62,7 +62,8 @@ def k8s_repositories():
         "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_amd64_toolchain",
         "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_arm64_toolchain",
         "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_linux_s390x_toolchain",
-        "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_toolchain",
+        "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_amd64_toolchain",
+        "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_osx_arm64_toolchain",
         "@io_bazel_rules_k8s//toolchains/kubectl:kubectl_windows_toolchain",
     )
 
