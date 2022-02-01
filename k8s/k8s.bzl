@@ -51,7 +51,7 @@ def k8s_repositories():
         http_archive,
         name = "com_github_yaml_pyyaml",
         build_file_content = _com_github_yaml_pyyaml_build_file,
-        sha256 = "e9df8412ddabc9c21b4437ee138875b95ebb32c25f07f962439e16005152e00e",
+        sha256 = "ba59d7e97eb131d8f8f52d19cb124bb67772f4c7f4d14cb2919deb885ef8c572",
         strip_prefix = "pyyaml-5.1.2",
         urls = ["https://github.com/yaml/pyyaml/archive/5.1.2.zip"],
     )
