@@ -35,8 +35,8 @@ kubectl_toolchain(
 toolchain(
     name = "kubectl_linux_amd64_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:linux",
-        "@bazel_tools//platforms:x86_64",
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
@@ -45,8 +45,8 @@ toolchain(
 toolchain(
     name = "kubectl_linux_s390x_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:linux",
-        "@bazel_tools//platforms:s390x",
+        "@platforms//os:linux",
+        "@platforms//cpu:s390x",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
@@ -55,8 +55,8 @@ toolchain(
 toolchain(
     name = "kubectl_linux_arm64_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:linux",
-        "@bazel_tools//platforms:aarch64",
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
@@ -65,8 +65,8 @@ toolchain(
 toolchain(
     name = "kubectl_osx_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:osx",
-        "@bazel_tools//platforms:x86_64",
+        "@platforms//os:osx",
+        "@platforms//cpu:x86_64",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
@@ -75,8 +75,8 @@ toolchain(
 toolchain(
     name = "kubectl_windows_toolchain",
     target_compatible_with = [
-        "@bazel_tools//platforms:windows",
-        "@bazel_tools//platforms:x86_64",
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
