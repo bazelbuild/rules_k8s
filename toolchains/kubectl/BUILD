@@ -14,7 +14,7 @@
 
 load(":kubectl_toolchain.bzl", "kubectl_toolchain")
 
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
@@ -63,10 +63,25 @@ toolchain(
 )
 
 toolchain(
-    name = "kubectl_osx_toolchain",
+    name = "kubectl_macos_x86_64_toolchain",
     target_compatible_with = [
-        "@platforms//os:osx",
+        "@platforms//os:macos",
         "@platforms//cpu:x86_64",
+    ],
+    toolchain = "@k8s_config//:toolchain",
+    toolchain_type = ":toolchain_type",
+)
+
+alias(
+    name = "kubectl_osx_toolchain",
+    actual = ":kubectl_macos_x86_64_toolchain",
+)
+
+toolchain(
+    name = "kubectl_macos_arm64_toolchain",
+    target_compatible_with = [
+        "@platforms//os:macos",
+        "@platforms//cpu:arm64",
     ],
     toolchain = "@k8s_config//:toolchain",
     toolchain_type = ":toolchain_type",
