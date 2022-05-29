@@ -58,14 +58,41 @@ func RegisterFlags(flagset *flag.FlagSet) *Flags {
 	return &flags
 }
 
+// Option can be passed to NewResolver to configure the resolver.
+type Option struct {
+	apply func(r *Resolver)
+}
+
 // Resolver performs substitutions and resolves/pushes images
 type Resolver struct {
 	flags *Flags
+
+	// parseTag is called instead of name.NewTag, which allows overriding how image
+	// tags are parsed.
+	parseTag func(name string, opts ...name.Option) (name.Tag, error)
+}
+
+// ParseTagOption specifies a function to be used instead of name.NewTag to parse image tags.
+//
+// This option allows specifying different name.Option values in the call to name.Tag. For
+// example, the default logic for detecting whether a registry name is insecure can be
+// overridden.
+func ParseTagOption(f func(name string, opts ...name.Option) (name.Tag, error)) Option {
+	return Option{
+		func(r *Resolver) { r.parseTag = f },
+	}
 }
 
 // NewResolver takes some Flags and returns a Resolver
-func NewResolver(flags *Flags) *Resolver {
-	return &Resolver{flags: flags}
+func NewResolver(flags *Flags, option ...Option) *Resolver {
+	r := &Resolver{
+		flags:    flags,
+		parseTag: name.NewTag,
+	}
+	for _, o := range option {
+		o.apply(r)
+	}
+	return r
 }
 
 // Resolve will parse the files pointed by the flags and return a resolvedTemplate and error as applicable
@@ -238,13 +265,13 @@ func (r *Resolver) publishSingle(spec imageSpec, stamper *compat.Stamper) (strin
 	var ref name.Reference
 	if r.flags.ImgChroot != "" {
 		n := path.Join(r.flags.ImgChroot, stampedName)
-		t, err := name.NewTag(n, name.WeakValidation)
+		t, err := r.parseTag(n, name.WeakValidation)
 		if err != nil {
 			return "", fmt.Errorf("unable to create a docker tag from stamped name %q: %v", n, err)
 		}
 		ref = t
 	} else {
-		t, err := name.NewTag(stampedName, name.WeakValidation)
+		t, err := r.parseTag(stampedName, name.WeakValidation)
 		if err != nil {
 			return "", fmt.Errorf("unable to create a docker tag from stamped name %q: %v", stampedName, err)
 		}
