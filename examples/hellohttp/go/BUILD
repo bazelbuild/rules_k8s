@@ -28,6 +28,9 @@ go_image(
 
 k8s_deploy(
     name = "staging",
+    args = [
+        "--v=2",
+    ],
     images = {
         "hello-http-image:latest": ":server",
     },

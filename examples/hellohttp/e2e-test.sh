@@ -133,11 +133,11 @@ check_no_images_resolution() {
 check_kubectl_args() {
     # Checks that bazel run <some target> does pick up the args attr and
     # passes it to the execution of the template
-    EXPECT_CONTAINS "$("$bazel" run examples/hellohttp/java:staging.apply 2>/dev/null)" "apply --v=2"
+    EXPECT_CONTAINS "$("$bazel" run examples/hellohttp/go:staging.apply 2>/dev/null)" "apply --v=2"
     # Checks that bazel run <some target> -- <some extra arg> does pass both the
     # args in the attr as well as the <some extra arg> to the execution of the
     # template
-    EXPECT_CONTAINS "$("$bazel" run examples/hellohttp/java:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
+    EXPECT_CONTAINS "$("$bazel" run examples/hellohttp/go:staging.apply -- --v=1 2>/dev/null)" "apply --v=2 --v=1"
 }
 
 logfail() {

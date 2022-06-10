@@ -217,85 +217,9 @@ load("@rules_proto_grpc//go:repositories.bzl", rules_proto_grpc_go_repos = "go_r
 
 rules_proto_grpc_go_repos()
 
-RULES_JVM_EXTERNAL_TAG = "4.2"
-
-RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
-
-http_archive(
-    name = "rules_jvm_external",
-    sha256 = RULES_JVM_EXTERNAL_SHA,
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
-)
-
-load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
-
-rules_jvm_external_deps()
-
-load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
-
-rules_jvm_external_setup()
-
-load("@rules_jvm_external//:defs.bzl", "maven_install")
-
-#maven_install(
-#    artifacts = [
-#        "junit:junit:4.12",
-#        "androidx.test.espresso:espresso-core:3.1.1",
-#        "org.hamcrest:hamcrest-library:1.3",
-#    ],
-#    repositories = [
-#        # Private repositories are supported through HTTP Basic auth
-#        "http://username:password@localhost:8081/artifactory/my-repository",
-#        "https://maven.google.com",
-#        "https://repo1.maven.org/maven2",
-#    ],
-#)
-
-load("@rules_proto_grpc//java:repositories.bzl", rules_proto_grpc_java_repos = "java_repos")
-
-rules_proto_grpc_java_repos()
-
-load(
-    "@io_grpc_grpc_java//:repositories.bzl",
-    "IO_GRPC_GRPC_JAVA_ARTIFACTS",
-    "IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS",
-    "grpc_java_repositories",
-)
-
-#artifacts = [
-#    "com.google.errorprone:error_prone_annotations:2.3.2",
-#],
-#repositories = [
-#    "https://jcenter.bintray.com",
-#    "https://repo1.maven.org/maven2",
-#],
-maven_install(
-    artifacts = IO_GRPC_GRPC_JAVA_ARTIFACTS,
-    generate_compat_repositories = True,
-    override_targets = IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS,
-    repositories = [
-        "https://repo.maven.apache.org/maven2/",
-    ],
-)
-
-load("@maven//:compat.bzl", "compat_repositories")
-
-compat_repositories()
-
-grpc_java_repositories()
-
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
 gazelle_dependencies()
-
-# We use java_image to build a sample service
-load(
-    "@io_bazel_rules_docker//java:image.bzl",
-    _java_image_repos = "repositories",
-)
-
-_java_image_repos()
 
 # We use go_image to build a sample service
 load(
@@ -323,41 +247,6 @@ jsonnet_go_repositories()
 load("@google_jsonnet_go//bazel:deps.bzl", "jsonnet_go_dependencies")
 
 jsonnet_go_dependencies()
-
-http_archive(
-    name = "build_bazel_rules_nodejs",
-    sha256 = "0fad45a9bda7dc1990c47b002fd64f55041ea751fafc00cd34efb96107675778",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.5.0/rules_nodejs-5.5.0.tar.gz"],
-)
-
-load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_dependencies")
-
-build_bazel_rules_nodejs_dependencies()
-
-load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories", "yarn_install")
-
-node_repositories()
-
-# We use nodejs_image to build a sample service
-load(
-    "@io_bazel_rules_docker//nodejs:image.bzl",
-    _nodejs_image_repos = "repositories",
-)
-
-_nodejs_image_repos()
-
-yarn_install(
-    name = "examples_hellohttp_npm",
-    package_json = "//examples/hellohttp/nodejs:package.json",
-    symlink_node_modules = False,
-    yarn_lock = "//examples:yarn.lock",
-)
-
-# error_prone_annotations required by protobuf 3.7.1
-bind(
-    name = "error_prone_annotations",
-    actual = "@maven//:com_google_errorprone_error_prone_annotations",
-)
 
 # gazelle:repo bazel_gazelle
 
