@@ -14,6 +14,7 @@
 
 # In case you only have ipv6, you may need this:
 # https://github.com/bazelbuild/bazel/issues/2486#issuecomment-657932374
+# But this breaks buildkite
 #startup --host_jvm_args=-Djava.net.preferIPv6Addresses=true
 
 build --workspace_status_command=./hack/print-workspace-status.sh
@@ -36,8 +37,6 @@ test --test_output=errors
 # Builds fail on MacOS otherwise
 build --copt=-DGRPC_BAZEL_BUILD
 
-
-
+# Maybe interesting
 # https://github.com/bazelbuild/rules_docker/issues/2016
 # https://github.com/bazelbuild/rules_docker/issues/2078
-# ERICK ERICK ERICK
