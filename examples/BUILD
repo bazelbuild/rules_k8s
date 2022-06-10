@@ -29,9 +29,10 @@ jsonnet_library(
     srcs = ["container.libsonnet"],
 )
 
-par_binary(
+py_binary(
     name = "e2e_gc",
     srcs = ["e2e_gc.py"],
     main = "e2e_gc.py",
     python_version = "PY3",
+    srcs_version = "PY3",
 )

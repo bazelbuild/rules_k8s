@@ -21,9 +21,13 @@ licenses(["notice"])  # Apache 2.0
 
 nodejs_image(
     name = "server",
-    data = [":server.js"],
+    data = [
+      ":server.js",
+      "@examples_hellohttp_npm//:node_modules",
+    ],
     entry_point = "@io_bazel_rules_k8s//examples/hellohttp/nodejs:server.js",
-    node_modules = "@examples_hellohttp_npm//:node_modules",
+    node_repository_name = "nodejs_linux_amd64",
+    include_node_repo_args = False,
 )
 
 k8s_deploy(

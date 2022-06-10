@@ -32,7 +32,7 @@ def deps():
        already.
     """
     go_rules_dependencies()
-    go_register_toolchains()
+    go_register_toolchains("1.18.3")
     gazelle_dependencies()
     rules_docker_repositories()
     rules_docker_go_deps()

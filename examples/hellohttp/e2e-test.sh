@@ -20,7 +20,7 @@ set -o pipefail
 source ./examples/util.sh
 
 validate_args $@
-shift 2
+shift 1
 
 fail() {
     echo "FAILURE: $1"
@@ -50,6 +50,7 @@ apply-lb() {
 check_msg() {
     stop-port-forwarding
     port-forward hello-http-staging 8080
+    kubectl "--namespace=${namespace}" get svc
     local ip=localhost
     local output
     local url="http://$ip:8080"
@@ -186,5 +187,6 @@ main() {
     trap stop-port-forwarding EXIT
 }
 
+command -v curl || fail curl not installed
 main "$@"
 echo "hellohttp: PASS"

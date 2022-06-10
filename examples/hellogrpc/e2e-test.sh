@@ -20,7 +20,7 @@ set -o pipefail
 source ./examples/util.sh
 
 validate_args "$@"
-shift 2
+shift 1
 
 fail() {
     echo "FAILURE: $@"

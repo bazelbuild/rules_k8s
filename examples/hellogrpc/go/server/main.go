@@ -40,7 +40,9 @@ func main() {
 	}
 }
 
-type server struct{}
+type server struct {
+	pb.UnimplementedSimpleServer
+}
 
 func (s *server) Foo(ctx context.Context, req *pb.FooRequest) (*pb.FooReply, error) {
 	return &pb.FooReply{

@@ -28,7 +28,7 @@ class SubstitutionTest(unittest.TestCase):
     stamp variable."""
     k8s_obj = TestData('examples/stamping/substitution_stamping')
     out = subprocess.check_output([k8s_obj])
-    generated = yaml.load(out)
+    generated = yaml.safe_load(out)
 
     self.assertRegexpMatches(
         generated['data']['e2e_namespace'],
@@ -39,7 +39,7 @@ class SubstitutionTest(unittest.TestCase):
     """Tests that the %{key} in the template is substituted with a fixed string."""
     k8s_obj = TestData('examples/stamping/substitution_stamping')
     out = subprocess.check_output([k8s_obj])
-    generated = yaml.load(out)
+    generated = yaml.safe_load(out)
 
     self.assertEqual("bar", generated['data']['foo'])
 

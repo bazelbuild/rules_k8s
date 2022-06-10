@@ -1,1 +1,1 @@
-deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8
+deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8
