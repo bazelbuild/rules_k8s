@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@build_stack_rules_proto//go:go_grpc_library.bzl", "go_grpc_library")
-load("@build_stack_rules_proto//java:java_grpc_library.bzl", "java_grpc_library")
+load("@rules_proto_grpc//go:go_grpc_library.bzl", "go_grpc_library")
+load("@rules_proto_grpc//java:defs.bzl", "java_grpc_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
 
 proto_library(
     name = "simple_proto",
@@ -25,18 +26,12 @@ proto_library(
 java_grpc_library(
     name = "simple_java_grpc",
     visibility = ["//examples/hellogrpc/java:__subpackages__"],
-    deps = [":simple_proto"],
+    protos = [":simple_proto"],
 )
 
 go_grpc_library(
     name = "simple_go_grpc",
-    go_deps = [
-        "@org_golang_google_protobuf//reflect/protoreflect:go_default_library",
-        "@org_golang_google_protobuf//runtime/protoimpl:go_default_library",
-        "@org_golang_google_grpc//codes:go_default_library",
-        "@org_golang_google_grpc//status:go_default_library",
-    ],
     importpath = "github.com/bazelbuild/rules_k8s/examples/hellogrpc/proto/go",
     visibility = ["//examples/hellogrpc/go:__subpackages__"],
-    deps = [":simple_proto"],
+    protos = [":simple_proto"],
 )

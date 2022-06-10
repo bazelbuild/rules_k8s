@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load("@io_bazel_rules_k8s//k8s:object.bzl", "k8s_object")
+load("@py_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -43,8 +44,8 @@ py_test(
     name = "substitution_test",
     srcs = ["substitution_test.py"],
     data = [":substitution_stamping"],
-    python_version = "PY2",
+    python_version = "PY3",
     deps = [
-        "@com_github_yaml_pyyaml//:yaml",
+        requirement("pyyaml"),
     ],
 )

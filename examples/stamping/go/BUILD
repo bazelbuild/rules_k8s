@@ -20,4 +20,7 @@ go_image(
     name = "go-container",
     srcs = ["main.go"],
     importpath = "github.com/bazelbuild/not-my-project/examples/stamping/go",
+    pure = "on",
+    goarch = "amd64",
+    goos = "linux",
 )

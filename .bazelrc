@@ -12,14 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# In case you only have ipv6, you may need this:
+# https://github.com/bazelbuild/bazel/issues/2486#issuecomment-657932374
+#startup --host_jvm_args=-Djava.net.preferIPv6Addresses=true
+
 build --workspace_status_command=./hack/print-workspace-status.sh
 build --verbose_failures
 build --define=TAG=staging
 
 run --workspace_status_command=./hack/print-workspace-status.sh
 
+# https://docs.bazel.build/versions/main/bazel-and-java.html#hermetic-testing-and-compilation
+build --java_runtime_version=remotejdk_11
+run --java_runtime_version=remotejdk_11
+test --java_runtime_version=remotejdk_11
+
+# https://github.com/bazelbuild/rules_jvm_external/issues/445
+build --repo_env=JAVA_HOME=../bazel_tools/jdk
+
 test --test_output=errors
 
 # Taken from https://github.com/grpc/grpc/blob/66b045636018505dfa2654e62003d9596733076b/tools/bazel.rc
 # Builds fail on MacOS otherwise
 build --copt=-DGRPC_BAZEL_BUILD
+
+
+
+# https://github.com/bazelbuild/rules_docker/issues/2016
+# https://github.com/bazelbuild/rules_docker/issues/2078
+# ERICK ERICK ERICK

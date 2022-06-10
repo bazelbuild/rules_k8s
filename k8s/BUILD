@@ -33,6 +33,7 @@ exports_files([
 par_binary(
     name = "stamper",
     srcs = ["stamper.py"],
+    compiler_args = ["--interpreter=bazel_tools/tools/python/py3wrapper.sh"],
     main = "stamper.py",
     python_version = "PY3",
     srcs_version = "PY3",
@@ -42,6 +43,7 @@ par_binary(
 par_binary(
     name = "reverser",
     srcs = ["reverser.py"],
+    compiler_args = ["--interpreter=bazel_tools/tools/python/py3wrapper.sh"],
     main = "reverser.py",
     python_version = "PY3",
     srcs_version = "PY3",

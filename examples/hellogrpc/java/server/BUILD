@@ -25,7 +25,7 @@ java_image(
     main_class = "io.bazel.rules_k8s.examples.helloworld.java.server.HelloServer",
     deps = [
         "//examples/hellogrpc/proto:simple_java_grpc",
-        "@build_stack_rules_proto//java:grpc_netty",
+        #"@build_stack_rules_proto//java:grpc_netty",
     ],
 )
 

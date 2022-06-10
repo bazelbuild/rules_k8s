@@ -20,6 +20,32 @@ load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 # Tell Gazelle to use @io_bazel_rules_docker as the external repository for rules_docker go packages
 # gazelle:repository go_repository name=io_bazel_rules_docker importpath=github.com/bazelbuild/rules_docker
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "rules_python",
+    sha256 = "cdf6b84084aad8f10bf20b46b77cb48d83c319ebe6458a18e9d2cebf57807cdd",
+    strip_prefix = "rules_python-0.8.1",
+    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.8.1.tar.gz",
+)
+
+#load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+#
+#python_register_toolchains(
+#    name = "python3_9",
+#    python_version = "3.9",
+#)
+#
+#load("@python3_9//:defs.bzl", "interpreter")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# ERICK
+#load("@rules_python//python:pip.bzl", "pip_parse")
+#
+#pip_parse(
+#    python_interpreter_target = interpreter,
+#)
+
 k8s_repositories()
 
 load("@io_bazel_rules_docker//repositories:repositories.bzl", _rules_docker_repos = "repositories")
@@ -29,6 +55,18 @@ _rules_docker_repos()
 load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
 
 k8s_go_deps()
+
+http_archive(
+    name = "rules_cc",
+    sha256 = "4dccbfd22c0def164c8f47458bd50e0c7148f3d92002cdb459c2a96a68498241",
+    urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz"],
+)
+
+load("@rules_cc//cc:repositories.bzl", "rules_cc_dependencies", "rules_cc_toolchains")
+
+rules_cc_dependencies()
+
+rules_cc_toolchains()
 
 http_archive(
     name = "com_google_protobuf",
@@ -46,26 +84,16 @@ protobuf_deps()
 # can be removed once other dependencies are updated.
 git_repository(
     name = "subpar",
+    commit = "9fae6b63cfeace2e0fb93c9c1ebdc28d3991b16f",
     remote = "https://github.com/google/subpar.git",
-    tag = "2.0.0",
 )
-
-http_archive(
-    name = "rules_python",
-    sha256 = "778197e26c5fbeb07ac2a2c5ae405b30f6cb7ad1f5510ea6fdac03bded96cc6f",
-    strip_prefix = "rules_python-0.2.0",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.2.0/rules_python-0.2.0.tar.gz",
-)
-
-load("@rules_python//python:repositories.bzl", "py_repositories")
-
-py_repositories()
 
 # Only needed if using the packaging rules.
 load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install(
     name = "py_deps",
+    #python_interpreter_target = interpreter,
     requirements = "//:requirements.txt",
 )
 
@@ -168,32 +196,99 @@ k8s_defaults(
 # rules_python is a transitive dep of build_stack_rules_proto, so place it
 # first if we're going to explicitly mention it at all
 
+# https://rules-proto-grpc.com/en/latest/#installation
 http_archive(
-    name = "build_stack_rules_proto",
-    patch_args = ["-p1"],
-    patches = [
-        "//third_party/build_stack_rules_proto:stackb.patch",
-    ],
-    sha256 = "2c62ecc133ee0400d969750a5591909a9b3839af402f9c9d148cffb0ce9b374b",
-    strip_prefix = "rules_proto-6b334ece48828fb8e45052976d3516f808819ac7",
-    urls = ["https://github.com/stackb/rules_proto/archive/6b334ece48828fb8e45052976d3516f808819ac7.tar.gz"],
+    name = "rules_proto_grpc",
+    sha256 = "507e38c8d95c7efa4f3b1c0595a8e8f139c885cb41a76cab7e20e4e67ae87731",
+    strip_prefix = "rules_proto_grpc-4.1.1",
+    urls = ["https://github.com/rules-proto-grpc/rules_proto_grpc/archive/4.1.1.tar.gz"],
 )
 
-load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
+load("@rules_proto_grpc//:repositories.bzl", "rules_proto_grpc_repos", "rules_proto_grpc_toolchains")
 
-io_grpc_grpc_java()
+rules_proto_grpc_toolchains()
 
-load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
+rules_proto_grpc_repos()
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
+load("@rules_proto_grpc//go:repositories.bzl", rules_proto_grpc_go_repos = "go_repos")
+
+rules_proto_grpc_go_repos()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+RULES_JVM_EXTERNAL_TAG = "4.2"
+
+RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
+
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+)
+
+load("@rules_jvm_external//:repositories.bzl", "rules_jvm_external_deps")
+
+rules_jvm_external_deps()
+
+load("@rules_jvm_external//:setup.bzl", "rules_jvm_external_setup")
+
+rules_jvm_external_setup()
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+#maven_install(
+#    artifacts = [
+#        "junit:junit:4.12",
+#        "androidx.test.espresso:espresso-core:3.1.1",
+#        "org.hamcrest:hamcrest-library:1.3",
+#    ],
+#    repositories = [
+#        # Private repositories are supported through HTTP Basic auth
+#        "http://username:password@localhost:8081/artifactory/my-repository",
+#        "https://maven.google.com",
+#        "https://repo1.maven.org/maven2",
+#    ],
+#)
+
+load("@rules_proto_grpc//java:repositories.bzl", rules_proto_grpc_java_repos = "java_repos")
+
+rules_proto_grpc_java_repos()
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("@io_grpc_grpc_java//:repositories.bzl", "IO_GRPC_GRPC_JAVA_ARTIFACTS", "IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS", "grpc_java_repositories")
+
+#artifacts = [
+#    "com.google.errorprone:error_prone_annotations:2.3.2",
+#],
+#repositories = [
+#    "https://jcenter.bintray.com",
+#    "https://repo1.maven.org/maven2",
+#],
+maven_install(
+    artifacts = IO_GRPC_GRPC_JAVA_ARTIFACTS,
+    generate_compat_repositories = True,
+    override_targets = IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS,
+    repositories = [
+        "https://repo.maven.apache.org/maven2/",
+    ],
+)
+
+load("@maven//:compat.bzl", "compat_repositories")
+
+compat_repositories()
 
 grpc_java_repositories()
 
-load("@build_stack_rules_proto//java:deps.bzl", "java_grpc_library")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 
-java_grpc_library()
-
-load("@build_stack_rules_proto//go:deps.bzl", "go_grpc_library")
-
-go_grpc_library()
+gazelle_dependencies()
 
 # We use java_image to build a sample service
 load(
@@ -211,22 +306,38 @@ load(
 
 _go_image_repos()
 
-git_repository(
+http_archive(
     name = "io_bazel_rules_jsonnet",
-    commit = "12979862ab51358a8a5753f5a4aa0658fec9d4af",
-    remote = "https://github.com/bazelbuild/rules_jsonnet.git",
-    shallow_since = "1574670556 +0100",
+    sha256 = "d20270872ba8d4c108edecc9581e2bb7f320afab71f8caa2f6394b5202e8a2c3",
+    strip_prefix = "rules_jsonnet-0.4.0",
+    urls = ["https://github.com/bazelbuild/rules_jsonnet/archive/0.4.0.tar.gz"],
 )
 
 load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_repositories")
 
 jsonnet_repositories()
 
+load("@google_jsonnet_go//bazel:repositories.bzl", "jsonnet_go_repositories")
+
+jsonnet_go_repositories()
+
+load("@google_jsonnet_go//bazel:deps.bzl", "jsonnet_go_dependencies")
+
+jsonnet_go_dependencies()
+
 http_archive(
     name = "build_bazel_rules_nodejs",
-    sha256 = "9d93d4e1340c43dbf6b2fd66b683d89630a6310bf8be3bf40ec96685dcacc26c",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/2.3.3/rules_nodejs-2.3.3.tar.gz"],
+    sha256 = "0fad45a9bda7dc1990c47b002fd64f55041ea751fafc00cd34efb96107675778",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.5.0/rules_nodejs-5.5.0.tar.gz"],
 )
+
+load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_dependencies")
+
+build_bazel_rules_nodejs_dependencies()
+
+load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories")
+
+node_repositories()
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
@@ -243,26 +354,6 @@ yarn_install(
     package_json = "//examples/hellohttp/nodejs:package.json",
     symlink_node_modules = False,
     yarn_lock = "//examples:yarn.lock",
-)
-
-http_archive(
-    name = "rules_jvm_external",
-    sha256 = "e5b97a31a3e8feed91636f42e19b11c49487b85e5de2f387c999ea14d77c7f45",
-    strip_prefix = "rules_jvm_external-2.9",
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/2.9.zip",
-)
-
-load("@rules_jvm_external//:defs.bzl", "maven_install")
-
-maven_install(
-    name = "maven",
-    artifacts = [
-        "com.google.errorprone:error_prone_annotations:2.3.2",
-    ],
-    repositories = [
-        "https://jcenter.bintray.com",
-        "https://repo1.maven.org/maven2",
-    ],
 )
 
 # error_prone_annotations required by protobuf 3.7.1
