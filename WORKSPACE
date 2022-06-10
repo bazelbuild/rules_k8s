@@ -174,9 +174,9 @@ http_archive(
     patches = [
         "//third_party/build_stack_rules_proto:stackb.patch",
     ],
-    sha256 = "2c62ecc133ee0400d969750a5591909a9b3839af402f9c9d148cffb0ce9b374b",
-    strip_prefix = "rules_proto-6b334ece48828fb8e45052976d3516f808819ac7",
-    urls = ["https://github.com/stackb/rules_proto/archive/6b334ece48828fb8e45052976d3516f808819ac7.tar.gz"],
+    sha256 = "0b95271af1c98ef5b2df073b77b662366f02a40c4d0a4db0a5c249a8e7c96ab6",
+    strip_prefix = "rules_proto-12b7ab45a92958bf33f90a44a10b1a3096fd1c6d",
+    urls = ["https://github.com/stackb/rules_proto/archive/12b7ab45a92958bf33f90a44a10b1a3096fd1c6d.tar.gz"],
 )
 
 load("@build_stack_rules_proto//:deps.bzl", "io_grpc_grpc_java")
