@@ -14,18 +14,11 @@
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_proto_grpc//go:go_grpc_library.bzl", "go_grpc_library")
-load("@rules_proto_grpc//java:defs.bzl", "java_grpc_library")
 
 proto_library(
     name = "simple_proto",
     srcs = ["simple.proto"],
     visibility = ["//visibility:public"],
-)
-
-java_grpc_library(
-    name = "simple_java_grpc",
-    protos = [":simple_proto"],
-    visibility = ["//examples/hellogrpc/java:__subpackages__"],
 )
 
 go_grpc_library(

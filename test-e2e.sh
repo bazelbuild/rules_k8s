@@ -112,8 +112,8 @@ main() {
 }
 
 if [[ $# == 0 ]]; then
-    echo "Usage: $(basename "$0") go [java nodejs]"
-    main go java nodejs
+    echo "Usage: $(basename "$0") <go>"
+    main go
 else
     main "$@"
 fi

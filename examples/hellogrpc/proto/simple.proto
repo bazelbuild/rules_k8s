@@ -1,9 +1,5 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "io.bazel.rules_k8s.examples.helloworld.proto";
-option java_outer_classname = "SimpleProto";
-
 option go_package = "github.com/bazelbuild/rules_k8s/examples/hellogrpc/proto/go";
 
 package proto;
