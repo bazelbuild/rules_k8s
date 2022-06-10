@@ -20,8 +20,6 @@ load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 # Tell Gazelle to use @io_bazel_rules_docker as the external repository for rules_docker go packages
 # gazelle:repository go_repository name=io_bazel_rules_docker importpath=github.com/bazelbuild/rules_docker
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 http_archive(
     name = "rules_python",
     sha256 = "cdf6b84084aad8f10bf20b46b77cb48d83c319ebe6458a18e9d2cebf57807cdd",
@@ -37,7 +35,6 @@ http_archive(
 #)
 #
 #load("@python3_9//:defs.bzl", "interpreter")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # ERICK
 #load("@rules_python//python:pip.bzl", "pip_parse")
@@ -220,8 +217,6 @@ load("@rules_proto_grpc//go:repositories.bzl", rules_proto_grpc_go_repos = "go_r
 
 rules_proto_grpc_go_repos()
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 RULES_JVM_EXTERNAL_TAG = "4.2"
 
 RULES_JVM_EXTERNAL_SHA = "cd1a77b7b02e8e008439ca76fd34f5b07aecb8c752961f9640dea15e9e5ba1ca"
@@ -261,8 +256,12 @@ load("@rules_proto_grpc//java:repositories.bzl", rules_proto_grpc_java_repos = "
 
 rules_proto_grpc_java_repos()
 
-load("@rules_jvm_external//:defs.bzl", "maven_install")
-load("@io_grpc_grpc_java//:repositories.bzl", "IO_GRPC_GRPC_JAVA_ARTIFACTS", "IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS", "grpc_java_repositories")
+load(
+    "@io_grpc_grpc_java//:repositories.bzl",
+    "IO_GRPC_GRPC_JAVA_ARTIFACTS",
+    "IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS",
+    "grpc_java_repositories",
+)
 
 #artifacts = [
 #    "com.google.errorprone:error_prone_annotations:2.3.2",
@@ -286,7 +285,7 @@ compat_repositories()
 
 grpc_java_repositories()
 
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
 gazelle_dependencies()
 
@@ -335,11 +334,9 @@ load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_d
 
 build_bazel_rules_nodejs_dependencies()
 
-load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories")
+load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories", "yarn_install")
 
 node_repositories()
-
-load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
 # We use nodejs_image to build a sample service
 load(
@@ -365,8 +362,6 @@ bind(
 # gazelle:repo bazel_gazelle
 
 # Go dependencies needed for rules_k8s tests only.
-load("@bazel_gazelle//:deps.bzl", "go_repository")
-
 go_repository(
     name = "org_golang_google_grpc",
     importpath = "google.golang.org/grpc",
