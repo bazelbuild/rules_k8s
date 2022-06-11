@@ -12,21 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_library")
-
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
-
-jsonnet_library(
-    name = "deploy_lib",
-    srcs = ["deployment.libsonnet"],
-)
-
-jsonnet_library(
-    name = "container_lib",
-    srcs = ["container.libsonnet"],
-)
 
 py_binary(
     name = "e2e_gc",
