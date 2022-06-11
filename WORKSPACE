@@ -17,16 +17,6 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
-http_archive(
-    name = "com_google_protobuf",
-    strip_prefix = "protobuf-3.20.1",
-    url = "https://github.com/google/protobuf/archive/v3.20.1.tar.gz",
-)
-
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
-protobuf_deps()
-
 # Tell Gazelle to use @io_bazel_rules_docker as the external repository for rules_docker go packages
 # gazelle:repository go_repository name=io_bazel_rules_docker importpath=github.com/bazelbuild/rules_docker
 
@@ -69,31 +59,6 @@ pip_install(
     requirements = "//:requirements.txt",
 )
 
-http_archive(
-    name = "com_github_grpc_grpc",
-    sha256 = "acf247ec3a52edaee5dee28644a4e485c5e5badf46bdb24a80ca1d76cb8f1174",
-    strip_prefix = "grpc-1.37.1",
-    urls = ["https://github.com/grpc/grpc/archive/v1.37.1.tar.gz"],
-)
-
-load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-
-grpc_deps()
-
-load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
-
-grpc_extra_deps()
-
-pip_install(
-    name = "grpc_python_dependencies",
-    requirements = "@com_github_grpc_grpc//:requirements.bazel.txt",
-)
-
-# upb_deps and apple_rules_dependencies are needed for grpc
-load("@upb//bazel:workspace_deps.bzl", "upb_deps")
-
-upb_deps()
-
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
 _CONTEXT = _CLUSTER
@@ -132,33 +97,6 @@ k8s_defaults(
 # ================================================================
 # Imports for examples/
 # ================================================================
-
-# rules_python is a transitive dep of build_stack_rules_proto, so place it
-# first if we're going to explicitly mention it at all
-
-# https://rules-proto-grpc.com/en/latest/#installation
-http_archive(
-    name = "rules_proto_grpc",
-    sha256 = "507e38c8d95c7efa4f3b1c0595a8e8f139c885cb41a76cab7e20e4e67ae87731",
-    strip_prefix = "rules_proto_grpc-4.1.1",
-    urls = ["https://github.com/rules-proto-grpc/rules_proto_grpc/archive/4.1.1.tar.gz"],
-)
-
-load("@rules_proto_grpc//:repositories.bzl", "rules_proto_grpc_repos", "rules_proto_grpc_toolchains")
-
-rules_proto_grpc_toolchains()
-
-rules_proto_grpc_repos()
-
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-
-rules_proto_dependencies()
-
-rules_proto_toolchains()
-
-load("@rules_proto_grpc//go:repositories.bzl", rules_proto_grpc_go_repos = "go_repos")
-
-rules_proto_grpc_go_repos()
 
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
