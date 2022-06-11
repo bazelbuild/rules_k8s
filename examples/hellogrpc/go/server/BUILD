@@ -35,5 +35,5 @@ k8s_deploy(
     images = {
         "us.gcr.io/not-my-project/hello-grpc:staging": ":server",
     },
-    template = "//examples/hellogrpc:deployment.json",
+    template = "//examples/hellogrpc:deployment.yaml",
 )

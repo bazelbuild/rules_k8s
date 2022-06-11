@@ -14,8 +14,18 @@
 workspace(name = "io_bazel_rules_k8s")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
+
+http_archive(
+    name = "com_google_protobuf",
+    strip_prefix = "protobuf-3.20.1",
+    url = "https://github.com/google/protobuf/archive/v3.20.1.tar.gz",
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
 
 # Tell Gazelle to use @io_bazel_rules_docker as the external repository for rules_docker go packages
 # gazelle:repository go_repository name=io_bazel_rules_docker importpath=github.com/bazelbuild/rules_docker
@@ -27,22 +37,6 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.8.1.tar.gz",
 )
 
-#load("@rules_python//python:repositories.bzl", "python_register_toolchains")
-#
-#python_register_toolchains(
-#    name = "python3_9",
-#    python_version = "3.9",
-#)
-#
-#load("@python3_9//:defs.bzl", "interpreter")
-
-# ERICK
-#load("@rules_python//python:pip.bzl", "pip_parse")
-#
-#pip_parse(
-#    python_interpreter_target = interpreter,
-#)
-
 k8s_repositories()
 
 load("@io_bazel_rules_docker//repositories:repositories.bzl", _rules_docker_repos = "repositories")
@@ -53,16 +47,9 @@ load("//k8s:k8s_go_deps.bzl", k8s_go_deps = "deps")
 
 k8s_go_deps()
 
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "0cbdc9adda01f6d2facc65a22a2be5cecefbefe5a09e5382ee8879b522c04441",
-    strip_prefix = "protobuf-3.15.8",
-    url = "https://github.com/google/protobuf/archive/v3.15.8.tar.gz",
-)
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
-protobuf_deps()
+bazel_skylib_workspace()
 
 # Mention subpar directly to ensure we get version 2.0.0,
 # which included fixes for incompatible change flags added in Bazel 0.25. This
@@ -106,38 +93,6 @@ pip_install(
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
 
 upb_deps()
-
-load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
-
-apple_rules_dependencies()
-
-load(
-    "@io_bazel_rules_docker//container:container.bzl",
-    "container_pull",
-)
-
-container_pull(
-    name = "bazel_image",
-    registry = "launcher.gcr.io",
-    repository = "google/bazel",
-)
-
-container_pull(
-    name = "py3_image_base",
-    digest = "sha256:025b77e95e701917434c478e7fd267f3d894db5ca74e5b2362fe37ebe63bbeb0",
-    registry = "gcr.io",
-    repository = "distroless/python3-debian10",
-)
-
-# Gcloud installer
-http_file(
-    name = "gcloud_archive",
-    downloaded_file_path = "google-cloud-sdk.tar.gz",
-    sha256 = "a2205e35b11136004d52d47774762fbec9145bf0bda74ca506f52b71452c570e",
-    urls = [
-        "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-220.0.0-linux-x86_64.tar.gz",
-    ],
-)
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
@@ -216,25 +171,6 @@ load(
 )
 
 _go_image_repos()
-
-http_archive(
-    name = "io_bazel_rules_jsonnet",
-    sha256 = "d20270872ba8d4c108edecc9581e2bb7f320afab71f8caa2f6394b5202e8a2c3",
-    strip_prefix = "rules_jsonnet-0.4.0",
-    urls = ["https://github.com/bazelbuild/rules_jsonnet/archive/0.4.0.tar.gz"],
-)
-
-load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_repositories")
-
-jsonnet_repositories()
-
-load("@google_jsonnet_go//bazel:repositories.bzl", "jsonnet_go_repositories")
-
-jsonnet_go_repositories()
-
-load("@google_jsonnet_go//bazel:deps.bzl", "jsonnet_go_dependencies")
-
-jsonnet_go_dependencies()
 
 # gazelle:repo bazel_gazelle
 

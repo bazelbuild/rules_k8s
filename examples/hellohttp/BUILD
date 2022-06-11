@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@io_bazel_rules_jsonnet//jsonnet:jsonnet.bzl", "jsonnet_to_json")
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
-load("@py_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -28,29 +26,6 @@ k8s_deploy(
 k8s_deploy(
     name = "staging-service",
     template = "service.yaml",
-)
-
-jsonnet_to_json(
-    name = "deployment",
-    src = "deployment.jsonnet",
-    outs = ["deployment.json"],
-    deps = [
-        "//examples:container_lib",
-        "//examples:deploy_lib",
-    ],
-)
-
-# Verify that deployment.json == deployment.yaml
-py_test(
-    name = "deployment_test",
-    srcs = ["deployment_test.py"],
-    data = [
-        ":deployment.json",
-        ":deployment.yaml",
-    ],
-    deps = [
-        requirement("PyYAML"),
-    ],
 )
 
 # This is used by the e2e testing to make sure that we get a clear
