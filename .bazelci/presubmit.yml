@@ -10,22 +10,12 @@ buildifier:
 platforms:
   ubuntu2004: # TODO(fejta): ubuntu2204
     build_targets:
-    - "--"
     - "..."
-    - "-//images/gcloud-bazel:gcloud_push"
-    - "-//images/gcloud-bazel:gcloud_installer"
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud-layer"
     test_targets:
     - "..."
   macos:
     build_targets:
-    - "--"
     - "..."
-    - "-//images/gcloud-bazel:gcloud_push"
-    - "-//images/gcloud-bazel:gcloud_installer"
-    - "-//images/gcloud-bazel:gcloud_install"
-    - "-//images/gcloud-bazel:gcloud-layer"
     build_flags:
     - "--verbose_failures"
     test_targets:

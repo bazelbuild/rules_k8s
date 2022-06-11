@@ -84,7 +84,7 @@ main() {
     ensure-gcloud
 
     # Check that all of our tools and samples build and pass unit test.
-    logfail "$bazel" test -- //... -//images/gcloud-bazel:gcloud_install -//images/gcloud-bazel:gcloud_push
+    logfail "$bazel" test //...
 
     # Run the garbage collection script to delete old namespaces.
     logfail "$bazel" run -- //examples:e2e_gc
