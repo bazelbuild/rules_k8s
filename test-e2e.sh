@@ -100,7 +100,6 @@ main() {
     trap fail EXIT
     local failed=()
     log ./examples/resolver/e2e-test.sh "$E2E_NAMESPACE" "$@" || failed+=(resolver)
-    log ./examples/hellogrpc/e2e-test.sh "$E2E_NAMESPACE" "$@" || failed+=(hellogrpc)
     log ./examples/hellohttp/e2e-test.sh "$E2E_NAMESPACE" "$@" || failed+=(hellohttp)
     if [[ "${#failed[@]}" -gt 0 ]]; then
         echo "FAIL: test-e2e.sh: ${failed[@]}"
