@@ -539,14 +539,7 @@ def k8s_object(name, **kwargs):
         _k8s_object_diff(
             name = name + ".diff",
             resolved = name,
-            kind = kwargs.get("kind"),
-            cluster = kwargs.get("cluster"),
-            context = kwargs.get("context"),
-            kubeconfig = kwargs.get("kubeconfig"),
-            user = kwargs.get("user"),
-            namespace = kwargs.get("namespace"),
-            args = kwargs.get("args"),
-            **implicit_args
+            **common_args
         )
         if "kind" in kwargs:
             _k8s_object_describe(
