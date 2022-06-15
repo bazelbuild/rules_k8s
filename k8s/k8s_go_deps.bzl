@@ -25,14 +25,15 @@ load(
 )
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
-def deps():
+def deps(go_version = "1.18.3"):
     """Import dependencies for Go binaries in rules_k8s.
 
        This macro assumes k8s_repositories in //k8s:k8s.bzl has been called
        already.
     """
     go_rules_dependencies()
-    go_register_toolchains("1.18.3")
+    if go_version:
+        go_register_toolchains(go_version)
     gazelle_dependencies()
     rules_docker_repositories()
     rules_docker_go_deps()
