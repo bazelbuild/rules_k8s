@@ -13,7 +13,6 @@
 # limitations under the License.
 workspace(name = "io_bazel_rules_k8s")
 
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
@@ -40,15 +39,6 @@ k8s_go_deps()
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
-
-# Mention subpar directly to ensure we get version 2.0.0,
-# which included fixes for incompatible change flags added in Bazel 0.25. This
-# can be removed once other dependencies are updated.
-git_repository(
-    name = "subpar",
-    commit = "9fae6b63cfeace2e0fb93c9c1ebdc28d3991b16f",
-    remote = "https://github.com/google/subpar.git",
-)
 
 # Only needed if using the packaging rules.
 load("@rules_python//python:pip.bzl", "pip_install")
