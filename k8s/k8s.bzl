@@ -51,9 +51,9 @@ def k8s_repositories():
         http_archive,
         name = "com_github_yaml_pyyaml",
         build_file_content = _com_github_yaml_pyyaml_build_file,
-        sha256 = "ab5a9bc8aa7ffb3bd686cc5480c45d919bc2fa011a0623ca359997a1e7a75fbe",
-        strip_prefix = "pyyaml-6.0",
-        urls = ["https://github.com/yaml/pyyaml/archive/6.0.zip"],
+        sha256 = "3f11e50a10e70d481fc4c16880a605ee5f955e17eba2673a0bf15f4f40e3f7ef",
+        strip_prefix = "pyyaml-5.4.1",
+        urls = ["https://github.com/yaml/pyyaml/archive/5.4.1.zip"],
     )
 
     # Register the default kubectl toolchain targets for supported platforms
