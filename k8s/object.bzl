@@ -18,14 +18,34 @@ load(
     _get_layers = "get_from_target",
     _layer_tools = "tools",
 )
-load(
-    "@io_bazel_rules_docker//skylib:label.bzl",
-    _string_to_label = "string_to_label",
-)
-load(
-    "@io_bazel_rules_docker//skylib:path.bzl",
-    _get_runfile_path = "runfile",
-)
+
+# Note: could use https://docs.aspect.build/rules/aspect_bazel_lib/docs/paths#to_rlocation_path
+# if we had a dependency on aspect_bazel_lib
+def _get_runfile_path(ctx, f):
+    """Return the runfiles relative path of f."""
+    if ctx.workspace_name:
+        return ctx.workspace_name + "/" + f.short_path
+    else:
+        return f.short_path
+
+# Note: could use https://docs.aspect.build/rules/aspect_bazel_lib/docs/utils#to_label
+# if we had a dependency on aspect_bazel_lib
+def _string_to_label(label_list, string_list):
+    """Return a mapping from label strings to the resolved label.
+
+    Args:
+      label_list: The list of labels
+      string_list: The list of strings
+
+    Returns:
+      A mapping from label strings to the resolved label.
+    """
+    label_string_dict = dict()
+    for i in range(len(label_list)):
+        string = string_list[i]
+        label = label_list[i]
+        label_string_dict[string] = label
+    return label_string_dict
 
 def _runfiles(ctx, f):
     return "${RUNFILES}/%s" % _get_runfile_path(ctx, f)
@@ -33,7 +53,7 @@ def _runfiles(ctx, f):
 def _deduplicate(iterable):
     """Performs a deduplication (similar to `list(set(...))`)
 
-    This is necessary because `set` is not available in Skylark.
+    This is necessary because `set` is not available in Starlark.
     """
     return {k: None for k in iterable}.keys()
 
@@ -124,7 +144,7 @@ def _impl(ctx):
             },
         ).to_json(),
     )
-    all_inputs += [substitutions_file]
+    all_inputs.append(substitutions_file)
 
     ctx.actions.expand_template(
         template = ctx.file._template,
