@@ -1,4 +1,6 @@
-# Bazel Kubernetes Rules
+# (ARCHIVED) Bazel Kubernetes Rules
+
+**This repository is no longer maintained.**
 
 Prow | Bazel CI
 :---: | :---:
