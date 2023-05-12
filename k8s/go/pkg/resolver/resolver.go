@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/bazelbuild/rules_docker/container/go/pkg/compat"
-	"github.com/bazelbuild/rules_docker/container/go/pkg/utils"
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
@@ -26,8 +25,8 @@ type Flags struct {
 	SubstitutionsFile string
 	AllowUnusedImages bool
 	NoPush            bool
-	StampInfoFile     utils.ArrayStringFlags
-	ImgSpecs          utils.ArrayStringFlags
+	StampInfoFile     ArrayStringFlags
+	ImgSpecs          ArrayStringFlags
 }
 
 // Commandline flags
@@ -97,7 +96,7 @@ func NewResolver(flags *Flags, option ...Option) *Resolver {
 
 // Resolve will parse the files pointed by the flags and return a resolvedTemplate and error as applicable
 func (r *Resolver) Resolve() (resolvedTemplate string, err error) {
-	stamper, err := compat.NewStamper(r.flags.StampInfoFile)
+	stamper, err := NewStamper(r.flags.StampInfoFile)
 	if err != nil {
 		return "", fmt.Errorf("Failed to initialize the stamper: %w", err)
 	}
@@ -221,7 +220,7 @@ func parseImageSpec(spec string) (imageSpec, error) {
 // parseSubsitutions parses a substitution file, which should be a JSON object
 // with strings to search for and values to replace them with. The replacement values
 // are stamped using the provided stamper.
-func parseSubstitutions(file string, stamper *compat.Stamper) (map[string]string, error) {
+func parseSubstitutions(file string, stamper *Stamper) (map[string]string, error) {
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read file: %v", err)
@@ -245,7 +244,7 @@ func parseSubstitutions(file string, stamper *compat.Stamper) (map[string]string
 // registry indicated in the image name. The image name is stamped with the
 // given stamper.
 // The stamped image name is returned referenced by its sha256 digest.
-func (r *Resolver) publishSingle(spec imageSpec, stamper *compat.Stamper) (string, error) {
+func (r *Resolver) publishSingle(spec imageSpec, stamper *Stamper) (string, error) {
 	layers, err := spec.layers()
 	if err != nil {
 		return "", fmt.Errorf("unable to convert the layer parts in image spec for %s into a single comma separated argument: %v", spec.name, err)
@@ -297,10 +296,10 @@ func (r *Resolver) publishSingle(spec imageSpec, stamper *compat.Stamper) (strin
 }
 
 // publish publishes the image with the given spec. It returns:
-// 1. A map from the unstamped & tagged image name to the stamped image name
-//    referenced by its sha256 digest.
-// 2. A set of unstamped & tagged image names that were pushed to the registry.
-func (r *Resolver) publish(spec []imageSpec, stamper *compat.Stamper) (map[string]string, map[string]bool, error) {
+//  1. A map from the unstamped & tagged image name to the stamped image name
+//     referenced by its sha256 digest.
+//  2. A set of unstamped & tagged image names that were pushed to the registry.
+func (r *Resolver) publish(spec []imageSpec, stamper *Stamper) (map[string]string, map[string]bool, error) {
 	overrides := make(map[string]string)
 	unseen := make(map[string]bool)
 	for _, s := range spec {
@@ -336,11 +335,12 @@ type yamlResolver struct {
 // a tagged image name with an image name referenced by its sha256 digest. If
 // the given string doesn't represent a tagged image, it is returned as is.
 // The given resolver is also modified:
-// 1. If the given string was a tagged image, the resolved image lookup in the
-//    given resolver is updated to include a mapping from the given string to
-//    the resolved image name.
-// 2. If the given string was a tagged image, the set of unseen images in the
-//    given resolver is updated to exclude the given string.
+//  1. If the given string was a tagged image, the resolved image lookup in the
+//     given resolver is updated to include a mapping from the given string to
+//     the resolved image name.
+//  2. If the given string was a tagged image, the set of unseen images in the
+//     given resolver is updated to exclude the given string.
+//
 // The resolver is best-effort, i.e., if any errors are encountered, the given
 // string is returned as is.
 func resolveString(r *yamlResolver, s string) (string, error) {
