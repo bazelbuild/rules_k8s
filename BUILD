@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,6 +27,13 @@ exports_files([
 gazelle(
     name = "gazelle",
     prefix = "github.com/bazelbuild/rules_k8s",
+)
+
+compile_pip_requirements(
+    name = "pip",
+    extra_args = ["--allow-unsafe"],
+    requirements_in = "//:requirements.txt",
+    requirements_txt = "//:requirements_lock.txt",
 )
 
 # Make Gazelle ignore Go files in the examples directory used in e2e tests.

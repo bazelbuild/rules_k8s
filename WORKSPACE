@@ -21,9 +21,9 @@ load("//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
 
 http_archive(
     name = "rules_python",
-    sha256 = "cdf6b84084aad8f10bf20b46b77cb48d83c319ebe6458a18e9d2cebf57807cdd",
-    strip_prefix = "rules_python-0.8.1",
-    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.8.1.tar.gz",
+    sha256 = "8c8fe44ef0a9afc256d1e75ad5f448bb59b81aba149b8958f02f7b3a98f5d9b4",
+    strip_prefix = "rules_python-0.13.0",
+    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.13.0.tar.gz",
 )
 
 k8s_repositories()
@@ -41,13 +41,18 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
 
 # Only needed if using the packaging rules.
-load("@rules_python//python:pip.bzl", "pip_install")
+load("@rules_python//python:pip.bzl", "pip_parse")
 
-pip_install(
+pip_parse(
     name = "py_deps",
     #python_interpreter_target = interpreter,
-    requirements = "//:requirements.txt",
+    requirements_lock = "//:requirements_lock.txt",
 )
+
+load("@py_deps//:requirements.bzl", k8s_py_deps = "install_deps")
+
+# Call it to define repos for your requirements.
+k8s_py_deps()
 
 _CLUSTER = "gke_rules-k8s_us-central1-f_testing"
 
